@@ -1,0 +1,5 @@
+org\nig\smp\order\OrderCommand.class
+org\nig\smp\order\ChatListener.class
+org\nig\smp\order\Order.class
+org\nig\smp\order\PrivateChatManager.class
+org\nig\smp\order\Config.class

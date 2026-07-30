@@ -1,0 +1,12 @@
+name: order
+version: '${version}'
+
+main: org.nig.smp.order.Order
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  order:
+    description: Система ордеров (заказов)
+    usage: /order <предмет> [количество]
+    aliases: [orders]

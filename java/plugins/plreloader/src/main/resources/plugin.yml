@@ -1,0 +1,16 @@
+name: PLReloader
+version: 1.0.0
+main: com.github.plreloader.PluginReloader
+api-version: 1.13
+
+commands:
+  plreload:
+    description: Управление плагинами (перезагрузка, включение, отключение)
+    usage: /<command> <reload|enable|disable|list> [plugin]
+    aliases: [plr, plreloader]
+    permission: plreloader.admin
+
+permissions:
+  plreloader.admin:
+    description: Доступ ко всем командам PLReloader
+    default: op

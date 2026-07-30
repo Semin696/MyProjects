@@ -1,0 +1,7 @@
+org\nig\smp\groups\expansion\DonationExpansion.class
+org\nig\smp\groups\menu\SettingsMenu.class
+org\nig\smp\groups\config\ConfigManager$DonationLevel.class
+org\nig\smp\groups\commands\AdminCommand.class
+org\nig\smp\groups\commands\DonateCommand.class
+org\nig\smp\groups\config\ConfigManager.class
+org\nig\smp\groups\Groups.class

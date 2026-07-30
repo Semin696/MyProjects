@@ -1,0 +1,17 @@
+name: settings
+version: '${version}'
+
+main: org.nig.smp.settings.Settings
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  settings:
+    description: Открыть меню настроек
+    usage: /<command>
+    aliases: [настройки]
+
+permissions:
+  settings.use:
+    description: Разрешает использование /settings
+    default: true

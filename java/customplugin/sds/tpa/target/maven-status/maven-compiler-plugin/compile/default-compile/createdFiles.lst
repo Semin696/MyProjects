@@ -1,0 +1,8 @@
+org\nig\smp\tpa\TpaRequest$Type.class
+org\nig\smp\tpa\command\TpaCommand$1.class
+org\nig\smp\tpa\command\TpaCommand.class
+org\nig\smp\tpa\listener\PlayerListener.class
+org\nig\smp\tpa\TpaManager.class
+org\nig\smp\tpa\command\RespondCommand.class
+org\nig\smp\tpa\TpaRequest.class
+org\nig\smp\tpa\Tpa.class

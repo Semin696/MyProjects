@@ -1,0 +1,30 @@
+name: HomeSev
+version: '${version}'
+main: org.nig.smp.homeSev.HomeSev
+api-version: '1.21'
+load: POSTWORLD
+
+commands:
+  sethome:
+    description: Save a home location
+    usage: /<command> <name>
+    permission: homesev.sethome
+  home:
+    description: Teleport to a saved home
+    usage: /<command> [name]
+    permission: homesev.home
+  delhome:
+    description: Delete a saved home
+    usage: /<command> <name>
+    permission: homesev.delhome
+
+permissions:
+  homesev.sethome:
+    description: Allows using /sethome
+    default: true
+  homesev.home:
+    description: Allows using /home
+    default: true
+  homesev.delhome:
+    description: Allows using /delhome
+    default: true

@@ -1,0 +1,4 @@
+org\nig\smp\pvp\Pvp.class
+org\nig\smp\pvp\CombatManager.class
+org\nig\smp\pvp\CombatManager$CombatData.class
+org\nig\smp\pvp\Pvp$CombatTimerTask.class

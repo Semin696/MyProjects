@@ -1,0 +1,20 @@
+rtp:
+  min-x: -2000
+  max-x: 2000
+  min-z: -2000
+  max-z: 2000
+  min-y: -64
+  max-y: 320
+  cooldown-seconds: 30
+  use-world-border: false
+  enabled-worlds:
+    - world
+
+messages:
+  prefix: "&8[&c&lmcru&8]"
+  teleporting: "&aТелепортируем в случайное место..."
+  success: "&aВы телепортированы в &e%x% &a/ &e%z%"
+  cooldown: "&cПодождите ещё &e%time% &cсек. перед следующим /rtp"
+  no-permission: "&cУ вас нет прав на эту команду"
+  world-disabled: "&cВ этом мире /rtp отключён"
+  safe-location-not-found: "&cНе удалось найти безопасное место. Попробуйте снова"

@@ -1,0 +1,21 @@
+# ПВП режим — настройки
+
+# Время боя в секундах
+combat-duration: 60
+
+# BossBar
+bossbar:
+  title: "&c&l⚔ ПВП РЕЖИМ &f{time}"
+  color: RED
+  style: SOLID
+
+# Scoreboard (сайдбар)
+scoreboard:
+  title: "&c&l⚔ ПВП РЕЖИМ"
+  lines:
+    - "&7▬▬▬▬▬▬▬▬▬▬"
+    - "&eНик: &f{player}"
+    - "&eHP: &c{health} &c❤"
+    - "&7▬▬▬▬▬▬▬▬▬▬"
+    - "&eДо конца: &f{time}"
+    - "&7▬▬▬▬▬▬▬▬▬▬"

@@ -1,0 +1,4 @@
+org\nig\smp\nightfall_motdicon\manager\IconManager.class
+org\nig\smp\nightfall_motdicon\manager\MotdManager.class
+org\nig\smp\nightfall_motdicon\Nightfall_motdicon.class
+org\nig\smp\nightfall_motdicon\listener\MotdListener.class

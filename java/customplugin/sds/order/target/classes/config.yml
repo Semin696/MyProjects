@@ -1,0 +1,14 @@
+prefix: "&8[&с&lmcru&8]"
+
+messages:
+  broadcast: "&e%player% &fхочет купить &a%item%%amount%&f!"
+  offer-sent-buyer: "&e%seller% &fхочет продать вам &a%item%%amount%&f!"
+  offer-sent-seller: "&aВы предложили &e%buyer% &aпродажу &a%item%%amount%"
+  offer-accepted: "&fНачат приватный чат с &e%player%&f. Напишите &c/order stop &fдля выхода."
+  offer-declined: "&c%player% отклонил ваше предложение."
+  chat-ended: "&cПриватный чат с &e%player% &cзавершён."
+  no-chat: "&cУ вас нет активного приватного чата."
+  usage: "&cИспользование: /order <предмет> [количество]"
+  in-chat-order: "&cВы не можете создать ордер, находясь в приватном чате."
+  in-chat-offer: "&cВы не можете сделать предложение, находясь в приватном чате."
+  not-found: "&cИгрок не найден."

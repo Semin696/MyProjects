@@ -1,0 +1,16 @@
+name: team
+version: '${version}'
+
+main: org.nig.smp.team.Team
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  team:
+    description: Управление командами/кланами
+    usage: /team <subcommand>
+
+permissions:
+  team.info.members:
+    description: Просмотр состава команды
+    default: true

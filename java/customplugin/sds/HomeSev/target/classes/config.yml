@@ -1,0 +1,10 @@
+# Default home limits per player
+standard-limit: 2
+command-limit: 1
+
+# Home names that count as "command" (team) homes
+command-home-names:
+  - "командный"
+  - "team"
+  - "base"
+  - "command"

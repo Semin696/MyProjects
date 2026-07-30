@@ -1,0 +1,67 @@
+default-balance: 100.0
+
+mob-categories:
+  bosses:
+    min: 500.0
+    max: 1000.0
+    mobs:
+      - WARDEN
+      - WITHER
+      - ENDER_DRAGON
+      - ELDER_GUARDIAN
+  hostile:
+    min: 10.0
+    max: 20.0
+    mobs:
+      - ZOMBIE
+      - SKELETON
+      - CREEPER
+      - SPIDER
+      - ENDERMAN
+      - BLAZE
+      - WITHER_SKELETON
+      - PIGLIN
+      - WITCH
+      - VINDICATOR
+      - EVOKER
+      - RAVAGER
+      - PILLAGER
+      - GUARDIAN
+      - SLIME
+      - MAGMA_CUBE
+      - GHAST
+      - PHANTOM
+      - DROWNED
+      - HUSK
+      - STRAY
+      - CAVE_SPIDER
+      - SHULKER
+      - BREEZE
+  peaceful:
+    min: 5.0
+    max: 10.0
+    mobs:
+      - COW
+      - PIG
+      - SHEEP
+      - CHICKEN
+      - RABBIT
+      - FOX
+      - WOLF
+      - CAT
+      - HORSE
+      - DONKEY
+      - MULE
+      - LLAMA
+      - PARROT
+      - BEE
+      - GOAT
+      - FROG
+      - AXOLOTL
+      - TURTLE
+      - DOLPHIN
+      - SQUID
+      - GLOW_SQUID
+      - SNIFFER
+      - CAMEL
+      - ARMADILLO

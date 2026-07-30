@@ -1,0 +1,24 @@
+name: spawn
+version: '1.0'
+
+main: org.nig.smp.spawn.Spawn
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  setspawn:
+    description: Set the spawn location
+    usage: /setspawn
+    permission: spawn.setspawn
+  spawn:
+    description: Teleport to spawn
+    usage: /spawn
+    permission: spawn.spawn
+
+permissions:
+  spawn.setspawn:
+    description: Allows using /setspawn
+    default: op
+  spawn.spawn:
+    description: Allows using /spawn
+    default: true

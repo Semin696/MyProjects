@@ -1,0 +1,17 @@
+name: Nightfall_motdicon
+version: '1.0-SNAPSHOT'
+
+main: org.nig.smp.nightfall_motdicon.Nightfall_motdicon
+api-version: '1.21'
+load: POSTWORLD
+
+commands:
+  motdicon:
+    description: Manage MOTD and server icon
+    usage: /<command> reload
+    permission: nightfall_motdicon.admin
+
+permissions:
+  nightfall_motdicon.admin:
+    description: Allows reloading MOTD and icon config
+    default: op

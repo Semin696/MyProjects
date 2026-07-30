@@ -1,0 +1,8 @@
+org\nig\smp\moneys\MoneyCommand.class
+org\nig\smp\moneys\BalanceCommand.class
+org\nig\smp\moneys\MoneyManager.class
+org\nig\smp\moneys\MobKillListener$1.class
+org\nig\smp\moneys\MobKillListener$MobReward.class
+org\nig\smp\moneys\MoneyPlaceholderExpansion.class
+org\nig\smp\moneys\Moneys.class
+org\nig\smp\moneys\MobKillListener.class

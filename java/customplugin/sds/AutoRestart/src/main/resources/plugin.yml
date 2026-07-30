@@ -1,0 +1,16 @@
+name: AutoRestart
+version: '${version}'
+main: org.nig.smp.autoRestart.AutoRestart
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  restart_server:
+    description: Технический рестарт сервера
+    usage: /restart_server
+    permission: autorestart.restart
+
+permissions:
+  autorestart.restart:
+    description: Право на перезапуск сервера
+    default: op

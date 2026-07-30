@@ -1,0 +1,8 @@
+prefix: "&8[&c&lmcru&8]&r"
+
+messages:
+  no-player: "{prefix} &cТолько игроки могут использовать эту команду"
+  no-permission: "{prefix} &cУ вас нет прав"
+  spawn-set: "{prefix} &aТочка спавна установлена"
+  spawn-not-set: "{prefix} &cСпавн не установлен"
+  teleported: "{prefix} &aВы телепортированы на спавн"

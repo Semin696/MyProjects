@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════
+#    🎁 Donations Plugin — Config
+# ═══════════════════════════════════════
+
+settings:
+  # Включить/выключить систему донатов
+  enabled: true
+
+  # Валюта (название)
+  currency: "₽"
+
+  # Сообщения
+  messages:
+    no-permission: "&c❌ У вас нет прав!"
+    invalid-amount: "&c❌ Неверная сумма!"
+    must-be-positive: "&c❌ Сумма должна быть больше 0!"
+    donate-success: "&a✅ Донат на сумму &e{amount} {currency} &aвыдан!"
+    donate-broadcast: "&6⭐ {player} сделал донат на &e{amount} {currency}&6!"
+    config-reloaded: "&a✅ Конфиг перезагружен!"
+    menu-opened: "&a✅ Меню настроек открыто"
+    only-players: "&c❌ Только игроки могут использовать эту команду!"
+
+# ═══════════════════════════════════════
+#    🏅 Уровни донатов (для плейсхолдера)
+# ═══════════════════════════════════════
+# %donations_current% покажет название уровня,
+# permission которого есть у игрока (последний по списку = наивысший)
+
+donations:
+  starter:
+    name: "&a☘ Starter"
+    permission: "donate.starter"
+  premium:
+    name: "&b✦ Premium"
+    permission: "donate.premium"
+  vip:
+    name: "&d✧ VIP"
+    permission: "donate.vip"
+  elite:
+    name: "&6✦ ELITE"
+    permission: "donate.elite"
+  sponsor:
+    name: "&c✧ SPONSOR"
+    permission: "donate.sponsor"

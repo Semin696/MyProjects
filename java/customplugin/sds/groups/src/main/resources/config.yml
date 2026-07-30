@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════
+#    🎁 Donations Plugin — Config
+# ═══════════════════════════════════════
+
+settings:
+  # Включить/выключить систему донатов
+  enabled: true
+
+  # Текст, если у игрока нет доната (для %donations_current%)
+  no-donation-text: "&7Нет"
+
+  # Сообщения
+  messages:
+    no-permission: "&c❌ У вас нет прав!"
+    config-reloaded: "&a✅ Конфиг перезагружен!"
+    menu-opened: "&a✅ Меню настроек открыто"
+    only-players: "&c❌ Только игроки могут использовать эту команду!"
+
+# ═══════════════════════════════════════
+#    🏅 Уровни донатов (для плейсхолдера)
+# ═══════════════════════════════════════
+# %donations_current% покажет название уровня,
+# permission которого есть у игрока (последний по списку = наивысший).
+# * означает, что уровень подходит всем.
+# default — базовый уровень, выдаётся при заходе (можно указать permission: "*").
+
+donations:
+  default:
+    name: "&7Игрок"
+    permission: "*"
+  starter:
+    name: "&a☘ Starter"
+    permission: "donate.starter"
+  premium:
+    name: "&b✦ Premium"
+    permission: "donate.premium"
+  vip:
+    name: "&d✧ VIP"
+    permission: "donate.vip"
+  elite:
+    name: "&6✦ ELITE"
+    permission: "donate.elite"
+  sponsor:
+    name: "&c✧ SPONSOR"
+    permission: "donate.sponsor"

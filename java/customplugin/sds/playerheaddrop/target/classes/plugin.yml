@@ -1,0 +1,6 @@
+name: playerheaddrop
+version: '1.0'
+
+main: org.nig.smp.playerheaddrop.Playerheaddrop
+api-version: '1.21.11'
+load: POSTWORLD

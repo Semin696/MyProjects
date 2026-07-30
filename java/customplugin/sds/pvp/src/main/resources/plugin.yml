@@ -1,0 +1,6 @@
+name: pvp
+version: '${version}'
+
+main: org.nig.smp.pvp.Pvp
+api-version: '1.21.11'
+load: POSTWORLD

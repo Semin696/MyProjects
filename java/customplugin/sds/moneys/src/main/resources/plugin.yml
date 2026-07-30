@@ -1,0 +1,36 @@
+name: moneys
+version: '${version}'
+
+main: org.nig.smp.moneys.Moneys
+api-version: '1.21.11'
+load: POSTWORLD
+softdepend: [PlaceholderAPI]
+
+commands:
+  balance:
+    description: "Проверить баланс"
+    usage: "/balance [игрок]"
+    aliases: [bal]
+    permission: moneys.balance
+  money:
+    description: "Управление деньгами"
+    usage: "/money give <игрок> <сумма>"
+    permission: moneys.money.give
+
+permissions:
+  moneys.*:
+    description: "Все права moneys"
+    default: op
+    children:
+      moneys.balance: true
+      moneys.balance.others: true
+      moneys.money.give: true
+  moneys.balance:
+    description: "Использовать /balance"
+    default: true
+  moneys.balance.others:
+    description: "Смотреть баланс других игроков через /balance <ник>"
+    default: true
+  moneys.money.give:
+    description: "Использовать /money give"
+    default: op

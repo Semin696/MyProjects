@@ -1,0 +1,17 @@
+name: rtp
+version: '${version}'
+
+main: org.nig.smp.rtp.Rtp
+api-version: '1.21.11'
+load: POSTWORLD
+
+commands:
+  rtp:
+    description: Random teleportation
+    usage: /<command>
+    permission: rtp.use
+
+permissions:
+  rtp.use:
+    description: Allows using /rtp
+    default: true

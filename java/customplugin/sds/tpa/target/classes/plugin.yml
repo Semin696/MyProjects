@@ -1,0 +1,24 @@
+name: tpa
+version: '1.0-SNAPSHOT'
+
+main: org.nig.smp.tpa.Tpa
+api-version: '1.21'
+load: POSTWORLD
+
+commands:
+  tpa:
+    description: Send teleport request to a player
+    usage: /tpa <player>
+    aliases: []
+  tpahere:
+    description: Ask a player to teleport to you
+    usage: /tpahere <player>
+    aliases: []
+  tpaccept:
+    description: Accept a teleport request
+    usage: /tpaccept
+    aliases: []
+  tpadeny:
+    description: Deny a teleport request
+    usage: /tpadeny
+    aliases: []

@@ -1,0 +1,26 @@
+name: groups
+version: '${version}'
+
+main: org.nig.smp.groups.Groups
+api-version: '1.21.11'
+load: POSTWORLD
+
+softdepend:
+  - LuckPerms
+  - PlaceholderAPI
+
+commands:
+  donate:
+    description: "Управление донатами"
+    usage: "/donate"
+    aliases: [donate, don, дон]
+  donations:
+    description: "Управление донатами (админка)"
+    usage: "/donations [reload]"
+    aliases: [donationsadmin, дон]
+    permission: donate.admin
+
+permissions:
+  donate.admin:
+    description: "Доступ к админ-командам донатов"
+    default: op
