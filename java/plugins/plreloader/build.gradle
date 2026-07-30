@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+group = 'pl.ru'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+processResources {
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand 'version': version
+    }
+}
+
+tasks.register('copyToServer') {
+    doLast {
+        copy {
+            from tasks.jar
+            into file('D:/server/plugins')
+        }
+    }
+}
+
+build.dependsOn copyToServer

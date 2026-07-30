@@ -7,3 +7,10 @@ venv/
 .idea/
 *.log
 .DS_Store
+
+# Java / Gradle
+build/
+.gradle/
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
