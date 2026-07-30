@@ -1,0 +1,19 @@
+name: csp
+version: '${version}'
+main: org.nig.smp.csp.CspPlugin
+api-version: '1.21.11'
+load: POSTWORLD
+author: NightfallRealm
+description: CheatShield Protection - IP ban system
+
+commands:
+  csp:
+    description: Main CSP command
+    usage: /<command> unban <ip|nick>
+    permission: csp.admin
+    aliases: [cheatshield]
+
+permissions:
+  csp.admin:
+    description: Allows using CSP commands
+    default: op

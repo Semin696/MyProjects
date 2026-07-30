@@ -1,0 +1,21 @@
+name: Impers
+version: '${version}'
+main: org.nig.smp.impers.ImpersPlugin
+api-version: '1.21.11'
+load: POSTWORLD
+author: NightfallRealm
+description: Empire territory management plugin
+
+commands:
+  imp:
+    description: Main Impers command
+    usage: /<command> [stick|create <name> <tag>|list|remove <name>]
+    aliases: [impers]
+
+permissions:
+  impers.admin:
+    description: Allows using all Impers commands
+    default: op
+  impers.use:
+    description: Allows using stick and basic commands
+    default: true

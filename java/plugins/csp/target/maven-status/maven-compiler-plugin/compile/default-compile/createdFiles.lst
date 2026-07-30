@@ -1,0 +1,5 @@
+org\nig\smp\csp\listener\PlayerLoginListener.class
+org\nig\smp\csp\manager\BanManager.class
+org\nig\smp\csp\CspPlugin.class
+org\nig\smp\csp\model\BanEntry.class
+org\nig\smp\csp\command\CspCommand.class
