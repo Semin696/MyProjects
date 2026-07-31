@@ -1,20 +1,21 @@
 name: BC
 version: '${version}'
 main: org.nig.smp.bc.BcPlugin
+api-version: '1.21.11'
 author: NightfallRealm
-description: Broadcast plugin for BungeeCord
+description: Broadcast plugin
 
 commands:
   bc:
     description: Send a broadcast
-    usage: /bc <message>
+    usage: /<command> <message>
     aliases: []
   bcmedia:
     description: Send a media-style broadcast
-    usage: /bcmedia <message>
+    usage: /<command> <message>
     aliases: []
 
 permissions:
   mediabc:
-    description: Allows using /bc and /bcmedia
+    description: Allows using /bc with nickname at the end
     default: op

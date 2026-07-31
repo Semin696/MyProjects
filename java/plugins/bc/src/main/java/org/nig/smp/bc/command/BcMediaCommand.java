@@ -1,34 +1,34 @@
 package org.nig.smp.bc.command;
 
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.plugin.Command;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 import org.nig.smp.bc.BcPlugin;
 
-public class BcMediaCommand extends Command {
+public class BcMediaCommand implements CommandExecutor {
 
     private final BcPlugin plugin;
 
     public BcMediaCommand(BcPlugin plugin) {
-        super("bcmedia");
         this.plugin = plugin;
     }
 
     @Override
-    public void execute(CommandSender sender, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(TextComponent.fromLegacyText(plugin.msg("usage-media")));
-            return;
+            sender.sendMessage(plugin.msg("usage-media"));
+            return true;
         }
 
         if (!sender.hasPermission("*")) {
-            sender.sendMessage(TextComponent.fromLegacyText(plugin.msg("no-permission")));
-            return;
+            sender.sendMessage(plugin.msg("no-permission"));
+            return true;
         }
 
         String message = String.join(" ", args);
         String line = plugin.msg("format-media", message);
-        ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(line));
+        plugin.getServer().broadcastMessage(line);
+        return true;
     }
 }

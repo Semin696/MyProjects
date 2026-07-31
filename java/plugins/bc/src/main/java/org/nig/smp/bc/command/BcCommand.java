@@ -1,50 +1,41 @@
 package org.nig.smp.bc.command;
 
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 import org.nig.smp.bc.BcPlugin;
 
-public class BcCommand extends Command {
+public class BcCommand implements CommandExecutor {
 
     private final BcPlugin plugin;
 
     public BcCommand(BcPlugin plugin) {
-        super("bc");
         this.plugin = plugin;
     }
 
     @Override
-    public void execute(CommandSender sender, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(TextComponent.fromLegacyText(plugin.msg("usage")));
-            return;
+            sender.sendMessage(plugin.msg("usage"));
+            return true;
         }
 
         String message = String.join(" ", args);
 
         if (sender.hasPermission("*")) {
             String line = plugin.msg("format-anonymous", message);
-            ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(line));
-            return;
+            plugin.getServer().broadcastMessage(line);
+            return true;
         }
 
-        if (!(sender instanceof ProxiedPlayer)) {
-            sender.sendMessage(TextComponent.fromLegacyText(plugin.msg("no-permission")));
-            return;
+        if (!sender.hasPermission("mediabc")) {
+            sender.sendMessage(plugin.msg("no-permission"));
+            return true;
         }
 
-        ProxiedPlayer player = (ProxiedPlayer) sender;
-        if (!player.hasPermission("mediabc")) {
-            sender.sendMessage(TextComponent.fromLegacyText(plugin.msg("no-permission")));
-            return;
-        }
-
-        String line = plugin.msg("format-named", message, player.getName());
-        for (ProxiedPlayer p : player.getServer().getInfo().getPlayers()) {
-            p.sendMessage(TextComponent.fromLegacyText(line));
-        }
+        String line = plugin.msg("format-named", message, sender.getName());
+        plugin.getServer().broadcastMessage(line);
+        return true;
     }
 }
