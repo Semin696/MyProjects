@@ -24,7 +24,7 @@ public class BcCommand implements CommandExecutor {
         String message = String.join(" ", args);
 
         if (sender.hasPermission("*")) {
-            String line = plugin.msg("format-anonymous", message);
+            String line = plugin.msg("format-anonymous", "message", message);
             plugin.getServer().broadcastMessage(line);
             return true;
         }
@@ -34,7 +34,7 @@ public class BcCommand implements CommandExecutor {
             return true;
         }
 
-        String line = plugin.msg("format-named", message, sender.getName());
+        String line = plugin.msg("format-named", "message", message, "name", sender.getName());
         plugin.getServer().broadcastMessage(line);
         return true;
     }

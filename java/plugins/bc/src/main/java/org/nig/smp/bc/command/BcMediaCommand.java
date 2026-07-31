@@ -27,7 +27,7 @@ public class BcMediaCommand implements CommandExecutor {
         }
 
         String message = String.join(" ", args);
-        String line = plugin.msg("format-media", message);
+        String line = plugin.msg("format-media", "message", message);
         plugin.getServer().broadcastMessage(line);
         return true;
     }
