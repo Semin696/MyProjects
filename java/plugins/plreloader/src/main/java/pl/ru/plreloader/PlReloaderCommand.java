@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class PlReloaderCommand implements CommandExecutor, TabCompleter {
 
-    private static final List<String> SUBCOMMANDS = Arrays.asList("reload", "enable", "disable", "list", "reloadall", "help");
+    private static final List<String> SUBCOMMANDS = Arrays.asList("reload", "enable", "disable", "list", "reloadall", "load", "loadall", "help");
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -31,10 +32,12 @@ public class PlReloaderCommand implements CommandExecutor, TabCompleter {
             case "help": {
                 sender.sendMessage(prefix + ChatColor.AQUA + "=== PlReloader — список команд ===");
                 sender.sendMessage(ChatColor.GOLD + "/plreload reload <плагин>" + ChatColor.GRAY + " — Перезагрузить плагин");
+                sender.sendMessage(ChatColor.GOLD + "/plreload load <файл.jar>" + ChatColor.GRAY + " — Запустить плагин из папки plugins без рестарта");
                 sender.sendMessage(ChatColor.GOLD + "/plreload enable <плагин>" + ChatColor.GRAY + " — Включить плагин");
                 sender.sendMessage(ChatColor.GOLD + "/plreload disable <плагин>" + ChatColor.GRAY + " — Выключить плагин");
                 sender.sendMessage(ChatColor.GOLD + "/plreload list" + ChatColor.GRAY + " — Список плагинов");
                 sender.sendMessage(ChatColor.GOLD + "/plreload reloadall" + ChatColor.GRAY + " — Перезагрузить все плагины");
+                sender.sendMessage(ChatColor.GOLD + "/plreload loadall" + ChatColor.GRAY + " — Запустить/обновить все плагины из папки plugins");
                 return true;
             }
             case "reload": {
@@ -141,6 +144,42 @@ public class PlReloaderCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(prefix + ChatColor.GREEN + "Перезагружено плагинов: " + count);
                 return true;
             }
+            case "load": {
+                if (!sender.hasPermission("plreloader.load") && !sender.hasPermission("plreloader.admin") && !sender.hasPermission("plreloader.use")) {
+                    sender.sendMessage(prefix + ChatColor.RED + "У вас нет прав на эту команду.");
+                    return true;
+                }
+                if (args.length < 2) {
+                    sender.sendMessage(prefix + ChatColor.RED + "Укажите имя файла плагина. Пример: /plreload load MyPlugin.jar");
+                    return true;
+                }
+                String fileName = args[1];
+                Plugin loaded = plugin.loadFromFile(fileName);
+                if (loaded == null) {
+                    sender.sendMessage(prefix + ChatColor.RED + "Не удалось загрузить плагин \"" + fileName + "\". Проверьте, что файл лежит в папке plugins.");
+                    return true;
+                }
+                sender.sendMessage(prefix + ChatColor.GREEN + "Плагин \"" + loaded.getName() + "\" успешно запущен!");
+                return true;
+            }
+            case "loadall": {
+                if (!sender.hasPermission("plreloader.loadall") && !sender.hasPermission("plreloader.admin") && !sender.hasPermission("plreloader.use")) {
+                    sender.sendMessage(prefix + ChatColor.RED + "У вас нет прав на эту команду.");
+                    return true;
+                }
+                int before = Bukkit.getPluginManager().getPlugins().length;
+                List<Plugin> loaded = plugin.loadAllNew();
+                int count = loaded.size();
+                if (count == 0) {
+                    sender.sendMessage(prefix + ChatColor.YELLOW + "Новых плагинов не найдено. Все уже загружены.");
+                } else {
+                    for (Plugin p : loaded) {
+                        sender.sendMessage(prefix + ChatColor.GREEN + "Плагин \"" + p.getName() + "\" запущен/обновлён!");
+                    }
+                    sender.sendMessage(prefix + ChatColor.GREEN + "Всего запущено/обновлено плагинов: " + count);
+                }
+                return true;
+            }
             default: {
                 sender.sendMessage(prefix + ChatColor.RED + "Неизвестная подкоманда. Используйте /" + label + " help");
                 return true;
@@ -159,6 +198,18 @@ public class PlReloaderCommand implements CommandExecutor, TabCompleter {
             String partial = args[1].toLowerCase();
             return Arrays.stream(Bukkit.getPluginManager().getPlugins())
                 .map(Plugin::getName)
+                .filter(name -> name.toLowerCase().startsWith(partial))
+                .collect(Collectors.toList());
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("load")) {
+            String partial = args[1].toLowerCase();
+            File pluginsDir = new File("plugins");
+            File[] jars = pluginsDir.listFiles((dir, name) -> name.endsWith(".jar"));
+            if (jars == null) {
+                return new ArrayList<>();
+            }
+            return Arrays.stream(jars)
+                .map(File::getName)
                 .filter(name -> name.toLowerCase().startsWith(partial))
                 .collect(Collectors.toList());
         }

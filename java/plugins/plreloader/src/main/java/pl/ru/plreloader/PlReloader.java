@@ -5,10 +5,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class PlReloader extends JavaPlugin {
 
@@ -77,6 +83,81 @@ public class PlReloader extends JavaPlugin {
         } catch (InvalidPluginException | InvalidDescriptionException e) {
             getLogger().log(Level.WARNING, "Не удалось перезагрузить плагин: " + pluginName, e);
         }
+    }
+
+    private String getPluginNameFromFile(File pluginFile) {
+        try (ZipFile zip = new ZipFile(pluginFile)) {
+            ZipEntry entry = zip.getEntry("plugin.yml");
+            if (entry == null) {
+                return null;
+            }
+            try (InputStream in = zip.getInputStream(entry)) {
+                PluginDescriptionFile desc = new PluginDescriptionFile(in);
+                return desc.getName();
+            }
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Не удалось прочитать plugin.yml из " + pluginFile.getName(), e);
+            return null;
+        }
+    }
+
+    private Plugin loadNewFromFile(File pluginFile) {
+        try {
+            Plugin loaded = Bukkit.getPluginManager().loadPlugin(pluginFile);
+            if (loaded != null) {
+                loaded.onLoad();
+                Bukkit.getPluginManager().enablePlugin(loaded);
+            }
+            return loaded;
+        } catch (InvalidPluginException | InvalidDescriptionException e) {
+            getLogger().log(Level.WARNING, "Не удалось загрузить плагин: " + pluginFile.getName(), e);
+            return null;
+        }
+    }
+
+    public Plugin loadFromFile(String fileName) {
+        File pluginsDir = new File("plugins");
+        File pluginFile = new File(pluginsDir, fileName);
+        if (!pluginFile.exists()) {
+            pluginFile = new File(pluginsDir, fileName + ".jar");
+        }
+        if (!pluginFile.exists()) {
+            return null;
+        }
+
+        String name = getPluginNameFromFile(pluginFile);
+        if (name != null) {
+            Plugin existing = Bukkit.getPluginManager().getPlugin(name);
+            if (existing != null) {
+                Bukkit.getPluginManager().disablePlugin(existing);
+            }
+        }
+
+        return loadNewFromFile(pluginFile);
+    }
+
+    public List<Plugin> loadAllNew() {
+        List<Plugin> loaded = new ArrayList<>();
+        File pluginsDir = new File("plugins");
+        File[] jars = pluginsDir.listFiles((dir, name) -> name.endsWith(".jar"));
+        if (jars == null) {
+            return loaded;
+        }
+        for (File jar : jars) {
+            String name = getPluginNameFromFile(jar);
+            if (name == null) {
+                continue;
+            }
+            Plugin existing = Bukkit.getPluginManager().getPlugin(name);
+            if (existing != null) {
+                Bukkit.getPluginManager().disablePlugin(existing);
+            }
+            Plugin plugin = loadNewFromFile(jar);
+            if (plugin != null) {
+                loaded.add(plugin);
+            }
+        }
+        return loaded;
     }
 
     public void enablePlugin(String pluginName) {

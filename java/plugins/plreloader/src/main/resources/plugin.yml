@@ -30,6 +30,12 @@ permissions:
   plreloader.reloadall:
     description: Разрешает перезагружать все плагины
     default: op
+  plreloader.load:
+    description: Разрешает запускать плагины из папки plugins без рестарта
+    default: op
+  plreloader.loadall:
+    description: Разрешает запускать все плагины из папки plugins
+    default: op
   plreloader.admin:
     description: Все права плагина
     default: op
@@ -40,3 +46,5 @@ permissions:
       plreloader.disable: true
       plreloader.list: true
       plreloader.reloadall: true
+      plreloader.load: true
+      plreloader.loadall: true
