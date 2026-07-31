@@ -1,7 +1,6 @@
 package org.nig.smp.impers.listener;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -56,12 +55,16 @@ public class PlayerListener implements Listener {
 
         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             sel.setPos1(chunkX, chunkZ);
-            player.sendMessage(Component.text("Первая точка: чанк [" + chunkX + ", " + chunkZ + "]", NamedTextColor.GREEN));
+            player.sendMessage(Component.text(plugin.msg("selection-pos1", "x", chunkX, "z", chunkZ)));
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            sel.setPos2(chunkX, chunkZ);
-            player.sendMessage(Component.text("Вторая точка: чанк [" + chunkX + ", " + chunkZ + "]", NamedTextColor.AQUA));
+            int max = plugin.getMaxSelectionSize();
+            boolean capped = sel.setPos2(chunkX, chunkZ, max);
+            player.sendMessage(Component.text(plugin.msg("selection-pos2", "x", sel.getPos2X(), "z", sel.getPos2Z())));
+            if (capped) {
+                player.sendMessage(Component.text(plugin.msg("selection-limit", "max", max)));
+            }
             if (sel.isComplete()) {
-                player.sendMessage(Component.text("Выделено чаunkов: " + sel.getSizeX() + "x" + sel.getSizeZ(), NamedTextColor.YELLOW));
+                player.sendMessage(Component.text(plugin.msg("selection-size", "x", sel.getSizeX(), "z", sel.getSizeZ())));
             }
         }
     }
@@ -81,14 +84,14 @@ public class PlayerListener implements Listener {
         if (fromX == toX && fromZ == toZ) return;
 
         Territory territory = territoryManager.getTerritoryAt(to.getWorld().getName(), toX, toZ);
+        String last = lastTerritoryMessage.get(player.getUniqueId());
         if (territory != null) {
-            String msgKey = territory.getName() + "|" + player.getUniqueId();
-            String lastMsg = lastTerritoryMessage.get(player.getUniqueId());
-            if (!territory.getName().equals(lastMsg)) {
-                player.sendMessage(Component.text("Территория " + territory.getName() + " империи " + territory.getTag(), NamedTextColor.GOLD));
+            if (!territory.getName().equals(last)) {
+                player.sendMessage(Component.text(plugin.msg("enter-territory", "name", territory.getName(), "tag", territory.getTag())));
                 lastTerritoryMessage.put(player.getUniqueId(), territory.getName());
             }
-        } else {
+        } else if (last != null) {
+            player.sendMessage(Component.text(plugin.msg("leave-territory", "name", last)));
             lastTerritoryMessage.remove(player.getUniqueId());
         }
     }
@@ -96,7 +99,10 @@ public class PlayerListener implements Listener {
     public void showSelectionParticles() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             ItemStack item = player.getInventory().getItemInMainHand();
-            if (!isSelectionStick(item)) continue;
+            if (!isSelectionStick(item)) {
+                item = player.getInventory().getItemInOffHand();
+                if (!isSelectionStick(item)) continue;
+            }
 
             ChunkSelection sel = selections.get(player.getUniqueId());
             if (sel == null || !sel.hasPos1()) continue;
@@ -107,22 +113,30 @@ public class PlayerListener implements Listener {
             int minZ = sel.getMinChunkZ() * 16;
             int maxZ = (sel.getMaxChunkZ() + 1) * 16;
 
-            double y = player.getLocation().getY() + 0.5;
+            double baseY = player.getLocation().getY() + 0.5;
 
-            Particle.DustOptions options;
-            if (sel.isComplete()) {
-                options = new Particle.DustOptions(Color.LIME, 1.5f);
-            } else {
-                options = new Particle.DustOptions(Color.YELLOW, 1.5f);
+            Particle.DustOptions border = sel.isComplete()
+                ? new Particle.DustOptions(Color.LIME, 1.2f)
+                : new Particle.DustOptions(Color.YELLOW, 1.2f);
+
+            for (double y : new double[]{baseY, baseY + 8}) {
+                for (int x = minX; x <= maxX; x += 2) {
+                    spawnParticle(world, x + 0.5, y, minZ + 0.5, border);
+                    spawnParticle(world, x + 0.5, y, maxZ + 0.5, border);
+                }
+                for (int z = minZ; z <= maxZ; z += 2) {
+                    spawnParticle(world, minX + 0.5, y, z + 0.5, border);
+                    spawnParticle(world, maxX + 0.5, y, z + 0.5, border);
+                }
             }
 
-            for (int x = minX; x <= maxX; x += 2) {
-                spawnParticle(world, x + 0.5, y, minZ + 0.5, options);
-                spawnParticle(world, x + 0.5, y, maxZ + 0.5, options);
+            if (sel.hasPos1()) {
+                spawnParticle(world, sel.getPos1X() * 16 + 8.5, baseY + 4, sel.getPos1Z() * 16 + 8.5,
+                    new Particle.DustOptions(Color.RED, 1.8f));
             }
-            for (int z = minZ; z <= maxZ; z += 2) {
-                spawnParticle(world, minX + 0.5, y, z + 0.5, options);
-                spawnParticle(world, maxX + 0.5, y, z + 0.5, options);
+            if (sel.hasPos2()) {
+                spawnParticle(world, sel.getPos2X() * 16 + 8.5, baseY + 4, sel.getPos2Z() * 16 + 8.5,
+                    new Particle.DustOptions(Color.AQUA, 1.8f));
             }
         }
     }

@@ -1,5 +1,6 @@
 package org.nig.smp.impers;
 
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.nig.smp.impers.command.ImpersCommand;
 import org.nig.smp.impers.listener.PlayerListener;
@@ -45,5 +46,18 @@ public final class ImpersPlugin extends JavaPlugin {
 
     public TerritoryManager getTerritoryManager() {
         return territoryManager;
+    }
+
+    public int getMaxSelectionSize() {
+        return Math.max(1, getConfig().getInt("max-selection-size", 10));
+    }
+
+    public String msg(String key, Object... placeholders) {
+        String msg = getConfig().getString("messages." + key, "");
+        msg = ChatColor.translateAlternateColorCodes('&', msg);
+        for (int i = 0; i + 1 < placeholders.length; i += 2) {
+            msg = msg.replace("{" + placeholders[i] + "}", String.valueOf(placeholders[i + 1]));
+        }
+        return msg;
     }
 }

@@ -1,1 +1,40 @@
-# Impers configuration
+# ===== Настройки плагина Impers =====
+
+# Максимальный размер выделения в чанках (X x Z)
+max-selection-size: 10
+
+# ===== Сообщения (используйте & для цветов) =====
+# Доступные плейсхолдеры:
+#   {name} - название территории, {tag} - тэг империи
+#   {player} - имя игрока, {x}, {z} - координаты чанка
+#   {world} - мир, {max} - макс. размер выделения
+messages:
+  enter-territory: "&6Территория &e{name} &6империи &e{tag}"
+  leave-territory: "&7Вы покинули территорию &e{name}"
+  selection-pos1: "&aПервая точка: чанк &e[{x}, {z}]"
+  selection-pos2: "&bВторая точка: чанк &e[{x}, {z}]"
+  selection-size: "&eВыделено чанков: &6{x}x{z}"
+  selection-limit: "&cЛимит выделения: &e{max}x{max} &cчанков!"
+  stick-received: "&aВы получили палку выделения империи"
+  territory-created: "&aТерритория &e{name} &aсоздана! Чанков: &e{x}x{z}"
+  territory-exists: "&cТерритория с таким именем уже существует"
+  no-selection: "&cСначала выделите территорию палкой"
+  no-territory: "&cТерритория не найдена"
+  territory-removed: "&aТерритория &e{name} &aудалена"
+  usage: "&cИспользование: /imp [stick|create <название> <тэг>|invite <игрок>|kick <игрок>|list|remove <название>]"
+  usage-create: "&cИспользование: /imp create <название> <тэг>"
+  usage-invite: "&cИспользование: /imp invite <игрок>"
+  usage-kick: "&cИспользование: /imp kick <игрок>"
+  usage-remove: "&cИспользование: /imp remove <название>"
+  list-header: "&6Территории:"
+  list-empty: "&eНет созданных территорий"
+  list-format: "&7- &e{name} &7[{tag}] &8мир: {world} &8чанки: {minX},{minZ} -> {maxX},{maxZ}"
+  not-owner: "&cВы не владеете этой территорией"
+  not-in-territory: "&cВы не находитесь на территории империи"
+  invite-success: "&aИгрок &e{player} &aприглашён на территорию &e{name}"
+  invite-target: "&aВы приглашены в империю &e{tag} &a(территория &e{name}&a)"
+  kick-success: "&aИгрок &e{player} &aисключён из территории &e{name}"
+  kick-target: "&cВы были исключены из территории &e{name}"
+  player-not-member: "&cИгрок не является участником этой территории"
+  cannot-kick-owner: "&cНельзя исключить владельца территории"
+  player-not-found: "&cИгрок не найден"

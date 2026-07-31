@@ -10,6 +10,7 @@ venv/
 
 # Java / Gradle
 build/
+target/
 .gradle/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar

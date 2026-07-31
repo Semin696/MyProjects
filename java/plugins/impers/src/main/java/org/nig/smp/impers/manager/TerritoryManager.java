@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class TerritoryManager {
 
@@ -29,6 +30,7 @@ public class TerritoryManager {
         if (section == null) return;
         for (String key : section.getKeys(false)) {
             ConfigurationSection t = section.getConfigurationSection(key);
+            UUID owner = t.contains("owner") ? UUID.fromString(t.getString("owner")) : null;
             Territory territory = new Territory(
                 t.getString("name"),
                 t.getString("tag"),
@@ -36,8 +38,12 @@ public class TerritoryManager {
                 t.getInt("minChunkX"),
                 t.getInt("minChunkZ"),
                 t.getInt("maxChunkX"),
-                t.getInt("maxChunkZ")
+                t.getInt("maxChunkZ"),
+                owner
             );
+            for (String member : t.getStringList("members")) {
+                territory.addMember(UUID.fromString(member));
+            }
             territories.put(key.toLowerCase(), territory);
         }
         plugin.getLogger().info("Loaded " + territories.size() + " territories");
@@ -54,6 +60,10 @@ public class TerritoryManager {
             config.set(path + ".minChunkZ", t.getMinChunkZ());
             config.set(path + ".maxChunkX", t.getMaxChunkX());
             config.set(path + ".maxChunkZ", t.getMaxChunkZ());
+            if (t.getOwner() != null) {
+                config.set(path + ".owner", t.getOwner().toString());
+            }
+            config.set(path + ".members", t.getMembers().stream().map(UUID::toString).toList());
         }
         try {
             config.save(file);

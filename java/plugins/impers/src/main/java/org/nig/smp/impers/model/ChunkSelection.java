@@ -13,10 +13,21 @@ public class ChunkSelection {
         this.hasPos1 = true;
     }
 
-    public void setPos2(int chunkX, int chunkZ) {
+    public boolean setPos2(int chunkX, int chunkZ, int maxSize) {
         this.x2 = chunkX;
         this.z2 = chunkZ;
         this.hasPos2 = true;
+        boolean capped = false;
+        int limit = Math.max(0, maxSize - 1);
+        if (Math.abs(x2 - x1) > limit) {
+            x2 = x1 + Integer.signum(x2 - x1) * limit;
+            capped = true;
+        }
+        if (Math.abs(z2 - z1) > limit) {
+            z2 = z1 + Integer.signum(z2 - z1) * limit;
+            capped = true;
+        }
+        return capped;
     }
 
     public boolean hasPos1() {

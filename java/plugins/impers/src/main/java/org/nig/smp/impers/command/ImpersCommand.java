@@ -1,7 +1,6 @@
 package org.nig.smp.impers.command;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -46,6 +45,12 @@ public class ImpersCommand implements CommandExecutor {
             case "create" -> {
                 return createTerritory(player, args);
             }
+            case "invite" -> {
+                return invite(player, args);
+            }
+            case "kick" -> {
+                return kick(player, args);
+            }
             case "list" -> {
                 return listTerritories(player);
             }
@@ -53,7 +58,7 @@ public class ImpersCommand implements CommandExecutor {
                 return removeTerritory(player, args);
             }
             default -> {
-                player.sendMessage(Component.text("Usage: /imp [stick|create <name> <tag>|list|remove <name>]", NamedTextColor.RED));
+                player.sendMessage(Component.text(plugin.msg("usage")));
                 return true;
             }
         }
@@ -62,10 +67,10 @@ public class ImpersCommand implements CommandExecutor {
     private boolean giveStick(Player player) {
         ItemStack stick = new ItemStack(Material.STICK);
         ItemMeta meta = stick.getItemMeta();
-        meta.displayName(Component.text("Выделение империи", NamedTextColor.GOLD));
+        meta.displayName(Component.text("Выделение империи", net.kyori.adventure.text.format.NamedTextColor.GOLD));
         meta.lore(java.util.List.of(
-            Component.text("ЛКМ - первая точка", NamedTextColor.GRAY),
-            Component.text("ПКМ - вторая точка", NamedTextColor.GRAY)
+            Component.text("ЛКМ - первая точка", net.kyori.adventure.text.format.NamedTextColor.GRAY),
+            Component.text("ПКМ - вторая точка", net.kyori.adventure.text.format.NamedTextColor.GRAY)
         ));
         meta.getPersistentDataContainer().set(
             new NamespacedKey(plugin, "impers_stick"),
@@ -74,13 +79,13 @@ public class ImpersCommand implements CommandExecutor {
         );
         stick.setItemMeta(meta);
         player.getInventory().addItem(stick);
-        player.sendMessage(Component.text("Вы получили палку выделения империи", NamedTextColor.GREEN));
+        player.sendMessage(Component.text(plugin.msg("stick-received")));
         return true;
     }
 
     private boolean createTerritory(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(Component.text("Usage: /imp create <name> <tag>", NamedTextColor.RED));
+            player.sendMessage(Component.text(plugin.msg("usage-create")));
             return true;
         }
 
@@ -88,54 +93,143 @@ public class ImpersCommand implements CommandExecutor {
         String tag = args[2];
 
         if (territoryManager.exists(name)) {
-            player.sendMessage(Component.text("Территория с таким именем уже существует", NamedTextColor.RED));
+            player.sendMessage(Component.text(plugin.msg("territory-exists")));
             return true;
         }
 
         ChunkSelection sel = selections.get(player.getUniqueId());
         if (sel == null || !sel.isComplete()) {
-            player.sendMessage(Component.text("Сначала выделите территорию палкой", NamedTextColor.RED));
+            player.sendMessage(Component.text(plugin.msg("no-selection")));
             return true;
         }
 
         Territory territory = new Territory(
             name, tag, player.getWorld().getName(),
             sel.getMinChunkX(), sel.getMinChunkZ(),
-            sel.getMaxChunkX(), sel.getMaxChunkZ()
+            sel.getMaxChunkX(), sel.getMaxChunkZ(),
+            player.getUniqueId()
         );
 
         territoryManager.add(territory);
         selections.remove(player.getUniqueId());
 
-        player.sendMessage(Component.text("Территория '" + name + "' создана! Чаunkов: " + sel.getSizeX() + "x" + sel.getSizeZ(), NamedTextColor.GREEN));
+        player.sendMessage(Component.text(plugin.msg("territory-created", "name", name, "x", sel.getSizeX(), "z", sel.getSizeZ())));
         return true;
+    }
+
+    private boolean invite(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage(Component.text(plugin.msg("usage-invite")));
+            return true;
+        }
+
+        Player target = plugin.getServer().getPlayerExact(args[1]);
+        if (target == null) {
+            player.sendMessage(Component.text(plugin.msg("player-not-found")));
+            return true;
+        }
+
+        Territory territory = getTerritoryAtPlayer(player);
+        if (territory == null) {
+            player.sendMessage(Component.text(plugin.msg("not-in-territory")));
+            return true;
+        }
+
+        if (!territory.isOwner(player.getUniqueId())) {
+            player.sendMessage(Component.text(plugin.msg("not-owner")));
+            return true;
+        }
+
+        territory.addMember(target.getUniqueId());
+        territoryManager.save();
+
+        player.sendMessage(Component.text(plugin.msg("invite-success", "player", target.getName(), "name", territory.getName())));
+        target.sendMessage(Component.text(plugin.msg("invite-target", "tag", territory.getTag(), "name", territory.getName())));
+        return true;
+    }
+
+    private boolean kick(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage(Component.text(plugin.msg("usage-kick")));
+            return true;
+        }
+
+        Player target = plugin.getServer().getPlayerExact(args[1]);
+        if (target == null) {
+            player.sendMessage(Component.text(plugin.msg("player-not-found")));
+            return true;
+        }
+
+        Territory territory = getTerritoryAtPlayer(player);
+        if (territory == null) {
+            player.sendMessage(Component.text(plugin.msg("not-in-territory")));
+            return true;
+        }
+
+        if (!territory.isOwner(player.getUniqueId())) {
+            player.sendMessage(Component.text(plugin.msg("not-owner")));
+            return true;
+        }
+
+        if (territory.isOwner(target.getUniqueId())) {
+            player.sendMessage(Component.text(plugin.msg("cannot-kick-owner")));
+            return true;
+        }
+
+        if (!territory.isMember(target.getUniqueId())) {
+            player.sendMessage(Component.text(plugin.msg("player-not-member")));
+            return true;
+        }
+
+        territory.removeMember(target.getUniqueId());
+        territoryManager.save();
+
+        player.sendMessage(Component.text(plugin.msg("kick-success", "player", target.getName(), "name", territory.getName())));
+        target.sendMessage(Component.text(plugin.msg("kick-target", "name", territory.getName())));
+        return true;
+    }
+
+    private Territory getTerritoryAtPlayer(Player player) {
+        return territoryManager.getTerritoryAt(
+            player.getWorld().getName(),
+            player.getLocation().getChunk().getX(),
+            player.getLocation().getChunk().getZ()
+        );
     }
 
     private boolean listTerritories(Player player) {
         java.util.Collection<Territory> all = territoryManager.getAll();
         if (all.isEmpty()) {
-            player.sendMessage(Component.text("Нет созданных территорий", NamedTextColor.YELLOW));
+            player.sendMessage(Component.text(plugin.msg("list-empty")));
             return true;
         }
-        player.sendMessage(Component.text("Территории:", NamedTextColor.GOLD));
+        player.sendMessage(Component.text(plugin.msg("list-header")));
         for (Territory t : all) {
-            player.sendMessage(Component.text(" §7- §e" + t.getName() + " §7[" + t.getTag() + "] §8мир: " + t.getWorld() + " чанки: " + t.getMinChunkX() + "," + t.getMinChunkZ() + " -> " + t.getMaxChunkX() + "," + t.getMaxChunkZ()));
+            player.sendMessage(Component.text(plugin.msg("list-format",
+                "name", t.getName(),
+                "tag", t.getTag(),
+                "world", t.getWorld(),
+                "minX", t.getMinChunkX(),
+                "minZ", t.getMinChunkZ(),
+                "maxX", t.getMaxChunkX(),
+                "maxZ", t.getMaxChunkZ()
+            )));
         }
         return true;
     }
 
     private boolean removeTerritory(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(Component.text("Usage: /imp remove <name>", NamedTextColor.RED));
+            player.sendMessage(Component.text(plugin.msg("usage-remove")));
             return true;
         }
         String name = args[1];
         if (!territoryManager.exists(name)) {
-            player.sendMessage(Component.text("Территория не найдена", NamedTextColor.RED));
+            player.sendMessage(Component.text(plugin.msg("no-territory")));
             return true;
         }
         territoryManager.remove(name);
-        player.sendMessage(Component.text("Территория '" + name + "' удалена", NamedTextColor.GREEN));
+        player.sendMessage(Component.text(plugin.msg("territory-removed", "name", name)));
         return true;
     }
 }
