@@ -19,7 +19,6 @@ public class BanManager {
 
     public void init() {
         try {
-            Class.forName("org.sqlite.JDBC");
             File dbFile = new File(dataFolder, "bans.db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
             try (Statement stmt = connection.createStatement()) {
