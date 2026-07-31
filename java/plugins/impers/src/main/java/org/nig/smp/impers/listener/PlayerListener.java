@@ -26,6 +26,8 @@ import java.util.UUID;
 
 public class PlayerListener implements Listener {
 
+    private static final int GRID_RADIUS = 3;
+
     private final ImpersPlugin plugin;
     private final TerritoryManager territoryManager;
     private final Map<UUID, ChunkSelection> selections;
@@ -105,40 +107,76 @@ public class PlayerListener implements Listener {
             }
 
             ChunkSelection sel = selections.get(player.getUniqueId());
-            if (sel == null || !sel.hasPos1()) continue;
-
             World world = player.getWorld();
-            int minX = sel.getMinChunkX() * 16;
-            int maxX = (sel.getMaxChunkX() + 1) * 16;
-            int minZ = sel.getMinChunkZ() * 16;
-            int maxZ = (sel.getMaxChunkZ() + 1) * 16;
-
             double baseY = player.getLocation().getY() + 0.5;
 
-            Particle.DustOptions border = sel.isComplete()
-                ? new Particle.DustOptions(Color.LIME, 1.2f)
-                : new Particle.DustOptions(Color.YELLOW, 1.2f);
+            drawChunkGrid(world, player.getLocation().getChunk().getX(), player.getLocation().getChunk().getZ(), baseY);
 
-            for (double y : new double[]{baseY, baseY + 8}) {
-                for (int x = minX; x <= maxX; x += 2) {
-                    spawnParticle(world, x + 0.5, y, minZ + 0.5, border);
-                    spawnParticle(world, x + 0.5, y, maxZ + 0.5, border);
-                }
-                for (int z = minZ; z <= maxZ; z += 2) {
-                    spawnParticle(world, minX + 0.5, y, z + 0.5, border);
-                    spawnParticle(world, maxX + 0.5, y, z + 0.5, border);
-                }
-            }
-
-            if (sel.hasPos1()) {
-                spawnParticle(world, sel.getPos1X() * 16 + 8.5, baseY + 4, sel.getPos1Z() * 16 + 8.5,
-                    new Particle.DustOptions(Color.RED, 1.8f));
-            }
-            if (sel.hasPos2()) {
-                spawnParticle(world, sel.getPos2X() * 16 + 8.5, baseY + 4, sel.getPos2Z() * 16 + 8.5,
-                    new Particle.DustOptions(Color.AQUA, 1.8f));
+            if (sel != null && sel.hasPos1()) {
+                drawSelection(world, player, sel, baseY);
             }
         }
+    }
+
+    private void drawChunkGrid(World world, int centerChunkX, int centerChunkZ, double y) {
+        Particle.DustOptions white = new Particle.DustOptions(Color.WHITE, 0.8f);
+        int minX = (centerChunkX - GRID_RADIUS) * 16;
+        int maxX = (centerChunkX + GRID_RADIUS + 1) * 16;
+        int minZ = (centerChunkZ - GRID_RADIUS) * 16;
+        int maxZ = (centerChunkZ + GRID_RADIUS + 1) * 16;
+
+        for (int x = minX; x <= maxX; x += 16) {
+            for (int z = minZ; z <= maxZ; z += 4) {
+                spawnParticle(world, x + 0.5, y, z + 0.5, white);
+            }
+        }
+        for (int z = minZ; z <= maxZ; z += 16) {
+            for (int x = minX; x <= maxX; x += 4) {
+                spawnParticle(world, x + 0.5, y, z + 0.5, white);
+            }
+        }
+    }
+
+    private void drawSelection(World world, Player player, ChunkSelection sel, double y) {
+        Particle.DustOptions color = getSelectionColor(player, sel);
+        int minX = sel.getMinChunkX() * 16;
+        int maxX = (sel.getMaxChunkX() + 1) * 16;
+        int minZ = sel.getMinChunkZ() * 16;
+        int maxZ = (sel.getMaxChunkZ() + 1) * 16;
+
+        for (int x = minX; x <= maxX; x += 2) {
+            spawnParticle(world, x + 0.5, y, minZ + 0.5, color);
+            spawnParticle(world, x + 0.5, y, maxZ + 0.5, color);
+        }
+        for (int z = minZ; z <= maxZ; z += 2) {
+            spawnParticle(world, minX + 0.5, y, z + 0.5, color);
+            spawnParticle(world, maxX + 0.5, y, z + 0.5, color);
+        }
+    }
+
+    private Particle.DustOptions getSelectionColor(Player player, ChunkSelection sel) {
+        String worldName = player.getWorld().getName();
+        boolean enemy = false;
+        boolean friendly = false;
+        for (int cx = sel.getMinChunkX(); cx <= sel.getMaxChunkX(); cx++) {
+            for (int cz = sel.getMinChunkZ(); cz <= sel.getMaxChunkZ(); cz++) {
+                Territory t = territoryManager.getTerritoryAt(worldName, cx, cz);
+                if (t != null) {
+                    if (t.isMember(player.getUniqueId())) {
+                        friendly = true;
+                    } else {
+                        enemy = true;
+                    }
+                }
+            }
+        }
+        if (enemy) {
+            return new Particle.DustOptions(Color.RED, 1.5f);
+        }
+        if (friendly) {
+            return new Particle.DustOptions(Color.GREEN, 1.5f);
+        }
+        return new Particle.DustOptions(Color.ORANGE, 1.5f);
     }
 
     private void spawnParticle(World world, double x, double y, double z, Particle.DustOptions options) {

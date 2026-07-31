@@ -27,7 +27,9 @@ public final class ImpersPlugin extends JavaPlugin {
 
         this.playerListener = new PlayerListener(this, territoryManager, selections);
 
-        getCommand("imp").setExecutor(new ImpersCommand(this, territoryManager, selections));
+        ImpersCommand command = new ImpersCommand(this, territoryManager, selections);
+        getCommand("imp").setExecutor(command);
+        getCommand("imp").setTabCompleter(command);
         getServer().getPluginManager().registerEvents(playerListener, this);
 
         taskId = getServer().getScheduler().runTaskTimer(this, playerListener::showSelectionParticles, 0L, 10L).getTaskId();

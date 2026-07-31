@@ -3,6 +3,7 @@ package org.nig.smp.impers.manager;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.nig.smp.impers.ImpersPlugin;
+import org.nig.smp.impers.model.ChunkSelection;
 import org.nig.smp.impers.model.Territory;
 
 import java.io.File;
@@ -101,5 +102,19 @@ public class TerritoryManager {
 
     public boolean exists(String name) {
         return territories.containsKey(name.toLowerCase());
+    }
+
+    public String checkOverlap(String world, ChunkSelection sel, UUID player) {
+        for (Territory t : territories.values()) {
+            if (!t.getWorld().equals(world)) continue;
+            int ox = Math.max(t.getMinChunkX(), sel.getMinChunkX());
+            int ox2 = Math.min(t.getMaxChunkX(), sel.getMaxChunkX());
+            int oz = Math.max(t.getMinChunkZ(), sel.getMinChunkZ());
+            int oz2 = Math.min(t.getMaxChunkZ(), sel.getMaxChunkZ());
+            if (ox <= ox2 && oz <= oz2) {
+                return t.isMember(player) ? "territory-overlap-own" : "territory-overlap-enemy";
+            }
+        }
+        return null;
     }
 }

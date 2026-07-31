@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,10 +16,14 @@ import org.nig.smp.impers.manager.TerritoryManager;
 import org.nig.smp.impers.model.ChunkSelection;
 import org.nig.smp.impers.model.Territory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class ImpersCommand implements CommandExecutor {
+public class ImpersCommand implements CommandExecutor, TabCompleter {
+
+    private static final List<String> SUBCOMMANDS = List.of("tool", "stick", "create", "invite", "kick", "list", "remove");
 
     private final ImpersPlugin plugin;
     private final TerritoryManager territoryManager;
@@ -37,7 +42,7 @@ public class ImpersCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length == 0 || args[0].equalsIgnoreCase("stick")) {
+        if (args.length == 0 || args[0].equalsIgnoreCase("stick") || args[0].equalsIgnoreCase("tool")) {
             return giveStick(player);
         }
 
@@ -100,6 +105,12 @@ public class ImpersCommand implements CommandExecutor {
         ChunkSelection sel = selections.get(player.getUniqueId());
         if (sel == null || !sel.isComplete()) {
             player.sendMessage(Component.text(plugin.msg("no-selection")));
+            return true;
+        }
+
+        String overlap = territoryManager.checkOverlap(player.getWorld().getName(), sel, player.getUniqueId());
+        if (overlap != null) {
+            player.sendMessage(Component.text(plugin.msg(overlap)));
             return true;
         }
 
@@ -231,5 +242,40 @@ public class ImpersCommand implements CommandExecutor {
         territoryManager.remove(name);
         player.sendMessage(Component.text(plugin.msg("territory-removed", "name", name)));
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            return filter(SUBCOMMANDS, args[0]);
+        }
+        if (args.length == 2) {
+            String sub = args[0].toLowerCase();
+            if (sub.equals("invite") || sub.equals("kick")) {
+                List<String> players = new ArrayList<>();
+                for (Player online : plugin.getServer().getOnlinePlayers()) {
+                    players.add(online.getName());
+                }
+                return filter(players, args[1]);
+            }
+            if (sub.equals("remove")) {
+                List<String> names = new ArrayList<>();
+                for (Territory t : territoryManager.getAll()) {
+                    names.add(t.getName());
+                }
+                return filter(names, args[1]);
+            }
+        }
+        return List.of();
+    }
+
+    private List<String> filter(List<String> candidates, String prefix) {
+        List<String> result = new ArrayList<>();
+        for (String candidate : candidates) {
+            if (candidate.toLowerCase().startsWith(prefix.toLowerCase())) {
+                result.add(candidate);
+            }
+        }
+        return result;
     }
 }
