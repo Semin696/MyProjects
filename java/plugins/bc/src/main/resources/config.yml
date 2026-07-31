@@ -1,0 +1,7 @@
+messages:
+  usage: "&cИспользование: &7/bc <сообщение>"
+  usage-media: "&cИспользование: &7/bcmedia <сообщение>"
+  no-permission: "&cУ вас нет прав на использование этой команды."
+  format-named: "&7[&bBC&7] &f{message} &8- &7{name}"
+  format-anonymous: "&7[&bBC&7] &f{message}"
+  format-media: "&7[&6Media&7] &f{message}"
