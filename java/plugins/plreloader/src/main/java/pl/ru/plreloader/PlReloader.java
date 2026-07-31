@@ -2,16 +2,24 @@ package pl.ru.plreloader;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.PluginClassLoader;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -64,58 +72,19 @@ public class PlReloader extends JavaPlugin {
             return;
         }
 
-        Bukkit.getPluginManager().disablePlugin(plugin);
-
-        File pluginFile = new File("plugins", plugin.getName() + ".jar");
-        if (!pluginFile.exists()) {
-            pluginFile = new File("plugins", plugin.getName() + ".jar");
-            File pluginsDir = new File("plugins");
-            File[] files = pluginsDir.listFiles((dir, name) -> name.startsWith(plugin.getName()) && name.endsWith(".jar"));
-            if (files != null && files.length > 0) {
-                pluginFile = files[0];
-            } else {
-                return;
-            }
+        File pluginFile = findPluginFile(plugin.getName());
+        if (pluginFile == null) {
+            getLogger().warning("Не найден jar-файл для плагина: " + pluginName);
+            return;
         }
 
-        try {
-            Plugin loadedPlugin = Bukkit.getPluginManager().loadPlugin(pluginFile);
-            if (loadedPlugin != null) {
-                loadedPlugin.onLoad();
-                Bukkit.getPluginManager().enablePlugin(loadedPlugin);
-            }
-        } catch (InvalidPluginException | InvalidDescriptionException e) {
-            getLogger().log(Level.WARNING, "Не удалось перезагрузить плагин: " + pluginName, e);
-        }
-    }
+        unloadPlugin(plugin);
 
-    private String getPluginNameFromFile(File pluginFile) {
-        try (ZipFile zip = new ZipFile(pluginFile)) {
-            ZipEntry entry = zip.getEntry("plugin.yml");
-            if (entry == null) {
-                return null;
-            }
-            try (InputStream in = zip.getInputStream(entry)) {
-                PluginDescriptionFile desc = new PluginDescriptionFile(in);
-                return desc.getName();
-            }
-        } catch (Exception e) {
-            getLogger().log(Level.WARNING, "Не удалось прочитать plugin.yml из " + pluginFile.getName(), e);
-            return null;
-        }
-    }
-
-    private Plugin loadNewFromFile(File pluginFile) {
-        try {
-            Plugin loaded = Bukkit.getPluginManager().loadPlugin(pluginFile);
-            if (loaded != null) {
-                loaded.onLoad();
-                Bukkit.getPluginManager().enablePlugin(loaded);
-            }
-            return loaded;
-        } catch (InvalidPluginException | InvalidDescriptionException e) {
-            getLogger().log(Level.WARNING, "Не удалось загрузить плагин: " + pluginFile.getName(), e);
-            return null;
+        Plugin loadedPlugin = loadNewFromFile(pluginFile);
+        if (loadedPlugin != null) {
+            getLogger().info("Плагин перезагружен: " + loadedPlugin.getName());
+        } else {
+            getLogger().warning("Не удалось перезагрузить плагин: " + pluginName);
         }
     }
 
@@ -137,7 +106,7 @@ public class PlReloader extends JavaPlugin {
         if (name != null) {
             Plugin existing = Bukkit.getPluginManager().getPlugin(name);
             if (existing != null) {
-                Bukkit.getPluginManager().disablePlugin(existing);
+                unloadPlugin(existing);
             }
         }
 
@@ -161,7 +130,7 @@ public class PlReloader extends JavaPlugin {
             }
             Plugin existing = Bukkit.getPluginManager().getPlugin(name);
             if (existing != null) {
-                Bukkit.getPluginManager().disablePlugin(existing);
+                unloadPlugin(existing);
             }
             Plugin plugin = loadNewFromFile(jar);
             if (plugin != null) {
@@ -190,8 +159,123 @@ public class PlReloader extends JavaPlugin {
             getLogger().info("Попытка выключить PlReloader отклонена.");
             return;
         }
+        unloadPlugin(plugin);
+    }
+
+    private File findPluginFile(String pluginName) {
+        File pluginsDir = new File("plugins");
+        File direct = new File(pluginsDir, pluginName + ".jar");
+        if (direct.exists()) {
+            return direct;
+        }
+        File[] files = pluginsDir.listFiles((dir, name) -> name.startsWith(pluginName) && name.endsWith(".jar"));
+        if (files != null && files.length > 0) {
+            return files[0];
+        }
+        return null;
+    }
+
+    private String getPluginNameFromFile(File pluginFile) {
+        try (ZipFile zip = new ZipFile(pluginFile)) {
+            ZipEntry entry = zip.getEntry("plugin.yml");
+            if (entry == null) {
+                return null;
+            }
+            try (InputStream in = zip.getInputStream(entry)) {
+                PluginDescriptionFile desc = new PluginDescriptionFile(in);
+                return desc.getName();
+            }
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Не удалось прочитать plugin.yml из " + pluginFile.getName(), e);
+            return null;
+        }
+    }
+
+    private Plugin loadNewFromFile(File pluginFile) {
+        try {
+            Plugin loaded = Bukkit.getPluginManager().loadPlugin(pluginFile);
+            if (loaded != null) {
+                Bukkit.getPluginManager().enablePlugin(loaded);
+            }
+            return loaded;
+        } catch (InvalidPluginException | InvalidDescriptionException e) {
+            getLogger().log(Level.WARNING, "Не удалось загрузить плагин: " + pluginFile.getName(), e);
+            return null;
+        }
+    }
+
+    private void unloadPlugin(Plugin plugin) {
+        try {
+            unregisterCommands(plugin);
+        } catch (Throwable t) {
+            getLogger().log(Level.WARNING, "Не удалось удалить команды плагина " + plugin.getName(), t);
+        }
+
         if (plugin.isEnabled()) {
             Bukkit.getPluginManager().disablePlugin(plugin);
+        }
+
+        try {
+            SimplePluginManager pm = (SimplePluginManager) Bukkit.getPluginManager();
+
+            Field pluginsField = SimplePluginManager.class.getDeclaredField("plugins");
+            pluginsField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<Plugin> plugins = (List<Plugin>) pluginsField.get(pm);
+            plugins.remove(plugin);
+
+            Field lookupNamesField = SimplePluginManager.class.getDeclaredField("lookupNames");
+            lookupNamesField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<String, Plugin> lookupNames = (Map<String, Plugin>) lookupNamesField.get(pm);
+            lookupNames.entrySet().removeIf(e -> e.getValue() == plugin || e.getValue().equals(plugin));
+            lookupNames.values().removeIf(p -> p == plugin);
+
+            if (plugin instanceof JavaPlugin) {
+                ClassLoader cl = plugin.getClass().getClassLoader();
+                if (cl instanceof PluginClassLoader) {
+                    ((PluginClassLoader) cl).close();
+                }
+            }
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Не удалось полностью выгрузить плагин: " + plugin.getName(), e);
+        }
+    }
+
+    private void unregisterCommands(Plugin plugin) {
+        if (plugin.getDescription().getCommands() == null || plugin.getDescription().getCommands().isEmpty()) {
+            return;
+        }
+        CommandMap commandMap = Bukkit.getCommandMap();
+        if (!(commandMap instanceof SimpleCommandMap)) {
+            return;
+        }
+        SimpleCommandMap simple = (SimpleCommandMap) commandMap;
+        Map<String, Command> known = simple.getKnownCommands();
+        List<String> toRemove = new ArrayList<>();
+
+        for (Map.Entry<String, Command> entry : known.entrySet()) {
+            Command cmd = entry.getValue();
+            if (cmd instanceof PluginCommand) {
+                PluginCommand pc = (PluginCommand) cmd;
+                if (plugin.equals(pc.getPlugin())) {
+                    toRemove.add(entry.getKey());
+                }
+            }
+        }
+
+        for (String name : plugin.getDescription().getCommands().keySet()) {
+            Command cmd = known.get(name);
+            if (cmd != null && !toRemove.contains(name)) {
+                toRemove.add(name);
+            }
+        }
+
+        for (String key : toRemove) {
+            Command cmd = known.remove(key);
+            if (cmd != null) {
+                cmd.unregister(commandMap);
+            }
         }
     }
 }
