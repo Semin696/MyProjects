@@ -59,6 +59,10 @@ public class PlReloader extends JavaPlugin {
         if (plugin == null) {
             return;
         }
+        if (plugin.equals(this)) {
+            getLogger().info("Попытка перезагрузить PlReloader отклонена.");
+            return;
+        }
 
         Bukkit.getPluginManager().disablePlugin(plugin);
 
@@ -126,6 +130,10 @@ public class PlReloader extends JavaPlugin {
         }
 
         String name = getPluginNameFromFile(pluginFile);
+        if (name != null && name.equals(getName())) {
+            getLogger().info("Попытка загрузить PlReloader заново отклонена.");
+            return null;
+        }
         if (name != null) {
             Plugin existing = Bukkit.getPluginManager().getPlugin(name);
             if (existing != null) {
@@ -146,6 +154,9 @@ public class PlReloader extends JavaPlugin {
         for (File jar : jars) {
             String name = getPluginNameFromFile(jar);
             if (name == null) {
+                continue;
+            }
+            if (name.equals(getName())) {
                 continue;
             }
             Plugin existing = Bukkit.getPluginManager().getPlugin(name);
@@ -173,6 +184,10 @@ public class PlReloader extends JavaPlugin {
     public void disablePlugin(String pluginName) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
         if (plugin == null) {
+            return;
+        }
+        if (plugin.equals(this)) {
+            getLogger().info("Попытка выключить PlReloader отклонена.");
             return;
         }
         if (plugin.isEnabled()) {
