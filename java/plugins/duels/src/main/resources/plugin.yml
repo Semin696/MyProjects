@@ -1,0 +1,26 @@
+name: Duels
+version: '${version}'
+main: org.nig.smp.duels.DuelsPlugin
+api-version: '1.21.11'
+load: POSTWORLD
+author: NightfallRealm
+description: Duels plugin with CMI kits
+softdepend: [CMI]
+
+commands:
+  duel:
+    description: Вызвать игрока на дуэль
+    usage: /<command> <игрок>
+    aliases: [d]
+  kit:
+    description: Выдать кит игроку
+    usage: /<command> <кит> <игрок>
+    permission: duels.admin
+
+permissions:
+  duels.admin:
+    description: Доступ к админ-командам
+    default: op
+  duels.use:
+    description: Использование дуэлей
+    default: true
