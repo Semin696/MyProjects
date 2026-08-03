@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -39,7 +41,9 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        player.getInventory().setItem(0, createCompass());
+        if (plugin.isDuelsWorld(player.getWorld())) {
+            giveCompass(player);
+        }
         Bukkit.getScheduler().runTask(plugin, visibilityManager::refresh);
     }
 
@@ -56,6 +60,10 @@ public final class PlayerListener implements Listener {
         event.setCancelled(true);
         if (duelManager.isBusy(player.getUniqueId())) {
             player.sendMessage(plugin.msg("already-in-duel"));
+            return;
+        }
+        if (plugin.getArenaManager().getArenas().isEmpty()) {
+            player.sendMessage(plugin.msg("no-arenas"));
             return;
         }
         new KitSelectionMenu(plugin, player).open();
@@ -79,6 +87,8 @@ public final class PlayerListener implements Listener {
         Player player = event.getEntity();
         if (duelManager.isInActiveDuel(player.getUniqueId())) {
             event.setCancelled(true);
+            event.getDrops().clear();
+            event.setDeathMessage(null);
             duelManager.onPlayerDeath(player);
         }
     }
@@ -94,6 +104,9 @@ public final class PlayerListener implements Listener {
         Player player = event.getPlayer();
         if (plugin.isDuelsWorld(player.getWorld())) {
             player.setGameMode(plugin.getDuelsGameMode());
+            giveCompass(player);
+        } else {
+            removeCompass(player);
         }
         Bukkit.getScheduler().runTask(plugin, visibilityManager::refresh);
     }
@@ -108,6 +121,7 @@ public final class PlayerListener implements Listener {
             return;
         }
         if (event.getFrom().getBlockX() == event.getTo().getBlockX()
+            && event.getFrom().getBlockY() == event.getTo().getBlockY()
             && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
             return;
         }
@@ -119,6 +133,33 @@ public final class PlayerListener implements Listener {
         ItemStack item = event.getItemDrop().getItemStack();
         if (item.getType() == Material.COMPASS && isCompass(item)) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getClickedInventory() == null || !(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() != Material.COMPASS || !isCompass(event.getCurrentItem())) {
+            return;
+        }
+        if (plugin.isDuelsWorld(player.getWorld())) {
+            event.setCancelled(true);
+        }
+    }
+
+    private void giveCompass(Player player) {
+        player.getInventory().setItem(0, createCompass());
+    }
+
+    private void removeCompass(Player player) {
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item != null && item.getType() == Material.COMPASS && isCompass(item)) {
+                inventory.setItem(i, null);
+            }
         }
     }
 

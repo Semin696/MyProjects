@@ -1,7 +1,6 @@
 package org.nig.smp.duels.manager;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -9,6 +8,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.nig.smp.duels.DuelsPlugin;
 import org.nig.smp.duels.cmi.CMIKitBridge;
+import org.nig.smp.duels.menu.KitSelectionMenu;
+import org.nig.smp.duels.menu.MapSelectionMenu;
 import org.nig.smp.duels.model.Arena;
 import org.nig.smp.duels.model.DuelMatch;
 import org.nig.smp.duels.model.SavedState;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +34,8 @@ public final class DuelManager {
     private final Map<UUID, DuelMatch> matches = new HashMap<>();
     private final Map<String, List<UUID>> queue = new HashMap<>();
     private final Set<UUID> waiting = new HashSet<>();
-    private final Map<UUID, String> waitingKit = new HashMap<>();
+    private final Map<UUID, SavedState> returnStates = new HashMap<>();
+    private final Random random = new Random();
 
     public DuelManager(DuelsPlugin plugin, ArenaManager arenaManager, VisibilityManager visibilityManager) {
         this.plugin = plugin;
@@ -63,6 +66,55 @@ public final class DuelManager {
         return ma != null && ma == mb && ma.getPhase() == DuelMatch.Phase.ACTIVE;
     }
 
+    // ===== Duels world entry / exit =====
+
+    public void enterDuels(Player player) {
+        if (plugin.getDuelsWorld() == null) {
+            player.sendMessage(plugin.msg("no-arenas"));
+            return;
+        }
+        if (!plugin.isDuelsWorld(player.getWorld())) {
+            if (!returnStates.containsKey(player.getUniqueId())) {
+                returnStates.put(player.getUniqueId(), new SavedState(player));
+            }
+            player.teleport(plugin.getDuelsWorld().getSpawnLocation());
+        }
+        player.sendMessage(plugin.msg("entered-duels"));
+    }
+
+    public void leaveDuels(Player player) {
+        if (isInActiveDuel(player.getUniqueId())) {
+            player.sendMessage(plugin.msg("cannot-cancel-active"));
+            return;
+        }
+        DuelMatch pending = matches.get(player.getUniqueId());
+        if (pending != null && pending.getPhase() != DuelMatch.Phase.ENDED) {
+            Player other = Bukkit.getPlayer(pending.getP1().equals(player.getUniqueId())
+                ? pending.getP2() : pending.getP1());
+            cancelMatch(pending, plugin.msg("cancelled"));
+            if (other != null) {
+                other.sendMessage(plugin.msg("challenge-cancelled", "player", player.getName()));
+            }
+        }
+        removeFromQueue(player);
+        clearWaiting(player);
+        SavedState state = returnStates.remove(player.getUniqueId());
+        if (state != null) {
+            state.apply(player);
+        } else if (plugin.isDuelsWorld(player.getWorld())) {
+            player.teleport(plugin.getServer().getWorlds().get(0).getSpawnLocation());
+        }
+        player.sendMessage(plugin.msg("left-duels"));
+    }
+
+    private void removeFromQueue(Player player) {
+        UUID id = player.getUniqueId();
+        waiting.remove(id);
+        queue.values().forEach(list -> list.remove(id));
+    }
+
+    // ===== Direct challenges =====
+
     public void createDirectChallenge(Player challenger, Player target) {
         if (challenger.getUniqueId().equals(target.getUniqueId())) {
             challenger.sendMessage(plugin.msg("cannot-duel-self"));
@@ -76,6 +128,14 @@ public final class DuelManager {
             challenger.sendMessage(plugin.msg("target-in-duel", "player", target.getName()));
             return;
         }
+        if (CMIKitBridge.getKitNames().isEmpty()) {
+            challenger.sendMessage(plugin.msg("no-kits"));
+            return;
+        }
+        if (arenaManager.getArenas().isEmpty()) {
+            challenger.sendMessage(plugin.msg("no-arenas"));
+            return;
+        }
 
         DuelMatch match = new DuelMatch(challenger.getUniqueId(), target.getUniqueId());
         match.setPhase(DuelMatch.Phase.KIT_SELECTION);
@@ -85,8 +145,11 @@ public final class DuelManager {
         challenger.sendMessage(plugin.msg("challenge-sent", "player", target.getName()));
         target.sendMessage(plugin.msg("challenge-received", "player", challenger.getName()));
 
-        new org.nig.smp.duels.menu.KitSelectionMenu(plugin, challenger, target).open();
-        new org.nig.smp.duels.menu.KitSelectionMenu(plugin, target, challenger).open();
+        enterDuels(challenger);
+        enterDuels(target);
+
+        new KitSelectionMenu(plugin, challenger, target).open();
+        new KitSelectionMenu(plugin, target, challenger).open();
     }
 
     public void selectKitForChallenge(Player player, String kit, Player opponent) {
@@ -96,31 +159,22 @@ public final class DuelManager {
         }
         match.setKit(player.getUniqueId(), kit);
         player.sendMessage(plugin.msg("kit-selected", "kit", kit));
-        applyWaiting(player);
 
         if (match.kitsReady()) {
             match.setPhase(DuelMatch.Phase.MAP_SELECTION);
             for (UUID id : match.players()) {
                 Player p = Bukkit.getPlayer(id);
                 if (p != null) {
-                    new org.nig.smp.duels.menu.MapSelectionMenu(plugin, p, match).open();
+                    new MapSelectionMenu(plugin, p, match).open();
                 }
             }
         } else if (opponent != null && opponent.isOnline()) {
-            player.showTitle(Title.title(
-                plugin.msg("waiting-title"),
-                plugin.msg("waiting-subtitle", "player", opponent.getName())
-            ));
+            player.sendTitle(
+                plugin.raw("waiting-title"),
+                plugin.raw("waiting-subtitle", "player", opponent.getName()),
+                10, 60, 20
+            );
         }
-    }
-
-    public void selectKitForMatchmaking(Player player, String kit) {
-        if (isBusy(player.getUniqueId())) {
-            player.sendMessage(plugin.msg("already-in-duel"));
-            return;
-        }
-        waitingKit.put(player.getUniqueId(), kit);
-        new org.nig.smp.duels.menu.MapSelectionMenu(plugin, player, kit).open();
     }
 
     public void selectMapForChallenge(Player player, String arenaName) {
@@ -132,57 +186,141 @@ public final class DuelManager {
             player.sendMessage(plugin.msg("arena-not-found"));
             return;
         }
+        if (isArenaInUse(arenaName)) {
+            player.sendMessage(plugin.msg("arena-in-use", "arena", arenaName));
+            return;
+        }
         match.setArena(arenaName);
         startDuel(match);
     }
 
-    public void selectMapForMatchmaking(Player player, String arenaName) {
-        if (arenaManager.getArena(arenaName) == null) {
-            player.sendMessage(plugin.msg("arena-not-found"));
+    public void cancel(Player player) {
+        DuelMatch match = matches.get(player.getUniqueId());
+        if (match == null || match.getPhase() == DuelMatch.Phase.ENDED) {
+            player.sendMessage(plugin.msg("not-in-duel"));
             return;
         }
-        String kit = waitingKit.remove(player.getUniqueId());
-        if (kit == null) {
+        if (match.getPhase() == DuelMatch.Phase.ACTIVE) {
+            player.sendMessage(plugin.msg("cannot-cancel-active"));
             return;
         }
-        queue(player, kit, arenaName);
+        Player other = Bukkit.getPlayer(match.getP1().equals(player.getUniqueId()) ? match.getP2() : match.getP1());
+        cancelMatch(match, plugin.msg("cancelled"));
+        if (other != null) {
+            other.sendMessage(plugin.msg("challenge-cancelled", "player", player.getName()));
+        }
     }
 
-    private void queue(Player player, String kit, String arenaName) {
+    // ===== Matchmaking queue =====
+
+    public void selectKitForMatchmaking(Player player, String kit) {
         if (isBusy(player.getUniqueId())) {
             player.sendMessage(plugin.msg("already-in-duel"));
             return;
         }
-        String key = kit + "||" + arenaName;
-        List<UUID> list = queue.computeIfAbsent(key, k -> new ArrayList<>());
-        list.add(player.getUniqueId());
-        player.sendMessage(plugin.msg("queued", "kit", kit, "arena", arenaName));
-        applyWaiting(player);
+        queue(player, kit);
+    }
 
-        if (list.size() >= 2) {
-            queue.remove(key);
-            UUID a = list.get(0);
-            UUID b = list.get(1);
-            Player pa = Bukkit.getPlayer(a);
-            Player pb = Bukkit.getPlayer(b);
-            if (pa == null || pb == null) {
-                for (Player p : new Player[]{pa, pb}) {
-                    if (p != null) {
-                        clearWaiting(p);
-                        p.sendMessage(plugin.msg("match-failed"));
-                    }
-                }
-                return;
+    private void queue(Player player, String kit) {
+        if (arenaManager.getArenas().isEmpty()) {
+            player.sendMessage(plugin.msg("no-arenas"));
+            return;
+        }
+        if (!CMIKitBridge.getKitNames().contains(kit)) {
+            player.sendMessage(plugin.msg("kit-not-found", "kit", kit));
+            return;
+        }
+        List<UUID> list = queue.computeIfAbsent(kit, k -> new ArrayList<>());
+        if (list.contains(player.getUniqueId()) || waiting.contains(player.getUniqueId())) {
+            player.sendMessage(plugin.msg("already-waiting"));
+            return;
+        }
+        list.add(player.getUniqueId());
+        waiting.add(player.getUniqueId());
+
+        player.sendMessage(plugin.msg("queued", "kit", kit));
+        applyWaiting(player);
+        player.sendTitle(
+            plugin.raw("waiting-title"),
+            "Кит: " + kit,
+            10, 60, 20
+        );
+
+        tryMatchQueue(kit);
+    }
+
+    private void tryMatchQueue(String kit) {
+        List<UUID> list = queue.get(kit);
+        if (list == null || list.size() < 2) {
+            return;
+        }
+        List<UUID> online = new ArrayList<>();
+        for (UUID id : list) {
+            Player p = Bukkit.getPlayer(id);
+            if (p != null && matches.get(id) == null) {
+                online.add(id);
+            } else {
+                waiting.remove(id);
             }
-            DuelMatch match = new DuelMatch(a, b);
-            match.setKit(a, kit);
-            match.setKit(b, kit);
-            match.setArena(arenaName);
-            matches.put(a, match);
-            matches.put(b, match);
-            startDuel(match);
+        }
+        if (online.size() < 2) {
+            queue.put(kit, online);
+            return;
+        }
+        Arena arena = getRandomFreeArena();
+        if (arena == null) {
+            queue.put(kit, online);
+            return;
+        }
+        queue.remove(kit);
+
+        UUID a = online.get(0);
+        UUID b = online.get(1);
+        waiting.remove(a);
+        waiting.remove(b);
+
+        Player pa = Bukkit.getPlayer(a);
+        Player pb = Bukkit.getPlayer(b);
+        if (pa == null || pb == null) {
+            return;
+        }
+
+        DuelMatch match = new DuelMatch(a, b);
+        match.setKit(a, kit);
+        match.setKit(b, kit);
+        match.setArena(arena.getName());
+        matches.put(a, match);
+        matches.put(b, match);
+        startDuel(match);
+    }
+
+    private void tryMatchQueues() {
+        for (String kit : new ArrayList<>(queue.keySet())) {
+            tryMatchQueue(kit);
         }
     }
+
+    public int countPlayersByKit(String kit) {
+        Set<DuelMatch> seen = new HashSet<>();
+        int count = 0;
+        for (DuelMatch match : matches.values()) {
+            if (seen.add(match) && match.getPhase() == DuelMatch.Phase.ACTIVE) {
+                for (UUID id : match.players()) {
+                    if (kit.equals(match.getKit(id))) {
+                        count++;
+                    }
+                }
+            }
+        }
+        for (List<UUID> list : queue.values()) {
+            for (UUID id : list) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // ===== Duel lifecycle =====
 
     public void startDuel(DuelMatch match) {
         if (match.getPhase() == DuelMatch.Phase.ACTIVE || match.getPhase() == DuelMatch.Phase.ENDED) {
@@ -206,7 +344,13 @@ public final class DuelManager {
         for (Player p : new Player[]{p1, p2}) {
             p.closeInventory();
             clearWaiting(p);
-            match.saveState(p.getUniqueId(), new SavedState(p));
+
+            SavedState state = returnStates.remove(p.getUniqueId());
+            if (state == null) {
+                state = new SavedState(p);
+            }
+            match.saveState(p.getUniqueId(), state);
+
             p.getInventory().clear();
             p.getActivePotionEffects().forEach(effect -> p.removePotionEffect(effect.getType()));
             p.setHealth(p.getMaxHealth());
@@ -242,8 +386,8 @@ public final class DuelManager {
     public void onPlayerQuit(Player player) {
         UUID id = player.getUniqueId();
         waiting.remove(id);
-        waitingKit.remove(id);
         queue.values().forEach(list -> list.remove(id));
+        returnStates.remove(id);
 
         DuelMatch match = matches.get(id);
         if (match == null) {
@@ -258,23 +402,6 @@ public final class DuelManager {
             if (other != null) {
                 other.sendMessage(plugin.msg("challenge-cancelled", "player", player.getName()));
             }
-        }
-    }
-
-    public void cancel(Player player) {
-        DuelMatch match = matches.get(player.getUniqueId());
-        if (match == null || match.getPhase() == DuelMatch.Phase.ENDED) {
-            player.sendMessage(plugin.msg("not-in-duel"));
-            return;
-        }
-        if (match.getPhase() == DuelMatch.Phase.ACTIVE) {
-            player.sendMessage(plugin.msg("cannot-cancel-active"));
-            return;
-        }
-        Player other = Bukkit.getPlayer(match.getP1().equals(player.getUniqueId()) ? match.getP2() : match.getP1());
-        cancelMatch(match, plugin.msg("cancelled"));
-        if (other != null) {
-            other.sendMessage(plugin.msg("challenge-cancelled", "player", player.getName()));
         }
     }
 
@@ -310,6 +437,7 @@ public final class DuelManager {
             winner.sendMessage(plugin.msg("duel-end", "winner", winner.getName()));
         }
         visibilityManager.refresh();
+        tryMatchQueues();
     }
 
     private void cancelMatch(DuelMatch match, Component reason) {
@@ -330,33 +458,44 @@ public final class DuelManager {
         visibilityManager.refresh();
     }
 
+    // ===== Waiting (stun + blindness) =====
+
     public void applyWaiting(Player player) {
         waiting.add(player.getUniqueId());
         player.addPotionEffect(new PotionEffect(STUN_EFFECT, Integer.MAX_VALUE, 6, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, Integer.MAX_VALUE, 250, false, false));
         player.addPotionEffect(new PotionEffect(BLIND_EFFECT, Integer.MAX_VALUE, 0, false, false));
     }
 
     public void clearWaiting(Player player) {
         waiting.remove(player.getUniqueId());
         player.removePotionEffect(STUN_EFFECT);
-        player.removePotionEffect(PotionEffectType.JUMP_BOOST);
         player.removePotionEffect(BLIND_EFFECT);
     }
 
-    public int countPlayersByKit(String kit) {
-        Set<DuelMatch> seen = new HashSet<>();
-        int count = 0;
+    // ===== Arenas =====
+
+    private boolean isArenaInUse(String name) {
         for (DuelMatch match : matches.values()) {
-            if (seen.add(match) && match.getPhase() == DuelMatch.Phase.ACTIVE) {
-                for (UUID id : match.players()) {
-                    if (kit.equals(match.getKit(id))) {
-                        count++;
-                    }
-                }
+            if (match.getPhase() == DuelMatch.Phase.ACTIVE
+                && match.getArena() != null
+                && match.getArena().equalsIgnoreCase(name)) {
+                return true;
             }
         }
-        return count;
+        return false;
+    }
+
+    private Arena getRandomFreeArena() {
+        List<Arena> free = new ArrayList<>();
+        for (Arena arena : arenaManager.getArenas()) {
+            if (!isArenaInUse(arena.getName())) {
+                free.add(arena);
+            }
+        }
+        if (free.isEmpty()) {
+            return null;
+        }
+        return free.get(random.nextInt(free.size()));
     }
 
     public void shutdown() {
@@ -370,7 +509,7 @@ public final class DuelManager {
             cancelMatch(match, plugin.msg("cancelled"));
         }
         waiting.clear();
-        waitingKit.clear();
         queue.clear();
+        returnStates.clear();
     }
 }

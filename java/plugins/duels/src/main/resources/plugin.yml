@@ -1,5 +1,5 @@
 name: Duels
-version: '${version}'
+version: '${project.version}'
 main: org.nig.smp.duels.DuelsPlugin
 api-version: '1.21.11'
 load: POSTWORLD

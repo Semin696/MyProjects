@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 public final class DuelsPlugin extends JavaPlugin {
 
+    private World duelsWorld;
     private ArenaManager arenaManager;
     private DuelManager duelManager;
     private VisibilityManager visibilityManager;
@@ -32,6 +35,7 @@ public final class DuelsPlugin extends JavaPlugin {
         saveDefaultConfig();
 
         getDuelsWorld();
+        setupLobby();
 
         this.arenaManager = new ArenaManager(this);
         arenaManager.load();
@@ -43,6 +47,7 @@ public final class DuelsPlugin extends JavaPlugin {
         getCommand("duel").setExecutor(duelCommand);
         getCommand("duel").setTabCompleter(duelCommand);
         getCommand("kit").setExecutor(new KitCommand(this));
+        getCommand("kit").setTabCompleter(new KitCommand(this));
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this, duelManager, visibilityManager), this);
 
@@ -59,7 +64,7 @@ public final class DuelsPlugin extends JavaPlugin {
             getLogger().warning("Плагин CMI не найден! Киты для дуэлей будут недоступны.");
         }
 
-        getLogger().info("Duels enabled");
+        getLogger().info("Duels enabled. Arenas: " + arenaManager.getArenas().size());
     }
 
     @Override
@@ -71,6 +76,9 @@ public final class DuelsPlugin extends JavaPlugin {
     }
 
     public World getDuelsWorld() {
+        if (duelsWorld != null) {
+            return duelsWorld;
+        }
         String name = getConfig().getString("world-name", "duels");
         World world = Bukkit.getWorld(name);
         if (world == null) {
@@ -87,8 +95,44 @@ public final class DuelsPlugin extends JavaPlugin {
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             world.setGameRule(GameRule.KEEP_INVENTORY, true);
             world.setTime(6000);
+            duelsWorld = world;
         }
-        return world;
+        return duelsWorld;
+    }
+
+    private void setupLobby() {
+        if (duelsWorld == null) {
+            return;
+        }
+        Location lobby = getLobbyLocation();
+        if (lobby == null) {
+            return;
+        }
+        int baseX = lobby.getBlockX();
+        int baseZ = lobby.getBlockZ();
+        int baseY = lobby.getBlockY();
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                for (int dy = 0; dy < 2; dy++) {
+                    duelsWorld.getBlockAt(baseX + dx, baseY - 1 + dy, baseZ + dz).setType(Material.GLASS);
+                }
+            }
+        }
+        duelsWorld.setSpawnLocation(baseX, baseY, baseZ);
+    }
+
+    public Location getLobbyLocation() {
+        if (duelsWorld == null) {
+            return null;
+        }
+        return new Location(
+            duelsWorld,
+            getConfig().getDouble("lobby.x", 0.0),
+            getConfig().getDouble("lobby.y", 64.0),
+            getConfig().getDouble("lobby.z", 0.0),
+            (float) getConfig().getDouble("lobby.yaw", 0.0),
+            (float) getConfig().getDouble("lobby.pitch", 0.0)
+        );
     }
 
     public GameMode getDuelsGameMode() {

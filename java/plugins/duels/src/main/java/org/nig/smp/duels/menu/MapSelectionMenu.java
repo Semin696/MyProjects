@@ -23,32 +23,16 @@ import java.util.Map;
 
 public final class MapSelectionMenu implements InventoryHolder, Listener {
 
-    private enum Context {
-        CHALLENGE, MATCHMAKING
-    }
-
     private final DuelsPlugin plugin;
     private final Player player;
-    private final Context context;
     private final DuelMatch match;
-    private final String kit;
     private final Inventory inventory;
     private final Map<Integer, String> slotArena = new HashMap<>();
 
     public MapSelectionMenu(DuelsPlugin plugin, Player player, DuelMatch match) {
-        this(plugin, player, Context.CHALLENGE, match, null);
-    }
-
-    public MapSelectionMenu(DuelsPlugin plugin, Player player, String kit) {
-        this(plugin, player, Context.MATCHMAKING, null, kit);
-    }
-
-    private MapSelectionMenu(DuelsPlugin plugin, Player player, Context context, DuelMatch match, String kit) {
         this.plugin = plugin;
         this.player = player;
-        this.context = context;
         this.match = match;
-        this.kit = kit;
 
         List<Arena> arenas = plugin.getArenaManager().getArenas();
         int rows = Math.max(1, (arenas.size() + 8) / 9);
@@ -119,11 +103,7 @@ public final class MapSelectionMenu implements InventoryHolder, Listener {
             return;
         }
         who.closeInventory();
-        if (context == Context.CHALLENGE) {
-            plugin.getDuelManager().selectMapForChallenge(who, arena);
-        } else {
-            plugin.getDuelManager().selectMapForMatchmaking(who, arena);
-        }
+        plugin.getDuelManager().selectMapForChallenge(who, arena);
     }
 
     @EventHandler
