@@ -103,18 +103,40 @@ spacetrace.sryze.cc
 
 ### 3.3 WebSocket (важно!)
 
-Сайт подключается к серверу по `ws://`, а Cloudflare-прокси работает только на 80/443 портах. Поэтому для WebSocket используйте **прямое соединение**, без оранжевого облака:
+Сайт подключается к серверу по `ws://`. Способы зависят от того, где крутится сервер.
 
-- В Cloudflare: `CNAME  play  →  IP-адрес_сервера` или `A  play  →  IP-адрес_сервера`, **облако серое (DNS only)**.
-- В консоли/панели указывайте: `ws://play.spacetrace.sryze.cc:25570`.
+**Pterodactyl (панель, без SSH) — рекомендую:**
 
-Схема записей в Cloudflare:
+Хостинг уже даёт публичные порты, пробрасывать роутер не нужно.
 
-| Тип | Имя | Цель | Прокси |
-| --- | --- | --- | --- |
-| CNAME | spacetrace | `<логин>.github.io` | оранжевое |
-| CNAME | cp | `<логин>.github.io` (или редирект-правило) | оранжевое |
-| A | play | IP сервера | серое (DNS only) |
+1. В панели Pterodactyl: **Settings (Network) → Ports → выделите дополнительный порт**, например `25570` (сохранить + перезапустить сервер).
+2. В `plugins/ConnectApi/config.yml`: `host: 0.0.0.0`, `port: 25570`.
+3. Узнайте IP ноды — он показан в панели рядом с портом (обычно `IP-ноды:25565`).
+4. В консоли/панели указывайте: `ws://IP-ноды:25570`.
+
+Для домена `play.spacetrace.sryze.cc`: в Cloudflare создайте `A  play  →  IP-ноды` (облако **серое**, DNS only — прокси Cloudflare не пропускает нестандартные порты), и подключайтесь как `ws://play.spacetrace.sryze.cc:25570`.
+
+**Вариант 2 — Cloudflare Tunnel (если есть SSH на сервере):**
+
+Плагин слушает только на `127.0.0.1` (`host: 127.0.0.1`), наружу сервер сам ходит к Cloudflare — портов открывать не нужно вообще.
+
+1. Установите `cloudflared` на сервер: `cloudflared tunnel login`, затем `cloudflared tunnel create play`.
+2. `~/.cloudflared/config.yml`:
+   ```yaml
+   tunnel: play
+   credentials-file: /root/.cloudflared/<ID-туннеля>.json
+   ingress:
+     - hostname: play.spacetrace.sryze.cc
+       service: ws://127.0.0.1:25570
+     - service: http_status:404
+   ```
+3. В DNS: `CNAME  play  →  <ID-туннеля>.cfargotunnel.com`.
+4. Запуск: `cloudflared tunnel run play`.
+5. В консоли/панели указывайте: `wss://play.spacetrace.sryze.cc` (без порта, TLS даёт Cloudflare).
+
+**Вариант 3 — обычный сервер у себя дома:**
+
+`host: 0.0.0.0`, открыть порт 25570 в фаерволе и пробросить в роутере; `A  play  →  домашний_IP` (серое облако).
 
 ---
 

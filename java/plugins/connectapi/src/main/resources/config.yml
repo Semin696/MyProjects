@@ -1,27 +1,24 @@
 # ==== ConnectApi ====
 
 # Address/port the WebSocket bridge listens on.
-# On most hosts you need to open this port in the firewall and forward it in your router.
+# Pterodactyl: укажите host: 0.0.0.0 и выделите дополнительный порт
+# в панели (Network -> Ports). Хостинг сам сделает его публичным,
+# проброс в роутере не нужен.
+#
+# Пример для f1.rustix.me: MC на 25283, запасной 38710.
+# Голосовой чат (Simple Voice Chat) ходит по UDP, ConnectApi по TCP —
+# они могут жить на ОДНОМ номере порта (38710) одновременно.
+# Укажите такой же порт в voicechat.server.port.
 host: 0.0.0.0
-port: 25570
+port: 38710
 
 # Token that the web console / control panel must send to connect.
 # CHANGE THIS! Anyone with the token can run allowed commands on your server.
 token: change-me
 
 # Command prefixes allowed from the web. Each entry is a command name.
-# An empty list means ANY command is allowed (dangerous!).
-allowed-commands:
-  - say
-  - broadcast
-  - bc
-  - whitelist
-  - kick
-  - ban
-  - pardon
-  - duels
-  - duelsystem
-  - stop
+# An empty list means ALL commands are allowed (dangerous!).
+allowed-commands: []
 
 # Forward in-game chat to the web console (op: chat).
 forward-chat: true
