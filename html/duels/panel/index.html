@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Control Panel — spacetrace.sryze.cc</title>
+<script src="../config.js"></script>
 <style>
   :root {
     --bg: #0d1117;
@@ -274,6 +275,11 @@
       if (s.addr) $('lgAddr').value = s.addr;
       if (s.token) $('lgToken').value = s.token;
     } catch (e) {}
+    if (typeof CONFIG !== 'undefined') {
+      if (CONFIG.addr && !localStorage.getItem(storeKey)) $('lgAddr').value = CONFIG.addr;
+      if (CONFIG.token) $('lgToken').value = CONFIG.token;
+      if (CONFIG.title) document.title = CONFIG.title;
+    }
   }
 
   function setStatus(state, text) {

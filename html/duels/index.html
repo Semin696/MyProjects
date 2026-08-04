@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Duels Console — ConnectApi</title>
+<script src="config.js"></script>
 <style>
   :root {
     --bg: #0d1117;
@@ -103,8 +104,7 @@
     <span id="statusText" class="hint">не подключено</span>
     <div class="grow"></div>
     <input id="addr" placeholder="ws://хост:25570" value="ws://localhost:25570">
-    <input id="token" type="password" placeholder="token">
-    <button id="btnConnect" class="primary">Подключить</button>
+    <input id="token" type="password" placeholder="token">    <button id="btnConnect" class="primary">Подключить</button>
   </header>
 
   <div id="log"></div>
@@ -126,6 +126,12 @@
   var logEl = document.getElementById('log');
   var dot = document.getElementById('dot');
   var statusText = document.getElementById('statusText');
+
+  if (typeof CONFIG !== 'undefined') {
+    if (CONFIG.addr) document.getElementById('addr').value = CONFIG.addr;
+    if (CONFIG.token) document.getElementById('token').value = CONFIG.token;
+    if (CONFIG.title) document.title = CONFIG.title;
+  }
 
   function setStatus(state, text) {
     dot.className = 'dot ' + state;

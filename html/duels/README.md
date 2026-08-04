@@ -6,9 +6,26 @@
 | --- | --- |
 | `index.html` | Консоль: логи сервера + ввод команд |
 | `panel/index.html` | Панель управления (для `cp.spacetrace.sryze.cc`) с простым входом по токену |
+| `config.js` | Настройки сайта (адрес сервера, токен, заголовок) |
 | `CNAME` | Привязка GitHub Pages к домену `spacetrace.sryze.cc` |
 
 Сайт — статический (чистый HTML/JS), хостится бесплатно на GitHub Pages, подключается к серверу по **WebSocket** (`ws://`).
+
+---
+
+## 0. Настройка сайта (обязательно!)
+
+Отредактируйте **`config.js`** перед заливкой на GitHub:
+
+```js
+var CONFIG = {
+  addr: "ws://f1.rustix.me:38710", // адрес WebSocket сервера
+  token: "",                        // токен (лучше оставить пустым и вводить при входе)
+  title: "Duels Console — spacetrace"
+};
+```
+
+> Токен в `config.js` увидят все, кто откроет сайт (репозиторий публичный). Безопаснее оставить пустым.
 
 ---
 
@@ -89,17 +106,13 @@ spacetrace.sryze.cc
 
 ### 3.2 cp.spacetrace.sryze.cc → панель управления
 
-Два варианта:
+Панель лежит в **отдельном репозитории** `Semin696/spacetrace-cp` (создан автоматически, Pages включены).
 
-**Вариант А — отдельный репозиторий (рекомендую):**
-1. Создайте репозиторий `cp` и залейте в него содержимое `panel/` (только `index.html`).
-2. Включите Pages, укажите Custom domain `cp.spacetrace.sryze.cc`.
-3. В Cloudflare: `CNAME  cp  →  <ВАШ_ЛОГИН>.github.io`.
+1. В репозитории уже лежит `CNAME` с `cp.spacetrace.sryze.cc`.
+2. В Cloudflare DNS: `CNAME  cp  →  Semin696.github.io`.
+3. После проверки DNS панель откроется по адресу `https://cp.spacetrace.sryze.cc`.
 
-**Вариант Б — редирект через Cloudflare:**
-1. Один репозиторий `duels-site` отдаёт и консоль, и панель: панель доступна как `spacetrace.sryze.cc/panel/`.
-2. В Cloudflare **Rules → Redirect Rules** добавьте правило: Hostname `cp.spacetrace.sryze.cc` → redirect `https://spacetrace.sryze.cc/panel/` (301).
-3. В DNS создайте запись `CNAME cp → spacetrace.sryze.cc` (или A-запись на Cloudflare) без проксирования.
+> Если когда-нибудь захотите отдавать панель в том же репозитории — включите в Cloudflare Redirect Rule: `cp.spacetrace.sryze.cc` → `https://spacetrace.sryze.cc/panel/`.
 
 ### 3.3 WebSocket (важно!)
 
@@ -170,3 +183,17 @@ spacetrace.sryze.cc
 {"op":"error","message":"..."}
 {"op":"pong"}
 ```
+
+---
+
+## 6. Почему сайт не работает?
+
+**Сайт открывается, но консоль пишет «Не удаётся подключиться»:**
+1. Проверьте `config.js`: адрес должен быть `ws://f1.rustix.me:38710` (или IP:порт), а не `localhost`.
+2. Порт 38710 должен быть выделен в панели Pterodactyl и открыт на TCP.
+3. Токен в плагине (`plugins/ConnectApi/config.yml`) должен совпадать с вводимым.
+4. Браузер должен открывать сайт по `https://` — WebSocket из https-страницы обязан быть `wss://` или `ws://` (некоторые браузеры блокируют смешанный контент `ws://` со страницы `https://`). Если так — в `config.js` укажите `wss://`, а перед плагином поставьте прокси с TLS (Cloudflare Tunnel), либо откройте консоль по HTTP.
+
+**Страница «404 / сайт не собирается»:**
+1. Проверьте, что в GitHub включён Pages: **Settings → Pages → Deploy from a branch → main → / (root)**.
+2. Если в репозитории лежит `CNAME`, но DNS на домен ещё не настроен — GitHub может не собрать сайт. Временно удалите `CNAME`, дождитесь публикации на `Semin696.github.io/mainsite/`, а домен добавляйте после настройки DNS.

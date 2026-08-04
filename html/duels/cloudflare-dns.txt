@@ -1,0 +1,28 @@
+; ============================================================
+;  Cloudflare DNS для домена spacetrace.sryze.cc
+;  Файл для импорта: Cloudflare -> DNS -> Import & Export -> Import
+;  (формат BIND)
+;
+;  После импорта:
+;   - записи spacetrace и cp переключите на оранжевое облако
+;     (proxy on), запись play оставьте СЕРОЙ (DNS only).
+; ============================================================
+
+$ORIGIN spacetrace.sryze.cc.
+
+; --- Сайт-консоль (GitHub Pages, репозиторий mainsite) ---
+; Прокси: ВКЛ (оранжевое облако)
+@	1	IN	CNAME	Semin696.github.io.
+
+; --- Панель управления cp.spacetrace.sryze.cc ---
+; Отдельный репозиторий Semin696/spacetrace-cp (Pages уже включены).
+; Прокси: ВКЛ (оранжевое облако)
+cp	1	IN	CNAME	Semin696.github.io.
+
+; ============================================================
+;  Итоговые адреса:
+;   Сайт:          https://spacetrace.sryze.cc   (репо mainsite)
+;   Панель:        https://cp.spacetrace.sryze.cc (репо spacetrace-cp)
+;   Консоль WS:    ws://play.spacetrace.sryze.cc:38710 (запись play уже есть)
+;   Minecraft:     f1.rustix.me:25283
+; ============================================================
