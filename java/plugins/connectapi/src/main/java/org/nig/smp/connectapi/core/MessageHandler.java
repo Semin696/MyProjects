@@ -27,7 +27,7 @@ public class MessageHandler {
         JsonObject hello = new JsonObject();
         hello.addProperty("op", "hello");
         hello.addProperty("name", "ConnectApi");
-        hello.addProperty("authRequired", !plugin.getToken().isEmpty());
+        hello.addProperty("authRequired", !plugin.getPassword().isEmpty());
         conn.send(hello.toString());
     }
 
@@ -57,8 +57,9 @@ public class MessageHandler {
 
         switch (op) {
             case "auth": {
-                String token = str(msg, "token");
-                boolean ok = token != null && !plugin.getToken().isEmpty() && token.equals(plugin.getToken());
+                String password = str(msg, "password");
+                if (password == null) password = str(msg, "token"); // обратная совместимость
+                boolean ok = password != null && !plugin.getPassword().isEmpty() && password.equals(plugin.getPassword());
                 JsonObject r = new JsonObject();
                 r.addProperty("op", "auth");
                 r.addProperty("ok", ok);
@@ -68,9 +69,9 @@ public class MessageHandler {
                     conn.send(r.toString());
                     status.sendStatus(conn);
                 } else {
-                    r.addProperty("message", "invalid token");
+                    r.addProperty("message", "invalid password");
                     conn.send(r.toString());
-                    conn.close("bad token");
+                    conn.close("bad password");
                 }
                 break;
             }

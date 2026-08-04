@@ -31,9 +31,9 @@ public final class ConnectApiPlugin extends JavaPlugin {
         wsServer.start();
         statusManager.start();
 
-        boolean tokenChanged = !getToken().isEmpty() && !"change-me".equals(getToken());
+        boolean tokenChanged = !getPassword().isEmpty() && !"change-me".equals(getPassword());
         getLogger().info("ConnectApi enabled on ws://" + host + ":" + port
-                + " (token set: " + tokenChanged + ", allowed commands: " + getAllowedCommands().size() + ")");
+                + " (password set: " + tokenChanged + ", allowed commands: " + getAllowedCommands().size() + ")");
     }
 
     @Override
@@ -47,8 +47,8 @@ public final class ConnectApiPlugin extends JavaPlugin {
         getLogger().info("ConnectApi disabled");
     }
 
-    public String getToken() {
-        return getConfig().getString("token", "change-me");
+    public String getPassword() {
+        return getConfig().getString("password", getConfig().getString("token", "change-me"));
     }
 
     public boolean forwardChat() {

@@ -3,252 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Duels Console — ConnectApi</title>
-<script src="config.js"></script>
+<title>SpaceTrace — Minecraft сервер</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --panel: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --muted: #8b949e;
     --accent: #58a6ff;
-    --green: #3fb950;
-    --red: #f85149;
-    --yellow: #d29922;
+    --accent2: #8b5cf6;
+    --accent3: #22d3ee;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
   body {
-    background: var(--bg);
-    color: var(--text);
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  header h1 { font-size: 16px; font-weight: 600; }
-  .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--muted); display: inline-block;
-  }
-  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .dot.offline { background: var(--red); }
-  .dot.connecting { background: var(--yellow); }
-  .grow { flex: 1; }
-  input, button, select {
-    background: var(--bg);
     color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    outline: none;
+    background: #05070f;
+    overflow-x: hidden;
   }
-  input:focus { border-color: var(--accent); }
-  button {
-    background: #21262d;
-    cursor: pointer;
-    transition: background .15s;
+
+  /* ---------- анимированный фон ---------- */
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  .nebula {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(40% 50% at 15% 20%, rgba(99,102,241,.25), transparent 70%),
+      radial-gradient(50% 60% at 85% 15%, rgba(34,211,238,.16), transparent 70%),
+      radial-gradient(60% 60% at 70% 90%, rgba(139,92,246,.20), transparent 70%),
+      radial-gradient(40% 40% at 10% 85%, rgba(244,114,182,.12), transparent 70%);
+    animation: nebulaDrift 30s ease-in-out infinite alternate;
   }
-  button:hover { background: #30363d; }
-  button.primary { background: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; }
-  button.primary:hover { background: #79c0ff; }
-  button.danger { background: var(--red); color: #fff; border-color: var(--red); }
-  button.danger:hover { opacity: .85; }
-  #log {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px 16px;
+  @keyframes nebulaDrift {
+    0%   { transform: translate(0,0) scale(1); opacity: .9; }
+    100% { transform: translate(-3%,-2%) scale(1.15); opacity: 1; }
+  }
+
+  /* ---------- контент ---------- */
+  .wrap {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .logo {
+    font-size: clamp(42px, 10vw, 96px);
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    background: linear-gradient(120deg, var(--accent3), var(--accent) 45%, var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(88,166,255,.45));
+    animation: fadeUp 1s ease both, glow 4s ease-in-out infinite 1s;
+  }
+  @keyframes glow {
+    0%,100% { filter: drop-shadow(0 0 18px rgba(88,166,255,.35)); }
+    50%     { filter: drop-shadow(0 0 34px rgba(139,92,246,.65)); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tagline {
+    margin-top: 14px;
+    font-size: clamp(14px, 2.4vw, 20px);
+    color: var(--muted);
+    letter-spacing: .06em;
+    animation: fadeUp 1s ease .25s both;
+  }
+
+  .status {
+    margin-top: 22px;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 22px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    background: rgba(255,255,255,.04);
+    backdrop-filter: blur(8px);
+    font-size: 14px;
+    animation: fadeUp 1s ease .4s both;
+  }
+  .pulse-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #f59e0b;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .pulse-dot.on  { background: #22c55e; box-shadow: 0 0 12px #22c55e; }
+  .pulse-dot.off { background: #ef4444; box-shadow: 0 0 12px #ef4444; }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%     { transform: scale(.7); opacity: .55; }
+  }
+
+  .ip-block {
+    margin-top: 34px;
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(88,166,255,.35);
+    border-radius: 14px;
+    padding: 14px 22px;
+    animation: fadeUp 1s ease .55s both;
+  }
+  .ip {
     font-family: Consolas, "Courier New", monospace;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .04em;
+  }
+  .copy-btn {
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.08);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 14px;
     font-size: 13px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
   }
-  #log .log { color: var(--muted); }
-  #log .log.info { color: var(--text); }
-  #log .log.warn { color: var(--yellow); }
-  #log .log.error { color: var(--red); }
-  #log .log.fatal { color: var(--red); font-weight: bold; }
-  #log .chat { color: var(--green); }
-  #log .sys { color: var(--accent); font-style: italic; }
-  #log .cmd { color: #d2a8ff; }
-  #log .ts { color: #6e7681; }
-  footer {
-    display: flex;
-    gap: 8px;
-    padding: 10px 16px;
-    background: var(--panel);
-    border-top: 1px solid var(--border);
+  .copy-btn:hover { background: rgba(255,255,255,.16); }
+  .copy-btn:active { transform: scale(.95); }
+
+  .buttons {
+    margin-top: 26px;
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 1s ease .7s both;
   }
-  #cmd { flex: 1; font-family: Consolas, "Courier New", monospace; }
-  #quick { display: flex; gap: 6px; align-items: center; }
-  .hint { color: var(--muted); font-size: 12px; }
-  .snippet { color: var(--yellow); }
-  @media (max-width: 700px) { #quick { display: none; } }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 30px;
+    border-radius: 999px;
+    font-size: 15px; font-weight: 600;
+    text-decoration: none;
+    color: var(--text);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.16);
+    transition: transform .15s, box-shadow .2s, background .2s;
+    cursor: pointer;
+  }
+  .btn:hover { transform: translateY(-3px); }
+  .btn.primary {
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(88,166,255,.35);
+  }
+  .btn.primary:hover { box-shadow: 0 12px 40px rgba(139,92,246,.5); }
+
+  .footer {
+    position: absolute; bottom: 18px; left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,.35);
+    font-size: 12px;
+    letter-spacing: .05em;
+    animation: fadeUp 1s ease .9s both;
+  }
+
+  .planet {
+    position: fixed; z-index: 0; pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), rgba(88,166,255,.12) 45%, rgba(5,7,15,.9) 72%);
+    box-shadow: inset -18px -18px 60px rgba(0,0,0,.8), 0 0 80px rgba(88,166,255,.18);
+  }
+  .planet.p1 { width: 220px; height: 220px; top: 12%; left: 6%; animation: float 14s ease-in-out infinite; }
+  .planet.p2 { width: 120px; height: 120px; bottom: 14%; right: 8%; animation: float 11s ease-in-out infinite reverse; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-26px); }
+  }
 </style>
 </head>
 <body>
-  <header>
-    <h1>Duels Console</h1>
-    <span class="dot" id="dot"></span>
-    <span id="statusText" class="hint">не подключено</span>
-    <div class="grow"></div>
-    <input id="addr" placeholder="ws://хост:25570" value="ws://localhost:25570">
-    <input id="token" type="password" placeholder="token">    <button id="btnConnect" class="primary">Подключить</button>
-  </header>
 
-  <div id="log"></div>
+<canvas id="stars"></canvas>
+<div class="nebula"></div>
+<div class="planet p1"></div>
+<div class="planet p2"></div>
 
-  <footer>
-    <input id="cmd" placeholder="Введите команду без слэша, например: say hello" autocomplete="off" spellcheck="false">
-    <button id="btnSend">Отправить</button>
-    <div id="quick">
-      <button data-cmd="say Hello from web console!">say</button>
-      <button data-cmd="list">list</button>
-      <button data-cmd="duel">duel</button>
-      <button data-cmd="help">help</button>
-    </div>
-  </footer>
+<div class="wrap">
+  <div class="logo">SpaceTrace</div>
+  <div class="tagline">Космический Minecraft сервер — дуэли, дружба, приключения</div>
+
+  <div class="status">
+    <span class="pulse-dot" id="dot"></span>
+    <span id="statusText">Проверяем сервер...</span>
+  </div>
+
+  <div class="ip-block">
+    <span class="ip">f1.rustix.me:25283</span>
+    <button class="copy-btn" id="copyIp">Копировать IP</button>
+  </div>
+
+  <div class="buttons">
+    <a class="btn primary" href="javascript:copyIp();">Начать игру</a>
+    <a class="btn" href="https://cp.spacetrace.sryze.cc">Панель управления</a>
+    <a class="btn" href="./console/">Консоль</a>
+  </div>
+
+  <div class="footer">SPACE TRACE © 2026 · spacetrace.sryze.cc</div>
+</div>
 
 <script>
 (function () {
-  var ws = null;
-  var logEl = document.getElementById('log');
-  var dot = document.getElementById('dot');
-  var statusText = document.getElementById('statusText');
+  var canvas = document.getElementById('stars');
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  var meteors = [];
 
-  if (typeof CONFIG !== 'undefined') {
-    if (CONFIG.addr) document.getElementById('addr').value = CONFIG.addr;
-    if (CONFIG.token) document.getElementById('token').value = CONFIG.token;
-    if (CONFIG.title) document.title = CONFIG.title;
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var starCount = Math.min(260, Math.floor(window.innerWidth * window.innerHeight / 5000));
+  for (var i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + .2,
+      tw: Math.random() * Math.PI * 2,
+      sp: Math.random() * .02 + .005,
+      vx: (Math.random() - .5) * .04,
+      vy: (Math.random() - .5) * .04
+    });
   }
 
-  function setStatus(state, text) {
-    dot.className = 'dot ' + state;
-    statusText.textContent = text;
-  }
+  var last = 0;
+  function loop(t) {
+    var dt = Math.min(50, t - last || 16);
+    last = t;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  function now() {
-    return new Date().toTimeString().slice(0, 8);
-  }
+    for (var s of stars) {
+      s.tw += s.sp * dt / 8;
+      s.x += s.vx * dt / 16;
+      s.y += s.vy * dt / 16;
+      if (s.x < -5) s.x = canvas.width + 5; if (s.x > canvas.width + 5) s.x = -5;
+      if (s.y < -5) s.y = canvas.height + 5; if (s.y > canvas.height + 5) s.y = -5;
+      var a = .35 + Math.abs(Math.sin(s.tw)) * .65;
+      ctx.globalAlpha = a;
+      ctx.fillStyle = '#dbe6ff';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
 
-  function addLine(text, cls) {
-    var div = document.createElement('div');
-    div.className = 'log ' + (cls || '');
-    div.textContent = text;
-    logEl.appendChild(div);
-    while (logEl.childNodes.length > 2000) logEl.removeChild(logEl.firstChild);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
-  function sys(text) { addLine(now() + '  ' + text, 'sys'); }
-  function chat(player, message) { addLine(now() + '  [' + player + '] ' + message, 'chat'); }
-  function cmdEcho(cmd) { addLine(now() + '  > /' + cmd, 'cmd'); }
-
-  function connect() {
-    if (ws) ws.close();
-    var addr = document.getElementById('addr').value.trim();
-    if (!addr) { sys('Укажите адрес WebSocket'); return; }
-    setStatus('connecting', 'подключение...');
-    sys('Подключение к ' + addr + ' ...');
-
-    var url = addr;
-    if (/^wss?:\/\//i.test(url) === false) url = 'ws://' + url;
-
-    try {
-      ws = new WebSocket(url);
-    } catch (e) {
-      setStatus('offline', 'ошибка подключения');
-      sys('Ошибка: ' + e.message);
-      return;
+    if (Math.random() < .008 && meteors.length < 3) {
+      meteors.push({ x: Math.random() * canvas.width * .7 + canvas.width * .3, y: -10, vx: -(Math.random() * 5 + 6), vy: Math.random() * 2.5 + 3, life: 1 });
+    }
+    for (var i = meteors.length - 1; i >= 0; i--) {
+      var m = meteors[i];
+      m.x += m.vx * dt / 16;
+      m.y += m.vy * dt / 16;
+      m.life -= dt / 700;
+      if (m.life <= 0 || m.x < -50 || m.y > canvas.height + 50) { meteors.splice(i, 1); continue; }
+      var grad = ctx.createLinearGradient(m.x, m.y, m.x - m.vx * 3, m.y - m.vy * 3);
+      grad.addColorStop(0, 'rgba(255,255,255,' + (m.life * .9) + ')');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(m.x, m.y);
+      ctx.lineTo(m.x - m.vx * 3, m.y - m.vy * 3);
+      ctx.stroke();
     }
 
-    ws.onopen = function () {
-      setStatus('online', 'соединение установлено, авторизация...');
-      sys('Соединение установлено');
-      var token = document.getElementById('token').value.trim();
-      ws.send(JSON.stringify({ op: 'auth', token: token }));
-    };
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 
-    ws.onmessage = function (ev) {
-      var data;
-      try { data = JSON.parse(ev.data); } catch (e) { addLine(ev.data, 'log'); return; }
-      switch (data.op) {
-        case 'hello':
-          sys('Сервер: ' + (data.name || '') + (data.authRequired === false ? ' (без токена)' : ''));
-          break;
-        case 'auth':
-          if (data.ok) { sys('Авторизация успешна'); setStatus('online', 'авторизовано'); }
-          else { sys('Ошибка авторизации: ' + (data.message || 'неверный токен')); setStatus('offline', 'ошибка авторизации'); }
-          break;
-        case 'log':
-          addLine(data.line || '', (data.level || 'info').toLowerCase());
-          break;
-        case 'chat':
-          chat(data.player, data.message);
-          break;
-        case 'status':
-          sys('Статус: онлайн ' + data.online + '/' + data.max + ', tps ' + (data.tps ? data.tps.toFixed(1) : '?') + ', игроки: ' + (data.players ? data.players.join(', ') : '-'));
-          break;
-        case 'cmd_result':
-          sys(data.ok ? 'Команда выполнена: /' + data.cmd : 'Команда отклонена: /' + data.cmd);
-          break;
-        case 'error':
-          addLine('Ошибка: ' + data.message, 'error');
-          break;
-        case 'pong':
-          break;
-        default:
-          addLine(ev.data, 'log');
+  window.copyIp = function () {
+    copyIp();
+  };
+  function copyIp() {
+    var text = 'f1.rustix.me:25283';
+    var btn = document.getElementById('copyIp');
+    var done = function () { btn.textContent = 'Скопировано!'; setTimeout(function () { btn.textContent = 'Копировать IP'; }, 1500); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+  document.getElementById('copyIp').addEventListener('click', copyIp);
+
+  var dot = document.getElementById('dot');
+  var statusText = document.getElementById('statusText');
+  fetch('https://api.mcsrvstat.us/3/f1.rustix.me:25283')
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d && d.online) {
+        dot.classList.add('on');
+        var n = d.players ? d.players.online : 0;
+        var m = d.players ? d.players.max : 0;
+        statusText.textContent = 'Сервер онлайн · ' + n + '/' + m + ' игроков';
+      } else {
+        dot.classList.add('off');
+        statusText.textContent = 'Сервер офлайн';
       }
-    };
-
-    ws.onerror = function () {
-      sys('Ошибка сети');
-    };
-
-    ws.onclose = function () {
-      setStatus('offline', 'отключено');
-      sys('Соединение закрыто');
-      ws = null;
-    };
-  }
-
-  function sendCmd() {
-    if (!ws || ws.readyState !== WebSocket.OPEN) { sys('Сначала подключитесь'); return; }
-    var cmd = document.getElementById('cmd').value.trim();
-    if (!cmd) return;
-    cmdEcho(cmd);
-    ws.send(JSON.stringify({ op: 'command', cmd: cmd }));
-    document.getElementById('cmd').value = '';
-  }
-
-  document.getElementById('btnConnect').addEventListener('click', connect);
-  document.getElementById('btnSend').addEventListener('click', sendCmd);
-  document.getElementById('cmd').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') sendCmd();
-  });
-  document.querySelectorAll('#quick button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.getElementById('cmd').value = b.dataset.cmd;
-      sendCmd();
+    })
+    .catch(function () {
+      statusText.textContent = 'Сервер: статус недоступен';
     });
-  });
-  document.getElementById('token').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') connect();
-  });
-
-  sys('Откройте консоль: укажите адрес ws://<IP>:25570, токен из config.yml плагина ConnectApi и нажмите Подключить.');
 })();
 </script>
 </body>

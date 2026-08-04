@@ -12,9 +12,9 @@
 host: 0.0.0.0
 port: 38710
 
-# Token that the web console / control panel must send to connect.
-# CHANGE THIS! Anyone with the token can run allowed commands on your server.
-token: change-me
+# Password that the web console / control panel must send to connect.
+# CHANGE THIS! Anyone with the password can run allowed commands on your server.
+password: change-me
 
 # Command prefixes allowed from the web. Each entry is a command name.
 # An empty list means ALL commands are allowed (dangerous!).

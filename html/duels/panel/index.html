@@ -169,8 +169,8 @@
         <input id="lgAddr" placeholder="ws://play.spacetrace.sryze.cc:25570" value="ws://localhost:25570">
       </div>
       <div class="field">
-        <label>Токен (из config.yml плагина ConnectApi)</label>
-        <input id="lgToken" type="password" placeholder="token">
+        <label>Пароль (из config.yml плагина ConnectApi)</label>
+        <input id="lgToken" type="password" placeholder="пароль">
       </div>
       <button id="btnLogin" class="primary">Войти</button>
       <div class="err" id="lgErr"></div>
@@ -366,7 +366,7 @@
     try { ws = new WebSocket(url); } catch (e) { showLogin('Не удалось подключиться: ' + e.message); return; }
 
     ws.onopen = function () {
-      ws.send(JSON.stringify({ op: 'auth', token: token }));
+      ws.send(JSON.stringify({ op: 'auth', password: token }));
     };
 
     ws.onmessage = function (ev) {
@@ -381,7 +381,7 @@
             addChat('Авторизация успешна', 'sys');
             send({ op: 'status' });
           } else {
-            showLogin('Неверный токен. Проверьте config.yml плагина ConnectApi.');
+            showLogin('Неверный пароль. Проверьте config.yml плагина ConnectApi.');
           }
           break;
         case 'status':
