@@ -1,6 +1,8 @@
 package org.nig.smp.connectapi;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.nig.smp.connectapi.command.ConnectApiCommand;
+import org.nig.smp.connectapi.core.AccountManager;
 import org.nig.smp.connectapi.core.ConsoleForwarder;
 import org.nig.smp.connectapi.core.MessageHandler;
 import org.nig.smp.connectapi.core.SessionManager;
@@ -13,27 +15,32 @@ public final class ConnectApiPlugin extends JavaPlugin {
 
     private WebSocketServer wsServer;
     private ConsoleForwarder consoleForwarder;
+    private AccountManager accounts;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
         String host = getConfig().getString("host", "0.0.0.0");
-        int port = getConfig().getInt("port", 25570);
+        int port = getConfig().getInt("port", 38710);
+
+        this.accounts = new AccountManager(this);
 
         SessionManager sessions = new SessionManager();
         StatusManager statusManager = new StatusManager(this, sessions);
-        MessageHandler handler = new MessageHandler(this, sessions, statusManager);
+        MessageHandler handler = new MessageHandler(this, sessions, statusManager, accounts);
 
         this.wsServer = new WebSocketServer(host, port, sessions, handler);
         this.consoleForwarder = ConsoleForwarder.start(sessions);
 
+        getCommand("connectapi").setExecutor(new ConnectApiCommand(accounts));
+
         wsServer.start();
         statusManager.start();
 
-        boolean tokenChanged = !getPassword().isEmpty() && !"change-me".equals(getPassword());
         getLogger().info("ConnectApi enabled on ws://" + host + ":" + port
-                + " (password set: " + tokenChanged + ", allowed commands: " + getAllowedCommands().size() + ")");
+                + " (accounts: " + accounts.getAccounts().size()
+                + ", allowed commands: " + getAllowedCommands().size() + ")");
     }
 
     @Override
@@ -47,8 +54,8 @@ public final class ConnectApiPlugin extends JavaPlugin {
         getLogger().info("ConnectApi disabled");
     }
 
-    public String getPassword() {
-        return getConfig().getString("password", getConfig().getString("token", "change-me"));
+    public AccountManager getAccounts() {
+        return accounts;
     }
 
     public boolean forwardChat() {

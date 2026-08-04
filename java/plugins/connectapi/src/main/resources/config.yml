@@ -8,13 +8,19 @@
 # Пример для f1.rustix.me: MC на 25283, запасной 38710.
 # Голосовой чат (Simple Voice Chat) ходит по UDP, ConnectApi по TCP —
 # они могут жить на ОДНОМ номере порта (38710) одновременно.
-# Укажите такой же порт в voicechat.server.port.
 host: 0.0.0.0
 port: 38710
 
-# Password that the web console / control panel must send to connect.
-# CHANGE THIS! Anyone with the password can run allowed commands on your server.
-password: change-me
+# ==== Аккаунты панели/консоли ====
+# Вход на сайте идёт по нику. Ник должен быть в этом списке.
+# Пароль можно создавать командой на сервере:
+#   /connectapi adduser <ник> <пароль>
+#   /connectapi passwd <ник> <пароль>
+#   /connectapi removeuser <ник>
+# Пустой пароль ("") означает вход БЕЗ пароля.
+accounts:
+  bogdemon: ""
+  ZAYZER: ""
 
 # Command prefixes allowed from the web. Each entry is a command name.
 # An empty list means ALL commands are allowed (dangerous!).

@@ -16,18 +16,20 @@ public class MessageHandler {
     private final ConnectApiPlugin plugin;
     private final SessionManager sessions;
     private final StatusManager status;
+    private final AccountManager accounts;
 
-    public MessageHandler(ConnectApiPlugin plugin, SessionManager sessions, StatusManager status) {
+    public MessageHandler(ConnectApiPlugin plugin, SessionManager sessions, StatusManager status, AccountManager accounts) {
         this.plugin = plugin;
         this.sessions = sessions;
         this.status = status;
+        this.accounts = accounts;
     }
 
     public void onOpen(WebSocketConnection conn) {
         JsonObject hello = new JsonObject();
         hello.addProperty("op", "hello");
         hello.addProperty("name", "ConnectApi");
-        hello.addProperty("authRequired", !plugin.getPassword().isEmpty());
+        hello.addProperty("authRequired", true);
         conn.send(hello.toString());
     }
 
@@ -57,21 +59,24 @@ public class MessageHandler {
 
         switch (op) {
             case "auth": {
+                String nick = str(msg, "nick");
                 String password = str(msg, "password");
-                if (password == null) password = str(msg, "token"); // обратная совместимость
-                boolean ok = password != null && !plugin.getPassword().isEmpty() && password.equals(plugin.getPassword());
+                boolean ok = accounts.authorize(nick, password);
                 JsonObject r = new JsonObject();
                 r.addProperty("op", "auth");
                 r.addProperty("ok", ok);
                 if (ok) {
+                    conn.setNick(nick);
                     sessions.markAuthed(conn);
+                    r.addProperty("nick", nick);
                     r.addProperty("message", "authenticated");
                     conn.send(r.toString());
                     status.sendStatus(conn);
                 } else {
-                    r.addProperty("message", "invalid password");
+                    r.addProperty("message", accounts.hasAccount(nick)
+                            ? "wrong password" : "nick not registered on the server");
                     conn.send(r.toString());
-                    conn.close("bad password");
+                    conn.close("bad credentials");
                 }
                 break;
             }

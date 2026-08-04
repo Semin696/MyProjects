@@ -413,6 +413,11 @@ public final class DuelManager {
         matches.remove(match.getP1());
         matches.remove(match.getP2());
 
+        UUID loserId = match.getP1().equals(winnerId) ? match.getP2() : match.getP1();
+        plugin.getStatsManager().recordWin(winnerId);
+        plugin.getStatsManager().recordLoss(loserId);
+        plugin.getStatsManager().save();
+
         Player winner = Bukkit.getPlayer(winnerId);
         for (UUID id : match.players()) {
             Player p = Bukkit.getPlayer(id);

@@ -26,6 +26,7 @@ public class WebSocketConnection implements Runnable {
 
     private volatile boolean open = true;
     private volatile boolean authed = false;
+    private volatile String nick = null;
     private OutputStream out;
 
     public WebSocketConnection(Socket socket, SessionManager sessions, MessageHandler handler) {
@@ -238,5 +239,13 @@ public class WebSocketConnection implements Runnable {
 
     public void setAuthed(boolean authed) {
         this.authed = authed;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 }

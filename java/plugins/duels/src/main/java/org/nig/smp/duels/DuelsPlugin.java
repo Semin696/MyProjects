@@ -16,9 +16,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.nig.smp.duels.cmi.CMIKitBridge;
 import org.nig.smp.duels.command.DuelCommand;
 import org.nig.smp.duels.command.KitCommand;
+import org.nig.smp.duels.expansion.DuelsExpansion;
 import org.nig.smp.duels.listener.PlayerListener;
 import org.nig.smp.duels.manager.ArenaManager;
 import org.nig.smp.duels.manager.DuelManager;
+import org.nig.smp.duels.manager.StatsManager;
 import org.nig.smp.duels.manager.VisibilityManager;
 
 import java.util.UUID;
@@ -29,6 +31,8 @@ public final class DuelsPlugin extends JavaPlugin {
     private ArenaManager arenaManager;
     private DuelManager duelManager;
     private VisibilityManager visibilityManager;
+    private StatsManager statsManager;
+    private DuelsExpansion duelsExpansion;
 
     @Override
     public void onEnable() {
@@ -39,6 +43,9 @@ public final class DuelsPlugin extends JavaPlugin {
 
         this.arenaManager = new ArenaManager(this);
         arenaManager.load();
+
+        this.statsManager = new StatsManager(this);
+        statsManager.load();
 
         this.visibilityManager = new VisibilityManager(this);
         this.duelManager = new DuelManager(this, arenaManager, visibilityManager);
@@ -64,6 +71,17 @@ public final class DuelsPlugin extends JavaPlugin {
             getLogger().warning("Плагин CMI не найден! Киты для дуэлей будут недоступны.");
         }
 
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            this.duelsExpansion = new DuelsExpansion(this);
+            if (duelsExpansion.register()) {
+                getLogger().info("PlaceholderAPI: зарегистрированы плейсхолдеры %duels_*%");
+            } else {
+                getLogger().warning("PlaceholderAPI: не удалось зарегистрировать экспаншен");
+            }
+        } else {
+            getLogger().warning("PlaceholderAPI не найден, плейсхолдеры %duels_*% недоступны");
+        }
+
         getLogger().info("Duels enabled. Arenas: " + arenaManager.getArenas().size());
     }
 
@@ -71,6 +89,12 @@ public final class DuelsPlugin extends JavaPlugin {
     public void onDisable() {
         if (duelManager != null) {
             duelManager.shutdown();
+        }
+        if (statsManager != null) {
+            statsManager.save();
+        }
+        if (duelsExpansion != null) {
+            duelsExpansion.unregister();
         }
         getLogger().info("Duels disabled");
     }
@@ -159,6 +183,10 @@ public final class DuelsPlugin extends JavaPlugin {
 
     public VisibilityManager getVisibilityManager() {
         return visibilityManager;
+    }
+
+    public StatsManager getStatsManager() {
+        return statsManager;
     }
 
     public String raw(String path, Object... placeholders) {

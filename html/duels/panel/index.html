@@ -3,174 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Panel — spacetrace.sryze.cc</title>
-<script src="../config.js"></script>
+<title>SpaceTrace — Панель управления</title>
+<script src="config.js"></script>
+<script>
+(function () {
+  var allowed = ['cp.spacetrace.sryze.cc', 'spacetrace.sryze.cc', 'localhost', '127.0.0.1'];
+  var host = window.location.hostname;
+  if (host && allowed.indexOf(host) === -1) {
+    window.location.replace('https://cp.spacetrace.sryze.cc/');
+  }
+})();
+</script>
 <style>
   :root {
-    --bg: #0d1117;
-    --panel: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --muted: #8b949e;
     --accent: #58a6ff;
-    --green: #3fb950;
-    --red: #f85149;
-    --yellow: #d29922;
+    --accent2: #8b5cf6;
+    --accent3: #22d3ee;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
+    --glass: rgba(22,27,34,.55);
+    --border: rgba(255,255,255,.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
-    color: var(--text);
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text);
+    background: #05070f;
     min-height: 100vh;
+    overflow-x: hidden;
+  }
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  .nebula {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(45% 55% at 20% 15%, rgba(99,102,241,.22), transparent 70%),
+      radial-gradient(50% 55% at 85% 20%, rgba(34,211,238,.14), transparent 70%),
+      radial-gradient(55% 55% at 70% 95%, rgba(139,92,246,.18), transparent 70%);
+    animation: nebulaDrift 26s ease-in-out infinite alternate;
+  }
+  @keyframes nebulaDrift {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(-2%,-3%) scale(1.12); }
   }
   .hidden { display: none !important; }
+  .z1 { position: relative; z-index: 1; }
 
-  /* ---- login ---- */
+  /* ---------- вход ---------- */
   #loginScreen {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 16px;
   }
   .login-card {
-    background: var(--panel);
+    width: 100%; max-width: 400px;
+    background: var(--glass);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-    width: 100%;
-    max-width: 380px;
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    padding: 34px 32px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 0 60px rgba(88,166,255,.10);
+    animation: fadeUp .6s ease both;
   }
-  .login-card h1 { font-size: 20px; margin-bottom: 4px; }
-  .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  input, select {
+  .login-card .brand {
+    text-align: center; margin-bottom: 26px;
+  }
+  .login-card .brand .logo {
+    font-size: 30px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+    background: linear-gradient(120deg, var(--accent3), var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .login-card .brand p { color: var(--muted); font-size: 13px; margin-top: 6px; letter-spacing: .04em; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 7px; letter-spacing: .03em; }
+  input {
     width: 100%;
-    background: var(--bg);
+    background: rgba(255,255,255,.05);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 9px 10px;
+    border-radius: 10px;
+    padding: 11px 13px;
     font-size: 14px;
     outline: none;
+    transition: border-color .2s, box-shadow .2s;
   }
-  input:focus { border-color: var(--accent); }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,.18); }
   button {
-    background: #21262d;
+    background: rgba(255,255,255,.07);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 14px;
+    border-radius: 10px;
+    padding: 9px 16px;
     font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background .15s;
+    transition: background .2s, transform .1s, box-shadow .2s;
   }
-  button:hover { background: #30363d; }
-  button.primary { background: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; width: 100%; padding: 10px; font-size: 15px; }
-  button.primary:hover { background: #79c0ff; }
-  button.danger { background: var(--red); color: #fff; border-color: var(--red); }
-  button.danger:hover { opacity: .85; }
-  .err { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+  button:hover { background: rgba(255,255,255,.14); }
+  button:active { transform: scale(.97); }
+  button.primary {
+    width: 100%; padding: 12px;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff; font-size: 15px;
+    box-shadow: 0 8px 26px rgba(88,166,255,.35);
+  }
+  button.primary:hover { box-shadow: 0 10px 34px rgba(139,92,246,.5); }
+  button.danger { background: rgba(248,81,73,.15); border-color: rgba(248,81,73,.4); color: #ff9d99; }
+  button.danger:hover { background: rgba(248,81,73,.3); }
+  .err { color: #ff9d99; font-size: 13px; margin-top: 12px; min-height: 18px; text-align: center; }
 
-  /* ---- main ---- */
-  #app { display: flex; flex-direction: column; min-height: 100vh; }
+  /* ---------- панель ---------- */
+  #app { min-height: 100vh; display: flex; flex-direction: column; }
   header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    background: var(--panel);
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 22px;
+    background: rgba(10,13,20,.7);
     border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 5;
     flex-wrap: wrap;
   }
-  header h1 { font-size: 16px; font-weight: 600; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); display: inline-block; }
-  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .dot.offline { background: var(--red); }
-  .dot.connecting { background: var(--yellow); }
+  header .brand { font-weight: 900; letter-spacing: .08em; text-transform: uppercase; font-size: 15px;
+    background: linear-gradient(120deg, var(--accent3), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block; animation: pulse 1.6s ease-in-out infinite; }
+  .dot.online { background: #22c55e; box-shadow: 0 0 12px #22c55e; }
+  .dot.offline { background: #ef4444; box-shadow: 0 0 12px #ef4444; }
+  .dot.connecting { background: #f59e0b; }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(.7);opacity:.55} }
   .grow { flex: 1; }
   .hint { color: var(--muted); font-size: 12px; }
+  header nav { display: flex; gap: 6px; }
+  header nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600;
+    padding: 7px 12px; border-radius: 8px; transition: background .2s, color .2s;
+  }
+  header nav a:hover { background: rgba(255,255,255,.08); color: var(--text); }
+  header nav a.active { background: rgba(88,166,255,.15); color: var(--accent); }
+
+  .content { padding: 20px 22px 40px; max-width: 1400px; width: 100%; margin: 0 auto; }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 12px;
-    padding: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
   }
   .card {
-    background: var(--panel);
+    background: var(--glass);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
+    border-radius: 16px;
+    padding: 18px;
+    backdrop-filter: blur(10px);
+    transition: transform .2s, border-color .2s;
   }
-  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
-  .card .value { font-size: 24px; font-weight: 700; margin-top: 6px; font-family: Consolas, monospace; }
-  .card .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
-  .tps-ok { color: var(--green); } .tps-warn { color: var(--yellow); } .tps-bad { color: var(--red); }
+  .card:hover { transform: translateY(-3px); border-color: rgba(88,166,255,.35); }
+  .card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .card .value { font-size: 26px; font-weight: 800; margin-top: 8px; font-family: Consolas, monospace; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tps-ok { color: #22c55e; } .tps-warn { color: #f59e0b; } .tps-bad { color: #ef4444; }
 
   .columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 16px 16px;
+    gap: 14px;
+    margin-bottom: 18px;
   }
   .box {
-    background: var(--panel);
+    background: var(--glass);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
+    border-radius: 16px;
+    padding: 18px;
+    backdrop-filter: blur(10px);
   }
-  .box h3 { font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-  .box .actions { display: flex; gap: 6px; }
+  .box h3 { font-size: 13px; margin-bottom: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+  .inputRow { display: flex; gap: 8px; margin-bottom: 12px; }
+  .inputRow input, .inputRow select { width: auto; flex: 1; }
+  .inputRow input.small { flex: 0 1 130px; }
+  .inline { display: flex; gap: 8px; align-items: center; }
   #playerList { list-style: none; }
   #playerList li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    background: var(--bg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 7px; background: rgba(255,255,255,.03);
   }
-  #playerList li button { padding: 4px 8px; font-size: 12px; }
+  #playerList li .pname { font-weight: 600; }
+  #playerList li button { padding: 4px 10px; font-size: 12px; }
   #chatLog {
-    height: 240px;
-    overflow-y: auto;
-    font-family: Consolas, monospace;
-    font-size: 13px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px;
-    line-height: 1.5;
+    height: 250px; overflow-y: auto;
+    font-family: Consolas, monospace; font-size: 13px; line-height: 1.55;
+    background: rgba(0,0,0,.35); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px;
   }
-  #chatLog .chat { color: var(--green); }
+  #chatLog .chat { color: #34d399; }
   #chatLog .sys { color: var(--accent); font-style: italic; }
   #chatLog .muted { color: var(--muted); }
-  .inputRow { display: flex; gap: 8px; margin-bottom: 10px; }
-  .inputRow input, .inputRow select { width: auto; flex: 1; }
-  .inputRow input.small { flex: 0 1 120px; }
-  .inline { display: flex; gap: 6px; align-items: center; }
+  .muted { color: var(--muted); }
+
   @media (max-width: 900px) { .columns { grid-template-columns: 1fr; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
+<canvas id="stars"></canvas>
+<div class="nebula"></div>
+
   <!-- ================= ВХОД ================= -->
-  <div id="loginScreen">
+  <div id="loginScreen" class="z1">
     <div class="login-card">
-      <h1>Control Panel</h1>
-      <p>cp.spacetrace.sryze.cc — управление сервером</p>
-      <div class="field">
-        <label>Адрес сервера (ws://IP:порт)</label>
-        <input id="lgAddr" placeholder="ws://play.spacetrace.sryze.cc:25570" value="ws://localhost:25570">
+      <div class="brand">
+        <div class="logo">SpaceTrace</div>
+        <p>Панель управления сервером</p>
       </div>
       <div class="field">
-        <label>Пароль (из config.yml плагина ConnectApi)</label>
-        <input id="lgToken" type="password" placeholder="пароль">
+        <label>Введите ник (зарегистрированный на сервере)</label>
+        <input id="lgNick" placeholder="ник" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input id="lgPass" type="password" placeholder="пароль" autocomplete="current-password">
       </div>
       <button id="btnLogin" class="primary">Войти</button>
       <div class="err" id="lgErr"></div>
@@ -181,125 +233,154 @@
   <div id="app" class="hidden">
     <header>
       <span class="dot" id="dot"></span>
-      <h1>Control Panel</h1>
+      <span class="brand">SpaceTrace CP</span>
       <span class="hint" id="connInfo">—</span>
       <div class="grow"></div>
+      <nav>
+        <a href="https://spacetrace.sryze.cc">Сайт</a>
+        <a href="./console/">Консоль</a>
+        <a class="active" href="./">Панель</a>
+      </nav>
       <button id="btnRefresh">Обновить</button>
       <button id="btnLogout">Выйти</button>
     </header>
 
-    <div class="grid">
-      <div class="card"><div class="label">Игроки онлайн</div><div class="value" id="statOnline">-</div><div class="sub" id="statPlayers">—</div></div>
-      <div class="card"><div class="label">TPS</div><div class="value tps-ok" id="statTps">-</div><div class="sub">1-минутный срез</div></div>
-      <div class="card"><div class="label">Версия</div><div class="value" id="statVersion" style="font-size:16px">-</div><div class="sub" id="statMOTD">—</div></div>
-      <div class="card"><div class="label">Аптайм</div><div class="value" id="statUptime">-</div><div class="sub" id="statWorlds">—</div></div>
-    </div>
-
-    <div class="columns">
-      <div class="box">
-        <h3>Игроки</h3>
-        <div class="inputRow">
-          <input id="playerInput" placeholder="Ник игрока" class="small">
-          <select id="playerAction">
-            <option value="kick">kick</option>
-            <option value="ban">ban</option>
-            <option value="pardon">разбанить</option>
-            <option value="op">выдать op</option>
-            <option value="deop">снять op</option>
-          </select>
-          <button id="btnPlayer">Выполнить</button>
-        </div>
-        <ul id="playerList"><li class="muted">Нет данных</li></ul>
+    <div class="content">
+      <div class="grid">
+        <div class="card"><div class="label">Игроки онлайн</div><div class="value" id="statOnline">-</div><div class="sub" id="statPlayers">—</div></div>
+        <div class="card"><div class="label">TPS</div><div class="value tps-ok" id="statTps">-</div><div class="sub">1-минутный срез</div></div>
+        <div class="card"><div class="label">Версия</div><div class="value" id="statVersion" style="font-size:16px">-</div><div class="sub" id="statMOTD">—</div></div>
+        <div class="card"><div class="label">Аптайм</div><div class="value" id="statUptime">-</div><div class="sub" id="statWorlds">—</div></div>
       </div>
 
-      <div class="box">
-        <h3>Чат</h3>
-        <div class="inputRow">
-          <input id="bcMsg" placeholder="Сообщение для всех игроков">
-          <button id="btnBroadcast">Анонс</button>
+      <div class="columns">
+        <div class="box">
+          <h3>Игроки</h3>
+          <div class="inputRow">
+            <input id="playerInput" placeholder="Ник игрока" class="small">
+            <select id="playerAction">
+              <option value="kick">kick</option>
+              <option value="ban">ban</option>
+              <option value="pardon">разбанить</option>
+              <option value="op">выдать op</option>
+              <option value="deop">снять op</option>
+            </select>
+            <button id="btnPlayer">Выполнить</button>
+          </div>
+          <ul id="playerList"><li class="muted">Нет данных</li></ul>
         </div>
-        <div id="chatLog"><div class="muted">Ожидание сообщений...</div></div>
-      </div>
-    </div>
 
-    <div class="columns">
-      <div class="box">
-        <h3>Консольная команда</h3>
-        <div class="inputRow">
-          <input id="cmdInput" placeholder="Команда без слэша, например: say test">
-          <button id="btnCmd" class="primary">Выполнить</button>
+        <div class="box">
+          <h3>Чат</h3>
+          <div class="inputRow">
+            <input id="bcMsg" placeholder="Сообщение для всех игроков">
+            <button id="btnBroadcast">Анонс</button>
+          </div>
+          <div id="chatLog"><div class="muted">Ожидание сообщений...</div></div>
         </div>
-        <div class="hint">Разрешённые команды задаются в config.yml плагина ConnectApi (allowed-commands).</div>
       </div>
 
-      <div class="box">
-        <h3>Whitelist</h3>
-        <div class="inputRow">
-          <input id="wlInput" placeholder="Ник игрока" class="small">
-          <button id="btnWlAdd">Добавить</button>
-          <button id="btnWlRemove">Убрать</button>
+      <div class="columns">
+        <div class="box">
+          <h3>Консольная команда</h3>
+          <div class="inputRow">
+            <input id="cmdInput" placeholder="Команда без слэша, например: say test">
+            <button id="btnCmd" class="primary">Выполнить</button>
+          </div>
+          <div class="hint">Разрешённые команды задаются в config.yml плагина ConnectApi (allowed-commands).</div>
         </div>
-        <h3 style="margin-top:14px">Сервер</h3>
-        <div class="inline" style="gap:8px">
-          <button id="btnStop" class="danger">Остановить сервер</button>
-          <button id="btnRestart" class="danger">Перезапустить сервер</button>
+
+        <div class="box">
+          <h3>Whitelist</h3>
+          <div class="inputRow">
+            <input id="wlInput" placeholder="Ник игрока" class="small">
+            <button id="btnWlAdd">Добавить</button>
+            <button id="btnWlRemove">Убрать</button>
+          </div>
+          <h3 style="margin-top:16px">Сервер</h3>
+          <div class="inline">
+            <button id="btnStop" class="danger">Остановить сервер</button>
+            <button id="btnRestart" class="danger">Перезапустить сервер</button>
+          </div>
+          <div class="hint" style="margin-top:8px">Стоп/рестарт требуют разрешения команды в allowed-commands.</div>
         </div>
-        <div class="hint" style="margin-top:8px">Стоп/рестарт требуют разрешения команды в allowed-commands.</div>
       </div>
     </div>
   </div>
 
 <script>
 (function () {
+  /* ---------- звёздный фон ---------- */
+  var canvas = document.getElementById('stars');
+  var ctx = canvas.getContext('2d');
+  var stars = [], meteors = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  var n = Math.min(220, Math.floor(window.innerWidth * window.innerHeight / 6000));
+  for (var i = 0; i < n; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.3+.2, tw: Math.random()*Math.PI*2, sp: Math.random()*.02+.005 });
+  var last = 0;
+  function loop(t) {
+    var dt = Math.min(50, t - last || 16); last = t;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (var s of stars) {
+      s.tw += s.sp*dt/8;
+      var a = .3 + Math.abs(Math.sin(s.tw))*.7;
+      ctx.globalAlpha = a; ctx.fillStyle = '#dbe6ff';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if (Math.random() < .006 && meteors.length < 2) meteors.push({ x: Math.random()*canvas.width*.7+canvas.width*.3, y: -10, vx: -(Math.random()*5+6), vy: Math.random()*2.5+3, life: 1 });
+    for (var mi = meteors.length-1; mi >= 0; mi--) {
+      var m = meteors[mi];
+      m.x += m.vx*dt/16; m.y += m.vy*dt/16; m.life -= dt/700;
+      if (m.life <= 0 || m.x < -50 || m.y > canvas.height+50) { meteors.splice(mi,1); continue; }
+      var g = ctx.createLinearGradient(m.x,m.y,m.x-m.vx*3,m.y-m.vy*3);
+      g.addColorStop(0,'rgba(255,255,255,'+(m.life*.9)+')'); g.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(m.x,m.y); ctx.lineTo(m.x-m.vx*3,m.y-m.vy*3); ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ---------- логика ---------- */
   var ws = null;
   var authed = false;
   var storeKey = 'cpspc_session';
-  var lastStatus = null;
   var reconnectTimer = null;
+  var WS_ADDR = (typeof CONFIG !== 'undefined' && CONFIG.addr) ? CONFIG.addr : 'ws://play.spacetrace.sryze.cc:38710';
 
   var $ = function (id) { return document.getElementById(id); };
   var loginScreen = $('loginScreen');
   var app = $('app');
 
   function now() { return new Date().toTimeString().slice(0, 8); }
-
   function saveSession() {
-    localStorage.setItem(storeKey, JSON.stringify({
-      addr: $('lgAddr').value.trim(),
-      token: $('lgToken').value.trim()
-    }));
+    localStorage.setItem(storeKey, JSON.stringify({ nick: $('lgNick').value.trim(), pass: $('lgPass').value.trim() }));
   }
   function loadSession() {
     try {
       var s = JSON.parse(localStorage.getItem(storeKey) || '{}');
-      if (s.addr) $('lgAddr').value = s.addr;
-      if (s.token) $('lgToken').value = s.token;
+      if (s.nick) $('lgNick').value = s.nick;
+      if (s.pass) $('lgPass').value = s.pass;
     } catch (e) {}
-    if (typeof CONFIG !== 'undefined') {
-      if (CONFIG.addr && !localStorage.getItem(storeKey)) $('lgAddr').value = CONFIG.addr;
-      if (CONFIG.token) $('lgToken').value = CONFIG.token;
-      if (CONFIG.title) document.title = CONFIG.title;
-    }
+    if (typeof CONFIG !== 'undefined' && CONFIG.title) document.title = CONFIG.title;
   }
-
   function setStatus(state, text) {
     $('dot').className = 'dot ' + state;
     $('connInfo').textContent = text || '';
   }
-
   function showLogin(err) {
     $('lgErr').textContent = err || '';
     app.classList.add('hidden');
     loginScreen.classList.remove('hidden');
   }
-
   function showApp() {
     loginScreen.classList.add('hidden');
     app.classList.remove('hidden');
   }
-
   function renderStatus(data) {
-    lastStatus = data;
     $('statOnline').textContent = data.online + ' / ' + data.max;
     $('statPlayers').textContent = (data.players && data.players.length) ? data.players.join(', ') : 'никто';
     var tps = typeof data.tps === 'number' ? data.tps : 20;
@@ -321,24 +402,23 @@
     } else {
       data.players.forEach(function (name) {
         var li = document.createElement('li');
-        li.textContent = name;
+        var span = document.createElement('span');
+        span.className = 'pname';
+        span.textContent = name;
         var btn = document.createElement('button');
         btn.textContent = 'kick';
-        btn.addEventListener('click', function () {
-          sendCommand('kick ' + name);
-        });
+        btn.addEventListener('click', function () { sendCommand('kick ' + name); });
+        li.appendChild(span);
         li.appendChild(btn);
         list.appendChild(li);
       });
     }
   }
-
   function fmtUptime(s) {
     s = Math.floor(s || 0);
     var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
     return (d ? d + 'д ' : '') + h + 'ч ' + m + 'м';
   }
-
   function addChat(text, cls) {
     var log = $('chatLog');
     var div = document.createElement('div');
@@ -348,27 +428,21 @@
     while (log.childNodes.length > 500) log.removeChild(log.firstChild);
     log.scrollTop = log.scrollHeight;
   }
-
   function send(json) {
     if (!ws || ws.readyState !== WebSocket.OPEN) { addChat('Нет соединения', 'muted'); return; }
     ws.send(JSON.stringify(json));
   }
+  function sendCommand(cmd) { send({ op: 'command', cmd: cmd }); }
 
-  function sendCommand(cmd) {
-    send({ op: 'command', cmd: cmd });
-  }
-
-  function connect(addr, token) {
+  function connect(nick, pass) {
     if (ws) ws.close();
     setStatus('connecting', 'подключение...');
-
-    var url = /^wss?:\/\//i.test(addr) ? addr : 'ws://' + addr;
+    var url = /^wss?:\/\//i.test(WS_ADDR) ? WS_ADDR : 'ws://' + WS_ADDR;
     try { ws = new WebSocket(url); } catch (e) { showLogin('Не удалось подключиться: ' + e.message); return; }
 
     ws.onopen = function () {
-      ws.send(JSON.stringify({ op: 'auth', password: token }));
+      ws.send(JSON.stringify({ op: 'auth', nick: nick, password: pass }));
     };
-
     ws.onmessage = function (ev) {
       var data;
       try { data = JSON.parse(ev.data); } catch (e) { return; }
@@ -378,10 +452,10 @@
             authed = true;
             showApp();
             setStatus('online', 'подключено');
-            addChat('Авторизация успешна', 'sys');
+            addChat('Привет, ' + (data.nick || '') + '! Авторизация успешна', 'sys');
             send({ op: 'status' });
           } else {
-            showLogin('Неверный пароль. Проверьте config.yml плагина ConnectApi.');
+            showLogin(data.message === 'wrong password' ? 'Неверный пароль.' : 'Ник не зарегистрирован на сервере. Создайте аккаунт: /connectapi adduser <ник> <пароль>');
           }
           break;
         case 'status':
@@ -402,16 +476,14 @@
           break;
       }
     };
-
     ws.onerror = function () { addChat('Ошибка сети', 'muted'); };
-
     ws.onclose = function () {
       setStatus('offline', 'отключено');
       if (authed) {
         addChat('Соединение потеряно, переподключение через 3 сек...', 'muted');
         if (reconnectTimer) clearTimeout(reconnectTimer);
         reconnectTimer = setTimeout(function () {
-          connect($('lgAddr').value.trim(), $('lgToken').value.trim());
+          connect($('lgNick').value.trim(), $('lgPass').value.trim());
         }, 3000);
       }
       ws = null;
@@ -419,14 +491,14 @@
   }
 
   $('btnLogin').addEventListener('click', function () {
-    var addr = $('lgAddr').value.trim();
-    var token = $('lgToken').value.trim();
-    if (!addr || !token) { $('lgErr').textContent = 'Укажите адрес и токен'; return; }
+    var nick = $('lgNick').value.trim();
+    var pass = $('lgPass').value.trim();
+    if (!nick) { $('lgErr').textContent = 'Введите ник'; return; }
     saveSession();
-    connect(addr, token);
+    connect(nick, pass);
   });
-  $('lgAddr').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
-  $('lgToken').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
+  $('lgNick').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
+  $('lgPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
 
   $('btnLogout').addEventListener('click', function () {
     authed = false;
@@ -435,7 +507,6 @@
     ws = null;
     showLogin();
   });
-
   $('btnRefresh').addEventListener('click', function () { send({ op: 'status' }); });
 
   $('btnBroadcast').addEventListener('click', function () {
@@ -461,16 +532,14 @@
     sendCommand(action + ' ' + name);
     $('playerInput').value = '';
   });
-
   $('btnWlAdd').addEventListener('click', function () {
-    var n = $('wlInput').value.trim(); if (!n) return;
-    sendCommand('whitelist add ' + n); $('wlInput').value = '';
+    var nn = $('wlInput').value.trim(); if (!nn) return;
+    sendCommand('whitelist add ' + nn); $('wlInput').value = '';
   });
   $('btnWlRemove').addEventListener('click', function () {
-    var n = $('wlInput').value.trim(); if (!n) return;
-    sendCommand('whitelist remove ' + n); $('wlInput').value = '';
+    var nn = $('wlInput').value.trim(); if (!nn) return;
+    sendCommand('whitelist remove ' + nn); $('wlInput').value = '';
   });
-
   $('btnStop').addEventListener('click', function () {
     if (confirm('Точно остановить сервер?')) sendCommand('stop');
   });

@@ -4,3 +4,15 @@ main: org.nig.smp.connectapi.ConnectApiPlugin
 api-version: '1.21.11'
 author: NightfallRealm
 description: WebSocket bridge between the web console/panel and the server
+
+commands:
+  connectapi:
+    description: Управление аккаунтами ConnectApi
+    usage: /<command> adduser <ник> <пароль> | passwd <ник> <пароль> | removeuser <ник> | list
+    aliases: [capi]
+    permission: connectapi.admin
+
+permissions:
+  connectapi.admin:
+    description: Управление аккаунтами ConnectApi
+    default: op

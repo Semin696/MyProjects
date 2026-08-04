@@ -5,7 +5,7 @@ api-version: '1.21.11'
 load: POSTWORLD
 author: NightfallRealm
 description: Duels plugin with CMI kits
-softdepend: [CMI]
+softdepend: [CMI, PlaceholderAPI]
 
 commands:
   duel:

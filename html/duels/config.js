@@ -5,15 +5,13 @@
 
 var CONFIG = {
   // Адрес WebSocket сервера (Pterodactyl: ws://<хост>:<порт>)
-  // Пример: "ws://f1.rustix.me:38710"
-  addr: "ws://f1.rustix.me:38710",
+  // Пример: "ws://play.spacetrace.sryze.cc:38710"
+  addr: "ws://play.spacetrace.sryze.cc:38710",
 
-  // Пароль из plugins/ConnectApi/config.yml (плагин ConnectApi).
-  // ВНИМАНИЕ: сайт лежит в публичном репозитории GitHub —
-  // если впишете пароль сюда, его увидят все. Лучше оставить
-  // пустым и вводить при входе на панели/консоли.
-  token: "",
+  // Пароль панели/консоли НЕ храните здесь! Аккаунты (ник+пароль)
+  // создаются на сервере командой: /connectapi adduser <ник> <пароль>.
+  // Ники bogdemon и ZAYZER могут входить без пароля.
 
   // Заголовок сайта
-  title: "Duels Console — spacetrace"
+  title: "SpaceTrace — Консоль"
 };

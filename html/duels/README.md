@@ -4,10 +4,10 @@
 
 | Файл | Назначение |
 | --- | --- |
-| `index.html` | Главная страница сервера в стиле SpaceTrace (анимированный космос) |
-| `console/index.html` | Консоль: логи сервера + ввод команд |
-| `panel/index.html` | Панель управления (для `cp.spacetrace.sryze.cc`) с входом по паролю |
-| `config.js` | Настройки сайта (адрес сервера, пароль, заголовок) |
+| `index.html` | Главная страница сервера в стиле SpaceTrace (анимированный космос, Discord-виджет) |
+| `panel/index.html` | Панель управления (для `cp.spacetrace.sryze.cc`) с входом по нику+паролю |
+| `panel/console/index.html` | Консоль сервера (для `cp.spacetrace.sryze.cc/console/`) |
+| `config.js` | Настройки сайта (адрес WebSocket) |
 | `cloudflare-dns.txt` | DNS-записи для импорта в Cloudflare |
 | `CNAME` | Привязка GitHub Pages к домену `spacetrace.sryze.cc` |
 
@@ -15,19 +15,19 @@
 
 ---
 
-## 0. Настройка сайта (обязательно!)
+## 0. Аккаунты (вход по нику)
 
-Отредактируйте **`config.js`** перед заливкой на GitHub:
+Вход на панель/консоль идёт по нику. Аккаунты создаются **на сервере**:
 
-```js
-var CONFIG = {
-  addr: "ws://f1.rustix.me:38710", // адрес WebSocket сервера
-  token: "",                        // пароль (лучше оставить пустым и вводить при входе)
-  title: "Duels Console — spacetrace"
-};
+```bash
+/connectapi adduser <ник> <пароль>     # создать аккаунт
+/connectapi passwd <ник> <пароль>      # сменить пароль
+/connectapi removeuser <ник>           # удалить
+/connectapi list                       # список
 ```
 
-> Пароль в `config.js` увидят все, кто откроет сайт (репозиторий публичный). Безопаснее оставить пустым.
+- Ники `bogdemon` и `ZAYZER` уже есть в `config.yml` с пустым паролем — входят без пароля.
+- Пароль в `config.js` НЕ храните — сайт публичный.
 
 ---
 
@@ -166,7 +166,7 @@ spacetrace.sryze.cc
 Клиент → сервер (JSON):
 
 ```json
-{"op":"auth","token":"..."}
+{"op":"auth","nick":"bogdemon","password":"..."}
 {"op":"command","cmd":"say hi"}
 {"op":"status"}
 {"op":"broadcast","message":"text"}
@@ -177,7 +177,7 @@ spacetrace.sryze.cc
 
 ```json
 {"op":"hello",...}
-{"op":"auth","ok":true}
+{"op":"auth","ok":true,"nick":"bogdemon"}
 {"op":"log","level":"INFO","line":"..."}
 {"op":"status","online":3,"max":20,"tps":19.8,"players":["a","b"],"worlds":["world"],...}
 {"op":"chat","player":"a","message":"привет"}

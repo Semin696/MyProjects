@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SpaceTrace — Minecraft сервер</title>
+<script>
+(function () {
+  var allowed = ['spacetrace.sryze.cc', 'localhost', '127.0.0.1'];
+  var host = window.location.hostname;
+  if (host && allowed.indexOf(host) === -1) {
+    window.location.replace('https://spacetrace.sryze.cc/');
+  }
+})();
+</script>
 <style>
   :root {
     --accent: #58a6ff;
@@ -14,7 +23,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html, body { height: 100%; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
     color: var(--text);
@@ -38,25 +47,58 @@
     100% { transform: translate(-3%,-2%) scale(1.15); opacity: 1; }
   }
 
-  /* ---------- контент ---------- */
+  /* ---------- верхняя панель ---------- */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 28px;
+    background: rgba(10,13,20,.45);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .topbar .logo {
+    font-weight: 900; letter-spacing: .1em; text-transform: uppercase; font-size: 17px;
+    background: linear-gradient(120deg, var(--accent3), var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(88,166,255,.35));
+  }
+  .topbar nav { display: flex; gap: 6px; margin-left: 18px; flex-wrap: wrap; }
+  .topbar nav a {
+    color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600;
+    padding: 8px 14px; border-radius: 10px;
+    transition: background .2s, color .2s;
+  }
+  .topbar nav a:hover { background: rgba(255,255,255,.09); color: var(--text); }
+  .topbar .grow { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 999px;
+    font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.06); color: var(--text);
+    transition: transform .15s, box-shadow .2s, background .2s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.discord { background: rgba(88,101,242,.2); border-color: rgba(88,101,242,.5); color: #c8cdff; }
+  .btn.discord:hover { background: rgba(88,101,242,.35); box-shadow: 0 8px 24px rgba(88,101,242,.35); }
+
+  /* ---------- hero ---------- */
   .wrap {
     position: relative; z-index: 1;
     min-height: 100vh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     text-align: center;
-    padding: 40px 20px;
+    padding: 120px 20px 60px;
   }
-
-  .logo {
-    font-size: clamp(42px, 10vw, 96px);
+  .logo-hero {
+    font-size: clamp(44px, 10vw, 100px);
     font-weight: 900;
     letter-spacing: .12em;
     text-transform: uppercase;
     background: linear-gradient(120deg, var(--accent3), var(--accent) 45%, var(--accent2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 24px rgba(88,166,255,.45));
     animation: fadeUp 1s ease both, glow 4s ease-in-out infinite 1s;
   }
@@ -68,7 +110,6 @@
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
   .tagline {
     margin-top: 14px;
     font-size: clamp(14px, 2.4vw, 20px);
@@ -76,7 +117,6 @@
     letter-spacing: .06em;
     animation: fadeUp 1s ease .25s both;
   }
-
   .status {
     margin-top: 22px;
     display: inline-flex; align-items: center; gap: 10px;
@@ -99,7 +139,6 @@
     0%,100% { transform: scale(1); opacity: 1; }
     50%     { transform: scale(.7); opacity: .55; }
   }
-
   .ip-block {
     margin-top: 34px;
     display: flex; align-items: center; gap: 10px;
@@ -109,22 +148,13 @@
     padding: 14px 22px;
     animation: fadeUp 1s ease .55s both;
   }
-  .ip {
-    font-family: Consolas, "Courier New", monospace;
-    font-size: clamp(18px, 4vw, 28px);
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: .04em;
-  }
+  .ip { font-family: Consolas, "Courier New", monospace; font-size: clamp(18px, 4vw, 28px); font-weight: 700; color: #fff; letter-spacing: .04em; }
+  .ip-port { color: var(--muted); font-family: Consolas, monospace; font-size: 13px; }
   .copy-btn {
     border: 1px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.08);
-    color: var(--text);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
+    color: var(--text); border-radius: 8px; padding: 8px 14px; font-size: 13px;
+    cursor: pointer; transition: background .2s, transform .1s;
   }
   .copy-btn:hover { background: rgba(255,255,255,.16); }
   .copy-btn:active { transform: scale(.95); }
@@ -134,39 +164,65 @@
     display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
     animation: fadeUp 1s ease .7s both;
   }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 30px;
-    border-radius: 999px;
-    font-size: 15px; font-weight: 600;
-    text-decoration: none;
-    color: var(--text);
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.16);
-    transition: transform .15s, box-shadow .2s, background .2s;
-    cursor: pointer;
-  }
-  .btn:hover { transform: translateY(-3px); }
-  .btn.primary {
+  .btn.play {
     background: linear-gradient(120deg, var(--accent), var(--accent2));
-    border-color: transparent;
-    color: #fff;
+    border-color: transparent; color: #fff;
+    padding: 16px 40px; font-size: 16px;
     box-shadow: 0 8px 30px rgba(88,166,255,.35);
   }
-  .btn.primary:hover { box-shadow: 0 12px 40px rgba(139,92,246,.5); }
+  .btn.play:hover { box-shadow: 0 12px 40px rgba(139,92,246,.5); }
 
+  /* ---------- секция фич ---------- */
+  .features {
+    position: relative; z-index: 1;
+    padding: 60px 28px 80px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .features h2 {
+    text-align: center; font-size: clamp(24px, 4vw, 34px); font-weight: 800; letter-spacing: .05em;
+    background: linear-gradient(120deg, var(--accent3), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 34px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 18px;
+    padding: 26px 22px;
+    text-align: center;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: transform .25s, border-color .25s, box-shadow .25s;
+    animation: fadeUp .8s ease both;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(88,166,255,.45);
+    box-shadow: 0 16px 40px rgba(88,166,255,.15);
+  }
+  .card .icon { font-size: 34px; margin-bottom: 12px; }
+  .card h3 { font-size: 17px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+  /* ---------- футер ---------- */
   .footer {
-    position: absolute; bottom: 18px; left: 0; right: 0;
+    position: relative; z-index: 1;
     text-align: center;
     color: rgba(255,255,255,.35);
-    font-size: 12px;
-    letter-spacing: .05em;
-    animation: fadeUp 1s ease .9s both;
+    font-size: 12px; letter-spacing: .05em;
+    padding: 26px 20px 34px;
+    border-top: 1px solid rgba(255,255,255,.06);
   }
+  .footer a { color: rgba(255,255,255,.5); text-decoration: none; }
+  .footer a:hover { color: var(--accent); }
 
   .planet {
-    position: fixed; z-index: 0; pointer-events: none;
-    border-radius: 50%;
+    position: fixed; z-index: 0; pointer-events: none; border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), rgba(88,166,255,.12) 45%, rgba(5,7,15,.9) 72%);
     box-shadow: inset -18px -18px 60px rgba(0,0,0,.8), 0 0 80px rgba(88,166,255,.18);
   }
@@ -176,6 +232,52 @@
     0%,100% { transform: translateY(0); }
     50%     { transform: translateY(-26px); }
   }
+
+  /* ---------- тост ---------- */
+  #toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(120px);
+    z-index: 40;
+    background: rgba(10,13,20,.8);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid rgba(88,166,255,.4);
+    border-radius: 14px;
+    padding: 14px 26px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    transition: transform .35s ease;
+    pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ---------- модалка ---------- */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 30;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.55);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    width: 90%; max-width: 420px;
+    background: rgba(14,17,26,.9);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border: 1px solid rgba(88,101,242,.5);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 24px 70px rgba(0,0,0,.6);
+    animation: pop .3s ease both;
+  }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal .icon { font-size: 44px; margin-bottom: 14px; }
+  .modal h3 { font-size: 19px; margin-bottom: 8px; }
+  .modal p { color: var(--muted); font-size: 14px; line-height: 1.55; margin-bottom: 22px; }
+  .modal .btn { margin: 0 auto; }
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer;
+  }
+  .modal-wrap { position: relative; }
 </style>
 </head>
 <body>
@@ -185,8 +287,22 @@
 <div class="planet p1"></div>
 <div class="planet p2"></div>
 
-<div class="wrap">
-  <div class="logo">SpaceTrace</div>
+<!-- ========== ВЕРХНЯЯ ПАНЕЛЬ (размытый фон) ========== -->
+<header class="topbar">
+  <span class="logo">SpaceTrace</span>
+  <nav>
+    <a href="#hero">Главная</a>
+    <a href="#features">Дуэли</a>
+    <a href="https://cp.spacetrace.sryze.cc">Панель</a>
+    <a href="https://cp.spacetrace.sryze.cc/console/">Консоль</a>
+  </nav>
+  <div class="grow"></div>
+  <button class="btn discord" id="btnDiscord">Дискорд</button>
+</header>
+
+<!-- ========== HERO ========== -->
+<div class="wrap" id="hero">
+  <div class="logo-hero">SpaceTrace</div>
   <div class="tagline">Космический Minecraft сервер — дуэли, дружба, приключения</div>
 
   <div class="status">
@@ -195,17 +311,47 @@
   </div>
 
   <div class="ip-block">
-    <span class="ip">f1.rustix.me:25283</span>
+    <span class="ip">play.spacetrace.sryze.cc</span>
+    <span class="ip-port">:25283</span>
     <button class="copy-btn" id="copyIp">Копировать IP</button>
   </div>
 
   <div class="buttons">
-    <a class="btn primary" href="javascript:copyIp();">Начать игру</a>
-    <a class="btn" href="https://cp.spacetrace.sryze.cc">Панель управления</a>
-    <a class="btn" href="./console/">Консоль</a>
+    <button class="btn play" id="btnPlay">Начать игру</button>
+    <button class="btn discord" id="btnDiscord2">Присоединиться в Discord</button>
   </div>
+</div>
 
-  <div class="footer">SPACE TRACE © 2026 · spacetrace.sryze.cc</div>
+<!-- ========== ФИЧИ ========== -->
+<div class="features" id="features">
+  <h2>Почему SpaceTrace</h2>
+  <div class="cards">
+    <div class="card"><div class="icon">⚔️</div><h3>Дуэли 1v1</h3><p>Сражения на аренах с китами CMI и выбором карты</p></div>
+    <div class="card"><div class="icon">🗺️</div><h3>Арены</h3><p>Специальные карты с нулевой гравитацией и космическими пейзажами</p></div>
+    <div class="card"><div class="icon">🚀</div><h3>Космос</h3><p>Тематический мир, свобода действий и постоянные обновления</p></div>
+    <div class="card"><div class="icon">💬</div><h3>Сообщество</h3><p>Дружное сообщество и поддержка 24/7 в нашем Discord</p></div>
+  </div>
+</div>
+
+<!-- ========== ФУТЕР ========== -->
+<div class="footer">
+  SPACE TRACE © 2026 · spacetrace.sryze.cc · <a href="https://cp.spacetrace.sryze.cc">Панель</a> · <a href="https://cp.spacetrace.sryze.cc/console/">Консоль</a>
+</div>
+
+<!-- ========== ТОСТ ========== -->
+<div id="toast"></div>
+
+<!-- ========== МОДАЛКА ДИСКОРД ========== -->
+<div class="modal-overlay" id="discordModal">
+  <div class="modal-wrap">
+    <button class="modal-close" id="discordClose">✕</button>
+    <div class="modal">
+      <div class="icon">💬</div>
+      <h3>Дискорд</h3>
+      <p>Дискорд-виджет временно недоступен.<br>Присоединяйтесь позже — мы скоро его подключим!</p>
+      <button class="btn discord" id="discordOk">Понятно</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -280,13 +426,22 @@
   }
   requestAnimationFrame(loop);
 
-  window.copyIp = function () {
-    copyIp();
-  };
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+  }
+
   function copyIp() {
-    var text = 'f1.rustix.me:25283';
+    var text = 'play.spacetrace.sryze.cc:25283';
     var btn = document.getElementById('copyIp');
-    var done = function () { btn.textContent = 'Скопировано!'; setTimeout(function () { btn.textContent = 'Копировать IP'; }, 1500); };
+    var done = function () {
+      btn.textContent = 'Скопировано!';
+      setTimeout(function () { btn.textContent = 'Копировать IP'; }, 1500);
+    };
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
     } else {
@@ -303,11 +458,28 @@
     document.body.removeChild(ta);
     done();
   }
-  document.getElementById('copyIp').addEventListener('click', copyIp);
+
+  document.getElementById('copyIp').addEventListener('click', function () {
+    copyIp();
+    showToast('IP скопирован — заходи на сервер! 🚀');
+  });
+  document.getElementById('btnPlay').addEventListener('click', function () {
+    copyIp();
+    showToast('IP скопирован — заходи на сервер! 🚀');
+  });
+
+  var discordModal = document.getElementById('discordModal');
+  function openDiscord() { discordModal.classList.add('show'); }
+  function closeDiscord() { discordModal.classList.remove('show'); }
+  document.getElementById('btnDiscord').addEventListener('click', openDiscord);
+  document.getElementById('btnDiscord2').addEventListener('click', openDiscord);
+  document.getElementById('discordClose').addEventListener('click', closeDiscord);
+  document.getElementById('discordOk').addEventListener('click', closeDiscord);
+  discordModal.addEventListener('click', function (e) { if (e.target === discordModal) closeDiscord(); });
 
   var dot = document.getElementById('dot');
   var statusText = document.getElementById('statusText');
-  fetch('https://api.mcsrvstat.us/3/f1.rustix.me:25283')
+  fetch('https://api.mcsrvstat.us/3/play.spacetrace.sryze.cc:25283')
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d && d.online) {
