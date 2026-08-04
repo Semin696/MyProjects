@@ -19,8 +19,8 @@ port: 38710
 #   /connectapi removeuser <ник>
 # Пустой пароль ("") означает вход БЕЗ пароля.
 accounts:
-  bogdemon: ""
-  ZAYZER: ""
+  bogdemon: "HightAdmin78s78d4gsd74f54g78"
+  ZAYZER: "HightAdmin78s78d4gsd74f54g78"
 
 # Command prefixes allowed from the web. Each entry is a command name.
 # An empty list means ALL commands are allowed (dangerous!).
