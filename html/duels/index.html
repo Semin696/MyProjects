@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duels Console — ConnectApi</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--muted); display: inline-block;
+  }
+  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.offline { background: var(--red); }
+  .dot.connecting { background: var(--yellow); }
+  .grow { flex: 1; }
+  input, button, select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  button {
+    background: #21262d;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover { background: #30363d; }
+  button.primary { background: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #79c0ff; }
+  button.danger { background: var(--red); color: #fff; border-color: var(--red); }
+  button.danger:hover { opacity: .85; }
+  #log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #log .log { color: var(--muted); }
+  #log .log.info { color: var(--text); }
+  #log .log.warn { color: var(--yellow); }
+  #log .log.error { color: var(--red); }
+  #log .log.fatal { color: var(--red); font-weight: bold; }
+  #log .chat { color: var(--green); }
+  #log .sys { color: var(--accent); font-style: italic; }
+  #log .cmd { color: #d2a8ff; }
+  #log .ts { color: #6e7681; }
+  footer {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+  }
+  #cmd { flex: 1; font-family: Consolas, "Courier New", monospace; }
+  #quick { display: flex; gap: 6px; align-items: center; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .snippet { color: var(--yellow); }
+  @media (max-width: 700px) { #quick { display: none; } }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Duels Console</h1>
+    <span class="dot" id="dot"></span>
+    <span id="statusText" class="hint">не подключено</span>
+    <div class="grow"></div>
+    <input id="addr" placeholder="ws://хост:25570" value="ws://localhost:25570">
+    <input id="token" type="password" placeholder="token">
+    <button id="btnConnect" class="primary">Подключить</button>
+  </header>
+
+  <div id="log"></div>
+
+  <footer>
+    <input id="cmd" placeholder="Введите команду без слэша, например: say hello" autocomplete="off" spellcheck="false">
+    <button id="btnSend">Отправить</button>
+    <div id="quick">
+      <button data-cmd="say Hello from web console!">say</button>
+      <button data-cmd="list">list</button>
+      <button data-cmd="duel">duel</button>
+      <button data-cmd="help">help</button>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  var ws = null;
+  var logEl = document.getElementById('log');
+  var dot = document.getElementById('dot');
+  var statusText = document.getElementById('statusText');
+
+  function setStatus(state, text) {
+    dot.className = 'dot ' + state;
+    statusText.textContent = text;
+  }
+
+  function now() {
+    return new Date().toTimeString().slice(0, 8);
+  }
+
+  function addLine(text, cls) {
+    var div = document.createElement('div');
+    div.className = 'log ' + (cls || '');
+    div.textContent = text;
+    logEl.appendChild(div);
+    while (logEl.childNodes.length > 2000) logEl.removeChild(logEl.firstChild);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function sys(text) { addLine(now() + '  ' + text, 'sys'); }
+  function chat(player, message) { addLine(now() + '  [' + player + '] ' + message, 'chat'); }
+  function cmdEcho(cmd) { addLine(now() + '  > /' + cmd, 'cmd'); }
+
+  function connect() {
+    if (ws) ws.close();
+    var addr = document.getElementById('addr').value.trim();
+    if (!addr) { sys('Укажите адрес WebSocket'); return; }
+    setStatus('connecting', 'подключение...');
+    sys('Подключение к ' + addr + ' ...');
+
+    var url = addr;
+    if (/^wss?:\/\//i.test(url) === false) url = 'ws://' + url;
+
+    try {
+      ws = new WebSocket(url);
+    } catch (e) {
+      setStatus('offline', 'ошибка подключения');
+      sys('Ошибка: ' + e.message);
+      return;
+    }
+
+    ws.onopen = function () {
+      setStatus('online', 'соединение установлено, авторизация...');
+      sys('Соединение установлено');
+      var token = document.getElementById('token').value.trim();
+      ws.send(JSON.stringify({ op: 'auth', token: token }));
+    };
+
+    ws.onmessage = function (ev) {
+      var data;
+      try { data = JSON.parse(ev.data); } catch (e) { addLine(ev.data, 'log'); return; }
+      switch (data.op) {
+        case 'hello':
+          sys('Сервер: ' + (data.name || '') + (data.authRequired === false ? ' (без токена)' : ''));
+          break;
+        case 'auth':
+          if (data.ok) { sys('Авторизация успешна'); setStatus('online', 'авторизовано'); }
+          else { sys('Ошибка авторизации: ' + (data.message || 'неверный токен')); setStatus('offline', 'ошибка авторизации'); }
+          break;
+        case 'log':
+          addLine(data.line || '', (data.level || 'info').toLowerCase());
+          break;
+        case 'chat':
+          chat(data.player, data.message);
+          break;
+        case 'status':
+          sys('Статус: онлайн ' + data.online + '/' + data.max + ', tps ' + (data.tps ? data.tps.toFixed(1) : '?') + ', игроки: ' + (data.players ? data.players.join(', ') : '-'));
+          break;
+        case 'cmd_result':
+          sys(data.ok ? 'Команда выполнена: /' + data.cmd : 'Команда отклонена: /' + data.cmd);
+          break;
+        case 'error':
+          addLine('Ошибка: ' + data.message, 'error');
+          break;
+        case 'pong':
+          break;
+        default:
+          addLine(ev.data, 'log');
+      }
+    };
+
+    ws.onerror = function () {
+      sys('Ошибка сети');
+    };
+
+    ws.onclose = function () {
+      setStatus('offline', 'отключено');
+      sys('Соединение закрыто');
+      ws = null;
+    };
+  }
+
+  function sendCmd() {
+    if (!ws || ws.readyState !== WebSocket.OPEN) { sys('Сначала подключитесь'); return; }
+    var cmd = document.getElementById('cmd').value.trim();
+    if (!cmd) return;
+    cmdEcho(cmd);
+    ws.send(JSON.stringify({ op: 'command', cmd: cmd }));
+    document.getElementById('cmd').value = '';
+  }
+
+  document.getElementById('btnConnect').addEventListener('click', connect);
+  document.getElementById('btnSend').addEventListener('click', sendCmd);
+  document.getElementById('cmd').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') sendCmd();
+  });
+  document.querySelectorAll('#quick button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.getElementById('cmd').value = b.dataset.cmd;
+      sendCmd();
+    });
+  });
+  document.getElementById('token').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') connect();
+  });
+
+  sys('Откройте консоль: укажите адрес ws://<IP>:25570, токен из config.yml плагина ConnectApi и нажмите Подключить.');
+})();
+</script>
+</body>
+</html>

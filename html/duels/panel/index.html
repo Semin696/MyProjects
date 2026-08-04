@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Panel — spacetrace.sryze.cc</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .hidden { display: none !important; }
+
+  /* ---- login ---- */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .login-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+  .login-card h1 { font-size: 20px; margin-bottom: 4px; }
+  .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  input, select {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 14px;
+    outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  button {
+    background: #21262d;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover { background: #30363d; }
+  button.primary { background: var(--accent); color: #0d1117; border-color: var(--accent); font-weight: 600; width: 100%; padding: 10px; font-size: 15px; }
+  button.primary:hover { background: #79c0ff; }
+  button.danger { background: var(--red); color: #fff; border-color: var(--red); }
+  button.danger:hover { opacity: .85; }
+  .err { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  /* ---- main ---- */
+  #app { display: flex; flex-direction: column; min-height: 100vh; }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); display: inline-block; }
+  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.offline { background: var(--red); }
+  .dot.connecting { background: var(--yellow); }
+  .grow { flex: 1; }
+  .hint { color: var(--muted); font-size: 12px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .card .value { font-size: 24px; font-weight: 700; margin-top: 6px; font-family: Consolas, monospace; }
+  .card .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .tps-ok { color: var(--green); } .tps-warn { color: var(--yellow); } .tps-bad { color: var(--red); }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+  .box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .box h3 { font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .box .actions { display: flex; gap: 6px; }
+  #playerList { list-style: none; }
+  #playerList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: var(--bg);
+  }
+  #playerList li button { padding: 4px 8px; font-size: 12px; }
+  #chatLog {
+    height: 240px;
+    overflow-y: auto;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    line-height: 1.5;
+  }
+  #chatLog .chat { color: var(--green); }
+  #chatLog .sys { color: var(--accent); font-style: italic; }
+  #chatLog .muted { color: var(--muted); }
+  .inputRow { display: flex; gap: 8px; margin-bottom: 10px; }
+  .inputRow input, .inputRow select { width: auto; flex: 1; }
+  .inputRow input.small { flex: 0 1 120px; }
+  .inline { display: flex; gap: 6px; align-items: center; }
+  @media (max-width: 900px) { .columns { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+  <!-- ================= ВХОД ================= -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <h1>Control Panel</h1>
+      <p>cp.spacetrace.sryze.cc — управление сервером</p>
+      <div class="field">
+        <label>Адрес сервера (ws://IP:порт)</label>
+        <input id="lgAddr" placeholder="ws://play.spacetrace.sryze.cc:25570" value="ws://localhost:25570">
+      </div>
+      <div class="field">
+        <label>Токен (из config.yml плагина ConnectApi)</label>
+        <input id="lgToken" type="password" placeholder="token">
+      </div>
+      <button id="btnLogin" class="primary">Войти</button>
+      <div class="err" id="lgErr"></div>
+    </div>
+  </div>
+
+  <!-- ================= ПАНЕЛЬ ================= -->
+  <div id="app" class="hidden">
+    <header>
+      <span class="dot" id="dot"></span>
+      <h1>Control Panel</h1>
+      <span class="hint" id="connInfo">—</span>
+      <div class="grow"></div>
+      <button id="btnRefresh">Обновить</button>
+      <button id="btnLogout">Выйти</button>
+    </header>
+
+    <div class="grid">
+      <div class="card"><div class="label">Игроки онлайн</div><div class="value" id="statOnline">-</div><div class="sub" id="statPlayers">—</div></div>
+      <div class="card"><div class="label">TPS</div><div class="value tps-ok" id="statTps">-</div><div class="sub">1-минутный срез</div></div>
+      <div class="card"><div class="label">Версия</div><div class="value" id="statVersion" style="font-size:16px">-</div><div class="sub" id="statMOTD">—</div></div>
+      <div class="card"><div class="label">Аптайм</div><div class="value" id="statUptime">-</div><div class="sub" id="statWorlds">—</div></div>
+    </div>
+
+    <div class="columns">
+      <div class="box">
+        <h3>Игроки</h3>
+        <div class="inputRow">
+          <input id="playerInput" placeholder="Ник игрока" class="small">
+          <select id="playerAction">
+            <option value="kick">kick</option>
+            <option value="ban">ban</option>
+            <option value="pardon">разбанить</option>
+            <option value="op">выдать op</option>
+            <option value="deop">снять op</option>
+          </select>
+          <button id="btnPlayer">Выполнить</button>
+        </div>
+        <ul id="playerList"><li class="muted">Нет данных</li></ul>
+      </div>
+
+      <div class="box">
+        <h3>Чат</h3>
+        <div class="inputRow">
+          <input id="bcMsg" placeholder="Сообщение для всех игроков">
+          <button id="btnBroadcast">Анонс</button>
+        </div>
+        <div id="chatLog"><div class="muted">Ожидание сообщений...</div></div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="box">
+        <h3>Консольная команда</h3>
+        <div class="inputRow">
+          <input id="cmdInput" placeholder="Команда без слэша, например: say test">
+          <button id="btnCmd" class="primary">Выполнить</button>
+        </div>
+        <div class="hint">Разрешённые команды задаются в config.yml плагина ConnectApi (allowed-commands).</div>
+      </div>
+
+      <div class="box">
+        <h3>Whitelist</h3>
+        <div class="inputRow">
+          <input id="wlInput" placeholder="Ник игрока" class="small">
+          <button id="btnWlAdd">Добавить</button>
+          <button id="btnWlRemove">Убрать</button>
+        </div>
+        <h3 style="margin-top:14px">Сервер</h3>
+        <div class="inline" style="gap:8px">
+          <button id="btnStop" class="danger">Остановить сервер</button>
+          <button id="btnRestart" class="danger">Перезапустить сервер</button>
+        </div>
+        <div class="hint" style="margin-top:8px">Стоп/рестарт требуют разрешения команды в allowed-commands.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var ws = null;
+  var authed = false;
+  var storeKey = 'cpspc_session';
+  var lastStatus = null;
+  var reconnectTimer = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var loginScreen = $('loginScreen');
+  var app = $('app');
+
+  function now() { return new Date().toTimeString().slice(0, 8); }
+
+  function saveSession() {
+    localStorage.setItem(storeKey, JSON.stringify({
+      addr: $('lgAddr').value.trim(),
+      token: $('lgToken').value.trim()
+    }));
+  }
+  function loadSession() {
+    try {
+      var s = JSON.parse(localStorage.getItem(storeKey) || '{}');
+      if (s.addr) $('lgAddr').value = s.addr;
+      if (s.token) $('lgToken').value = s.token;
+    } catch (e) {}
+  }
+
+  function setStatus(state, text) {
+    $('dot').className = 'dot ' + state;
+    $('connInfo').textContent = text || '';
+  }
+
+  function showLogin(err) {
+    $('lgErr').textContent = err || '';
+    app.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+  }
+
+  function showApp() {
+    loginScreen.classList.add('hidden');
+    app.classList.remove('hidden');
+  }
+
+  function renderStatus(data) {
+    lastStatus = data;
+    $('statOnline').textContent = data.online + ' / ' + data.max;
+    $('statPlayers').textContent = (data.players && data.players.length) ? data.players.join(', ') : 'никто';
+    var tps = typeof data.tps === 'number' ? data.tps : 20;
+    var tpsEl = $('statTps');
+    tpsEl.textContent = tps.toFixed(1);
+    tpsEl.className = 'value ' + (tps >= 18 ? 'tps-ok' : tps >= 14 ? 'tps-warn' : 'tps-bad');
+    $('statVersion').textContent = data.bukkitVersion || data.version || '-';
+    $('statMOTD').textContent = data.motd || '';
+    $('statUptime').textContent = fmtUptime(data.uptime || 0);
+    $('statWorlds').textContent = (data.worlds || []).join(', ');
+
+    var list = $('playerList');
+    list.innerHTML = '';
+    if (!data.players || !data.players.length) {
+      var li = document.createElement('li');
+      li.className = 'muted';
+      li.textContent = 'Никто не онлайн';
+      list.appendChild(li);
+    } else {
+      data.players.forEach(function (name) {
+        var li = document.createElement('li');
+        li.textContent = name;
+        var btn = document.createElement('button');
+        btn.textContent = 'kick';
+        btn.addEventListener('click', function () {
+          sendCommand('kick ' + name);
+        });
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
+    }
+  }
+
+  function fmtUptime(s) {
+    s = Math.floor(s || 0);
+    var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+    return (d ? d + 'д ' : '') + h + 'ч ' + m + 'м';
+  }
+
+  function addChat(text, cls) {
+    var log = $('chatLog');
+    var div = document.createElement('div');
+    div.className = cls || '';
+    div.textContent = now() + '  ' + text;
+    log.appendChild(div);
+    while (log.childNodes.length > 500) log.removeChild(log.firstChild);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function send(json) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) { addChat('Нет соединения', 'muted'); return; }
+    ws.send(JSON.stringify(json));
+  }
+
+  function sendCommand(cmd) {
+    send({ op: 'command', cmd: cmd });
+  }
+
+  function connect(addr, token) {
+    if (ws) ws.close();
+    setStatus('connecting', 'подключение...');
+
+    var url = /^wss?:\/\//i.test(addr) ? addr : 'ws://' + addr;
+    try { ws = new WebSocket(url); } catch (e) { showLogin('Не удалось подключиться: ' + e.message); return; }
+
+    ws.onopen = function () {
+      ws.send(JSON.stringify({ op: 'auth', token: token }));
+    };
+
+    ws.onmessage = function (ev) {
+      var data;
+      try { data = JSON.parse(ev.data); } catch (e) { return; }
+      switch (data.op) {
+        case 'auth':
+          if (data.ok) {
+            authed = true;
+            showApp();
+            setStatus('online', 'подключено');
+            addChat('Авторизация успешна', 'sys');
+            send({ op: 'status' });
+          } else {
+            showLogin('Неверный токен. Проверьте config.yml плагина ConnectApi.');
+          }
+          break;
+        case 'status':
+          renderStatus(data);
+          setStatus('online', 'подключено');
+          break;
+        case 'chat':
+          addChat('[' + data.player + '] ' + data.message, 'chat');
+          break;
+        case 'cmd_result':
+          addChat(data.ok ? 'OK: /' + data.cmd : 'ОТКЛОНЕНО: /' + data.cmd, data.ok ? 'sys' : 'muted');
+          break;
+        case 'error':
+          addChat('Ошибка: ' + data.message, 'muted');
+          break;
+        case 'log':
+          if (data.level && data.level.toLowerCase() === 'info') addChat(data.line, 'muted');
+          break;
+      }
+    };
+
+    ws.onerror = function () { addChat('Ошибка сети', 'muted'); };
+
+    ws.onclose = function () {
+      setStatus('offline', 'отключено');
+      if (authed) {
+        addChat('Соединение потеряно, переподключение через 3 сек...', 'muted');
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(function () {
+          connect($('lgAddr').value.trim(), $('lgToken').value.trim());
+        }, 3000);
+      }
+      ws = null;
+    };
+  }
+
+  $('btnLogin').addEventListener('click', function () {
+    var addr = $('lgAddr').value.trim();
+    var token = $('lgToken').value.trim();
+    if (!addr || !token) { $('lgErr').textContent = 'Укажите адрес и токен'; return; }
+    saveSession();
+    connect(addr, token);
+  });
+  $('lgAddr').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
+  $('lgToken').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnLogin').click(); });
+
+  $('btnLogout').addEventListener('click', function () {
+    authed = false;
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    if (ws) ws.close();
+    ws = null;
+    showLogin();
+  });
+
+  $('btnRefresh').addEventListener('click', function () { send({ op: 'status' }); });
+
+  $('btnBroadcast').addEventListener('click', function () {
+    var msg = $('bcMsg').value.trim();
+    if (!msg) return;
+    send({ op: 'broadcast', message: msg });
+    $('bcMsg').value = '';
+  });
+  $('bcMsg').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnBroadcast').click(); });
+
+  $('btnCmd').addEventListener('click', function () {
+    var cmd = $('cmdInput').value.trim();
+    if (!cmd) return;
+    sendCommand(cmd);
+    $('cmdInput').value = '';
+  });
+  $('cmdInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnCmd').click(); });
+
+  $('btnPlayer').addEventListener('click', function () {
+    var name = $('playerInput').value.trim();
+    var action = $('playerAction').value;
+    if (!name) return;
+    sendCommand(action + ' ' + name);
+    $('playerInput').value = '';
+  });
+
+  $('btnWlAdd').addEventListener('click', function () {
+    var n = $('wlInput').value.trim(); if (!n) return;
+    sendCommand('whitelist add ' + n); $('wlInput').value = '';
+  });
+  $('btnWlRemove').addEventListener('click', function () {
+    var n = $('wlInput').value.trim(); if (!n) return;
+    sendCommand('whitelist remove ' + n); $('wlInput').value = '';
+  });
+
+  $('btnStop').addEventListener('click', function () {
+    if (confirm('Точно остановить сервер?')) sendCommand('stop');
+  });
+  $('btnRestart').addEventListener('click', function () {
+    if (confirm('Точно перезапустить сервер?')) sendCommand('restart');
+  });
+
+  loadSession();
+  showLogin('');
+})();
+</script>
+</body>
+</html>

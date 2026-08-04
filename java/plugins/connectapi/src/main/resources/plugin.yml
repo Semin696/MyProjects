@@ -1,0 +1,6 @@
+name: ConnectApi
+version: '${project.version}'
+main: org.nig.smp.connectapi.ConnectApiPlugin
+api-version: '1.21.11'
+author: NightfallRealm
+description: WebSocket bridge between the web console/panel and the server
