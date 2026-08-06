@@ -75,24 +75,10 @@ extern Btn g_btns[3];
 Btn* GetBtn(int id);
 int HitTestBtn(int x, int y);
 
-// ---- Intro / boot animation (Windows 11 style) ----
-enum IntroStage { INTRO_BOOT, INTRO_LOAD, INTRO_RIP, INTRO_ASSEMBLE, INTRO_DONE };
+// ---- Intro (one-time title appearance) ----
+enum IntroStage { INTRO_BOOT, INTRO_DONE };
 extern IntroStage g_introStage;
 bool IsIntroDone();
-enum PartId { PART_ACCENT, PART_SUB, PART_BTN0, PART_BTN1, PART_BTN2, PART_PANEL0, PART_PANEL1, PART_COUNT };
-
-struct WobblePart
-{
-    float tx, ty, w, h;
-    float ox, oy, ovx, ovy;
-    float rot, vrot;
-    float k, c;
-    float sx, sy;
-    bool visible;
-    bool landed;
-    bool hasNails;
-    float nailScale;
-};
 
 void InitIntro();
 void UpdateIntro(float dt);

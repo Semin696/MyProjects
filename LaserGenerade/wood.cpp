@@ -165,11 +165,8 @@ void RenderBackdrop(Graphics& g, int W, int H)
     float endX = textLeft + g_textW;
 
     const float scanDur = 3.8f;
-    const float holdDur = 1.2f;
-    float cycle = scanDur + holdDur;
-    float tt = fmodf(t, cycle);
-    float scan = tt < scanDur ? tt / scanDur : 1.0f;
-    bool beamOn = tt < scanDur;
+    float scan = t < scanDur ? t / scanDur : 1.0f;
+    bool beamOn = t < scanDur;
     float beamX = textLeft + scan * (endX - textLeft) + sinf(t * 3.0f) * 1.5f;
 
     // engrave letters left of the beam
