@@ -8,7 +8,7 @@ $windres = Join-Path $mingwBin "windres.exe"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & $gpp -std=c++17 -O2 -municode -mwindows -specs=no-default-manifest -static -static-libgcc -static-libstdc++ "main.cpp" "app.res" -o "PhotoToBW.exe" `
-    -lgdiplus -lcomdlg32 -lole32 -luuid -luser32 -lgdi32 -lcomctl32 -lshell32
+    -lgdiplus -lcomdlg32 -lole32 -luuid -luser32 -lgdi32 -lcomctl32 -lshell32 -ldwmapi
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "OK: PhotoToBW.exe собран"
