@@ -108,3 +108,10 @@ void ClearAll();
 void DoAction(int id);
 bool SaveBitmap(Bitmap* bmp, const std::wstring& path);
 Bitmap* MakeGrayscale(Bitmap* src);
+
+// ---- Laser engraver settings (GRBL) ----
+extern float g_mmW;
+extern float g_mmH;
+extern float g_dpi;
+Bitmap* FitToLaser(Bitmap* src);
+void ApplyLaserSettings();
