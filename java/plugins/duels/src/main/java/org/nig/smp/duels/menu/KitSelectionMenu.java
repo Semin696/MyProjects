@@ -33,6 +33,7 @@ public final class KitSelectionMenu implements InventoryHolder, Listener {
     private final Player opponent;
     private final Inventory inventory;
     private final Map<Integer, String> slotKit = new HashMap<>();
+    private boolean selected;
 
     public KitSelectionMenu(DuelsPlugin plugin, Player player, Player opponent) {
         this(plugin, player, Context.CHALLENGE, opponent);
@@ -69,7 +70,7 @@ public final class KitSelectionMenu implements InventoryHolder, Listener {
             ItemStack icon = icon(kit);
             ItemMeta meta = icon.getItemMeta();
             if (meta != null) {
-                meta.displayName(plugin.msg("kit-name", "kit", kit));
+                meta.displayName(plugin.msg("kit-name", "kit", plugin.getKitManager().getDisplayName(kit)));
                 List<Component> lore = new ArrayList<>();
                 lore.add(plugin.msg("kit-players", "count", plugin.getDuelManager().countPlayersByKit(kit)));
                 if (context == Context.CHALLENGE && opponent != null) {
@@ -130,6 +131,7 @@ public final class KitSelectionMenu implements InventoryHolder, Listener {
         if (kit == null) {
             return;
         }
+        selected = true;
         who.closeInventory();
         if (context == Context.CHALLENGE) {
             plugin.getDuelManager().selectKitForChallenge(who, kit, opponent);
@@ -141,6 +143,9 @@ public final class KitSelectionMenu implements InventoryHolder, Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder(false) instanceof KitSelectionMenu menu && menu == this) {
+            if (!selected) {
+                plugin.getDuelManager().cancelAfterMenuClose(player);
+            }
             HandlerList.unregisterAll(this);
         }
     }

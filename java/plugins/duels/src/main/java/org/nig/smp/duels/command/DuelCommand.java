@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.nig.smp.duels.DuelsPlugin;
+import org.nig.smp.duels.cmi.CMIKitBridge;
 import org.nig.smp.duels.manager.DuelManager;
 import org.nig.smp.duels.menu.KitSelectionMenu;
 
@@ -58,12 +59,26 @@ public final class DuelCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage(plugin.msg("no-arenas"));
                     return true;
                 }
+                if (args.length >= 2) {
+                    String kit = args[1];
+                    if (!CMIKitBridge.getKitNames().contains(kit)) {
+                        player.sendMessage(plugin.msg("kit-not-found", "kit", kit));
+                        return true;
+                    }
+                    String arena = args.length >= 3 ? args[2] : null;
+                    if (arena != null && plugin.getArenaManager().getArena(arena) == null) {
+                        player.sendMessage(plugin.msg("arena-not-found"));
+                        return true;
+                    }
+                    duelManager.selectKitForMatchmaking(player, kit, arena);
+                    return true;
+                }
                 new KitSelectionMenu(plugin, player).open();
                 return true;
 
             case "reload":
                 if (!player.hasPermission("duels.admin")) {
-                    player.sendMessage(plugin.msg("player-not-found"));
+                    player.sendMessage(plugin.msg("no-permission"));
                     return true;
                 }
                 plugin.reloadConfig();
@@ -80,8 +95,8 @@ public final class DuelCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(plugin.msg("player-not-found"));
             return true;
         }
-
-        duelManager.createDirectChallenge(player, target);
+        String arena = args.length > 1 ? args[1] : null;
+        duelManager.createDirectChallenge(player, target, arena);
         return true;
     }
 
@@ -94,6 +109,15 @@ public final class DuelCommand implements CommandExecutor, TabCompleter {
             }
             result.addAll(SUBCOMMANDS);
             return filter(result, args[0]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("queue")) {
+            return filter(new ArrayList<>(CMIKitBridge.getKitNames()), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("queue")) {
+            return filter(plugin.getArenaManager().getArenaNames(), args[2]);
+        }
+        if (args.length == 2) {
+            return filter(plugin.getArenaManager().getArenaNames(), args[1]);
         }
         return List.of();
     }

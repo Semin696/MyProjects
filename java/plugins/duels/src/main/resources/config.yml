@@ -4,6 +4,22 @@
 # (если мир не существует - он будет создан автоматически как плоский)
 world-name: duels
 
+# Миры хаба, где компас выбора кита выдаётся всегда
+hub-worlds:
+  - world
+
+# Настройка китов.
+# Ключ — реальное имя кита из CMI, значение — отображаемое имя и флаг разрушительности.
+# destructive: true — кит ломает блоки (ТНТ, кристаллы и т.п.), такие киты играются
+# только на картах с allow-block-break: true.
+# Если кит не настроен, используется его реальное имя и destructive: false.
+kits:
+  tnt-war:
+    display-name: "&cТНТ-война"
+    destructive: true
+  swordsman:
+    display-name: "&cМечник"
+
 # Режим игры, который устанавливается игрокам в мире дуэлей
 duels-gamemode: SURVIVAL
 
@@ -18,9 +34,13 @@ lobby:
 # ===== Арены (координаты в мире дуэлей) =====
 # spawn1 - спавн первого игрока (вызвавшего на дуэль)
 # spawn2 - спавн второго игрока
+# display-name - отображаемое название карты
+# allow-block-break: true - на этой карте можно ломать блоки (для разрушительных китов)
 arenas:
   Arena-1:
     enabled: true
+    display-name: "&6Арена 1"
+    allow-block-break: false
     spawn1:
       x: 0.0
       y: 64.0
@@ -35,6 +55,8 @@ arenas:
       pitch: 0.0
   Arena-2:
     enabled: true
+    display-name: "&6Арена разрушений"
+    allow-block-break: true
     spawn1:
       x: 40.0
       y: 64.0
@@ -74,8 +96,10 @@ messages:
   arena-name: "&6{arena}"
   arena-lore: "&7Нажмите, чтобы выбрать"
   no-arenas: "&8[&6Дуэли&8] &cНет доступных арен. Настройте их в config.yml"
-  arena-not-found: "&8[&6Дуэли&8] &cАрена не найдена"
-  arena-in-use: "&8[&6Дуэли&8] &cАрена &e{arena} &cуже занята, выберите другую"
+  no-compatible-arenas: "&8[&6Дуэли&8] &cНет подходящих карт для этого кита"
+  arena-not-found: "&8[&6Дуэли&8] &cКарта не найдена"
+  arena-in-use: "&8[&6Дуэли&8] &cКарта &e{arena} &cуже занята, выберите другую"
+  arena-incompatible: "&8[&6Дуэли&8] &cКарта не подходит для выбранных китов"
   queued: "&8[&6Дуэли&8] &aВы в очереди на &e{kit}&a. Ожидание соперника..."
   duel-start: "&8[&6Дуэли&8] &aДуэль началась на арене &e{arena}&a!"
   duel-end: "&8[&6Дуэли&8] &e{winner} &aпобедил в дуэли!"
@@ -91,7 +115,8 @@ messages:
   waiting-subtitle: "&7Ждём, пока &e{player} &7выберет кит"
   waiting-actionbar: "&eОжидание дуэли..."
   match-failed: "&8[&6Дуэли&8] &cСоперник недоступен"
-  duel-usage: "&8[&6Дуэли&8] &cИспользование: /duel <игрок> | /duel queue | /duel lobby | /duel leave | /duel cancel | /duel reload"
+  duel-usage: "&8[&6Дуэли&8] &cИспользование: /duel <игрок> [карта] | /duel queue | /duel queue <кит> [карта] | /duel lobby | /duel leave | /duel cancel | /duel reload"
+  no-permission: "&8[&6Дуэли&8] &cУ вас нет прав на это действие"
   reloaded: "&8[&6Дуэли&8] &aКонфиг перезагружен"
   entered-duels: "&8[&6Дуэли&8] &aВы вошли в мир дуэлей. ПКМ по компасу — выбор кита"
   left-duels: "&8[&6Дуэли&8] &aВы покинули мир дуэлей"

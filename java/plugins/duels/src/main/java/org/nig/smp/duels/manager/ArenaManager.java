@@ -1,5 +1,6 @@
 package org.nig.smp.duels.manager;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,7 +35,12 @@ public final class ArenaManager {
                 plugin.getLogger().warning("Арена " + key + " имеет неверные координаты спавнов, пропущена");
                 continue;
             }
-            arenas.add(new Arena(key, spawn1, spawn2));
+            String display = section.getString(key + ".display-name");
+            if (display == null || display.isEmpty()) {
+                display = key;
+            }
+            boolean allowBlockBreak = section.getBoolean(key + ".allow-block-break", false);
+            arenas.add(new Arena(key, ChatColor.translateAlternateColorCodes('&', display), allowBlockBreak, spawn1, spawn2));
         }
         plugin.getLogger().info("Загружено арен: " + arenas.size());
     }

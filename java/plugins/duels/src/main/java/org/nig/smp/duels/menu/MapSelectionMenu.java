@@ -20,6 +20,7 @@ import org.nig.smp.duels.model.DuelMatch;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class MapSelectionMenu implements InventoryHolder, Listener {
 
@@ -28,13 +29,16 @@ public final class MapSelectionMenu implements InventoryHolder, Listener {
     private final DuelMatch match;
     private final Inventory inventory;
     private final Map<Integer, String> slotArena = new HashMap<>();
+    private boolean selected;
 
     public MapSelectionMenu(DuelsPlugin plugin, Player player, DuelMatch match) {
         this.plugin = plugin;
         this.player = player;
         this.match = match;
 
-        List<Arena> arenas = plugin.getArenaManager().getArenas();
+        List<Arena> arenas = plugin.getArenaManager().getArenas().stream()
+            .filter(a -> isArenaCompatible(a))
+            .toList();
         int rows = Math.max(1, (arenas.size() + 8) / 9);
         int size = Math.min(54, Math.max(9, rows * 9));
         this.inventory = Bukkit.createInventory(this, size, Component.text(plugin.raw("menu-title-map")));
@@ -42,9 +46,20 @@ public final class MapSelectionMenu implements InventoryHolder, Listener {
         draw(arenas);
     }
 
+    private boolean isArenaCompatible(Arena arena) {
+        boolean destructive = false;
+        for (UUID id : match.players()) {
+            String kit = match.getKit(id);
+            if (kit != null && plugin.getKitManager().isDestructive(kit)) {
+                destructive = true;
+            }
+        }
+        return destructive == arena.isBlockBreakAllowed();
+    }
+
     private void draw(List<Arena> arenas) {
         if (arenas.isEmpty()) {
-            inventory.setItem(4, createItem(Material.BARRIER, plugin.msg("no-arenas")));
+            inventory.setItem(4, createItem(Material.BARRIER, plugin.msg("no-compatible-arenas")));
             return;
         }
         int slot = 0;
@@ -52,7 +67,7 @@ public final class MapSelectionMenu implements InventoryHolder, Listener {
             if (slot >= inventory.getSize()) {
                 break;
             }
-            ItemStack icon = createItem(Material.GRASS_BLOCK, plugin.msg("arena-name", "arena", arena.getName()));
+            ItemStack icon = createItem(Material.GRASS_BLOCK, plugin.msg("arena-name", "arena", arena.getDisplayName()));
             ItemMeta meta = icon.getItemMeta();
             if (meta != null) {
                 meta.lore(List.of(plugin.msg("arena-lore")));
@@ -102,13 +117,18 @@ public final class MapSelectionMenu implements InventoryHolder, Listener {
         if (arena == null) {
             return;
         }
-        who.closeInventory();
-        plugin.getDuelManager().selectMapForChallenge(who, arena);
+        if (plugin.getDuelManager().selectMapForChallenge(who, arena)) {
+            selected = true;
+            who.closeInventory();
+        }
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         if (event.getInventory().getHolder(false) instanceof MapSelectionMenu menu && menu == this) {
+            if (!selected) {
+                plugin.getDuelManager().cancelAfterMenuClose(player);
+            }
             HandlerList.unregisterAll(this);
         }
     }

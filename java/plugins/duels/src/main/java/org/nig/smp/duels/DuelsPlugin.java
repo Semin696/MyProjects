@@ -18,8 +18,10 @@ import org.nig.smp.duels.command.DuelCommand;
 import org.nig.smp.duels.command.KitCommand;
 import org.nig.smp.duels.expansion.DuelsExpansion;
 import org.nig.smp.duels.listener.PlayerListener;
+import org.nig.smp.duels.listener.WorldProtectionListener;
 import org.nig.smp.duels.manager.ArenaManager;
 import org.nig.smp.duels.manager.DuelManager;
+import org.nig.smp.duels.manager.KitManager;
 import org.nig.smp.duels.manager.StatsManager;
 import org.nig.smp.duels.manager.VisibilityManager;
 
@@ -32,6 +34,8 @@ public final class DuelsPlugin extends JavaPlugin {
     private DuelManager duelManager;
     private VisibilityManager visibilityManager;
     private StatsManager statsManager;
+    private KitManager kitManager;
+    private WorldProtectionListener worldProtection;
     private DuelsExpansion duelsExpansion;
 
     @Override
@@ -49,6 +53,8 @@ public final class DuelsPlugin extends JavaPlugin {
 
         this.visibilityManager = new VisibilityManager(this);
         this.duelManager = new DuelManager(this, arenaManager, visibilityManager);
+        this.kitManager = new KitManager(this);
+        this.worldProtection = new WorldProtectionListener(this);
 
         DuelCommand duelCommand = new DuelCommand(this, duelManager);
         getCommand("duel").setExecutor(duelCommand);
@@ -57,6 +63,7 @@ public final class DuelsPlugin extends JavaPlugin {
         getCommand("kit").setTabCompleter(new KitCommand(this));
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this, duelManager, visibilityManager), this);
+        getServer().getPluginManager().registerEvents(worldProtection, this);
 
         getServer().getScheduler().runTaskTimer(this, () -> {
             for (UUID uuid : duelManager.getWaitingPlayers()) {
@@ -173,6 +180,18 @@ public final class DuelsPlugin extends JavaPlugin {
         return duels != null && duels.getName().equals(world.getName());
     }
 
+    public boolean isCompassWorld(World world) {
+        if (isDuelsWorld(world)) {
+            return true;
+        }
+        for (String name : getConfig().getStringList("hub-worlds")) {
+            if (name.equalsIgnoreCase(world.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArenaManager getArenaManager() {
         return arenaManager;
     }
@@ -183,6 +202,14 @@ public final class DuelsPlugin extends JavaPlugin {
 
     public VisibilityManager getVisibilityManager() {
         return visibilityManager;
+    }
+
+    public KitManager getKitManager() {
+        return kitManager;
+    }
+
+    public WorldProtectionListener getWorldProtection() {
+        return worldProtection;
     }
 
     public StatsManager getStatsManager() {

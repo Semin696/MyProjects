@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.nig.smp.duels.DuelsPlugin;
@@ -41,15 +43,18 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (plugin.isDuelsWorld(player.getWorld())) {
+        if (plugin.isCompassWorld(player.getWorld())) {
             giveCompass(player);
         }
         Bukkit.getScheduler().runTask(plugin, visibilityManager::refresh);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        if (!plugin.isCompassWorld(player.getWorld())) {
+            return;
+        }
         ItemStack item = event.getItem();
         if (item == null || item.getType() != Material.COMPASS || !isCompass(item)) {
             return;
@@ -102,7 +107,7 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        if (plugin.isDuelsWorld(player.getWorld())) {
+        if (plugin.isCompassWorld(player.getWorld())) {
             player.setGameMode(plugin.getDuelsGameMode());
             giveCompass(player);
         } else {
@@ -144,7 +149,7 @@ public final class PlayerListener implements Listener {
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() != Material.COMPASS || !isCompass(event.getCurrentItem())) {
             return;
         }
-        if (plugin.isDuelsWorld(player.getWorld())) {
+        if (plugin.isCompassWorld(player.getWorld())) {
             event.setCancelled(true);
         }
     }
@@ -184,6 +189,9 @@ public final class PlayerListener implements Listener {
                 PersistentDataType.BOOLEAN,
                 true
             );
+            if (meta instanceof CompassMeta compassMeta) {
+                compassMeta.setLodestoneTracked(false);
+            }
             compass.setItemMeta(meta);
         }
         return compass;

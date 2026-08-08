@@ -22,7 +22,7 @@ public final class KitCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("duels.admin")) {
-            sender.sendMessage(plugin.msg("player-not-found"));
+            sender.sendMessage(plugin.msg("no-permission"));
             return true;
         }
         if (args.length < 2) {
@@ -30,7 +30,7 @@ public final class KitCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        String kitName = args[0];
+        String kitName = resolveKit(args[0]);
         Player target = plugin.getServer().getPlayerExact(args[1]);
         if (target == null) {
             sender.sendMessage(plugin.msg("player-not-found"));
@@ -43,17 +43,37 @@ public final class KitCommand implements CommandExecutor, TabCompleter {
         }
 
         if (CMIKitBridge.applyKit(target, kitName)) {
-            sender.sendMessage(plugin.msg("kit-given", "kit", kitName, "player", target.getName()));
+            sender.sendMessage(plugin.msg("kit-given", "kit", plugin.getKitManager().getDisplayName(kitName), "player", target.getName()));
         } else {
             sender.sendMessage(plugin.msg("kit-not-found", "kit", kitName));
         }
         return true;
     }
 
+    private String resolveKit(String input) {
+        if (CMIKitBridge.getKitNames().contains(input)) {
+            return input;
+        }
+        for (String name : CMIKitBridge.getKitNames()) {
+            if (plugin.getKitManager().getDisplayName(name).equalsIgnoreCase(input)) {
+                return name;
+            }
+        }
+        return input;
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(new ArrayList<>(CMIKitBridge.getKitNames()), args[0]);
+            List<String> kits = new ArrayList<>();
+            for (String name : CMIKitBridge.getKitNames()) {
+                kits.add(name);
+                String display = plugin.getKitManager().getDisplayName(name);
+                if (!display.equals(name)) {
+                    kits.add(display);
+                }
+            }
+            return filter(kits, args[0]);
         }
         if (args.length == 2) {
             List<String> players = new ArrayList<>();
