@@ -149,7 +149,6 @@
     animation: fadeUp 1s ease .55s both;
   }
   .ip { font-family: Consolas, "Courier New", monospace; font-size: clamp(18px, 4vw, 28px); font-weight: 700; color: #fff; letter-spacing: .04em; }
-  .ip-port { color: var(--muted); font-family: Consolas, monospace; font-size: 13px; }
   .copy-btn {
     border: 1px solid rgba(255,255,255,.2);
     background: rgba(255,255,255,.08);
@@ -293,8 +292,6 @@
   <nav>
     <a href="#hero">Главная</a>
     <a href="#features">Дуэли</a>
-    <a href="https://cp.spacetrace.sryze.cc">Панель</a>
-    <a href="https://cp.spacetrace.sryze.cc/console/">Консоль</a>
   </nav>
   <div class="grow"></div>
   <button class="btn discord" id="btnDiscord">Дискорд</button>
@@ -312,7 +309,6 @@
 
   <div class="ip-block">
     <span class="ip">play.spacetrace.sryze.cc</span>
-    <span class="ip-port">:25283</span>
     <button class="copy-btn" id="copyIp">Копировать IP</button>
   </div>
 
@@ -335,7 +331,7 @@
 
 <!-- ========== ФУТЕР ========== -->
 <div class="footer">
-  SPACE TRACE © 2026 · spacetrace.sryze.cc · <a href="https://cp.spacetrace.sryze.cc">Панель</a> · <a href="https://cp.spacetrace.sryze.cc/console/">Консоль</a>
+  SPACE TRACE © 2026 · spacetrace.sryze.cc
 </div>
 
 <!-- ========== ТОСТ ========== -->
@@ -436,7 +432,7 @@
   }
 
   function copyIp() {
-    var text = 'play.spacetrace.sryze.cc:25283';
+    var text = 'play.spacetrace.sryze.cc';
     var btn = document.getElementById('copyIp');
     var done = function () {
       btn.textContent = 'Скопировано!';
@@ -479,22 +475,30 @@
 
   var dot = document.getElementById('dot');
   var statusText = document.getElementById('statusText');
-  fetch('https://api.mcsrvstat.us/3/play.spacetrace.sryze.cc:25283')
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (d && d.online) {
-        dot.classList.add('on');
-        var n = d.players ? d.players.online : 0;
-        var m = d.players ? d.players.max : 0;
-        statusText.textContent = 'Сервер онлайн · ' + n + '/' + m + ' игроков';
-      } else {
+
+  function checkStatus() {
+    dot.className = 'pulse-dot';
+    return fetch('https://api.mcsrvstat.us/2/play.spacetrace.sryze.cc:25283')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.online) {
+          dot.classList.add('on');
+          var n = d.players ? d.players.online : 0;
+          var m = d.players ? d.players.max : 0;
+          statusText.textContent = 'Сервер онлайн · ' + n + '/' + m + ' игроков';
+        } else {
+          dot.classList.add('off');
+          statusText.textContent = 'Сервер офлайн';
+        }
+      })
+      .catch(function () {
         dot.classList.add('off');
-        statusText.textContent = 'Сервер офлайн';
-      }
-    })
-    .catch(function () {
-      statusText.textContent = 'Сервер: статус недоступен';
-    });
+        statusText.textContent = 'Сервер: статус недоступен';
+      });
+  }
+
+  checkStatus();
+  setInterval(checkStatus, 30000);
 })();
 </script>
 </body>
