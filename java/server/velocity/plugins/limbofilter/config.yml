@@ -1,0 +1,323 @@
+version: "1.1.8"
+# Доступные сериализаторы (или форматирование):
+# LEGACY_AMPERSAND - "&c&lExample &c&9Text".
+# LEGACY_SECTION - "§c§lExample §c§9Text".
+# MINIMESSAGE - "<bold><red>Example</red> <blue>Text</blue></bold>". (https://webui.adventure.kyori.net/)
+# GSON - "[{"text":"Example","bold":true,"color":"red"},{"text":" ","bold":true},{"text":"Text","bold":true,"color":"blue"}]". (https://minecraft.tools/en/json_text.php/)
+# GSON_COLOR_DOWNSAMPLING - Похож на GSON, но использует colorDownsamplingGson (Понижает частоту цветов RGB до ближайшего устаревшего цвета Mojang).
+serializer: LEGACY_AMPERSAND
+prefix: "LimboFilter &6>>&f"
+
+# Не используйте \n, используйте {NL} для новой строки и {PREFIX} для префикса.
+main:
+  # Проверяет, отправляет ли клиент Minecraft игрока сетевой пакет с настройками.
+  check-client-settings: true
+  # Проверьте, есть ли у клиента Minecraft игрока бренд. (Бренд — загрузщик модификаций)
+  check-client-brand: true
+  # Если здесь установлен бренд, используемый игроком в его клиенте Minecraft (например, fabric или forge), то этот игрок будет кикнут.
+  blocked-client-brands:
+    - "brand1"
+    - "brand2"
+  # Время в миллисекундах, как часто будет сбрасываться список кэша с проверенными игроками. До этого времени верифицированные игроки могут присоединиться к серверу, не проходя анти-бот проверку.
+  purge-cache-millis: 3600000
+  # Максимальное количество попыток, которое может истратить игрок, чтобы разгадать капчу.
+  captcha-attempts: 2
+  # Продолжительность проверки на падения в Майнкрафт тиках (1 тик = 0,05 секунды, 20 тиков = 1 секунда).
+  falling-check-ticks: 128
+  # Максимальное время проверки игрока в миллисекундах. Если игрок остается в LimboFilter дольше, чем это время, то проверка завершится неудачей.
+  time-out: 15000
+  # То же самое, но для игроков Geyser.
+  geyser-time-out: 45000
+  # Тайм-аут для Netty. Максимальный пинг при нахождении в LimboFilter. Используется для удаления бесполезных буферов из оперативной памяти.
+  max-ping: 3500
+  # Изменяйте приведенные ниже параметры только в том случае, если вы знаете, что они означают.
+  non-valid-position-xz-attempts: 10
+  non-valid-position-y-attempts: 10
+  max-valid-position-difference: 0.01
+  # Параметр для разработчиков и более прошаренных пользователей.
+  falling-check-debug: false
+  # Должна ли капча отображаться в левой руке. Могут возникнуть проблемы с вводом капчи у пользователей с мониторами 4:3. Версия: 1.9+
+  captcha-left-hand: false
+  # Доступные типы проверок: ONLY_POSITION, ONLY_CAPTCHA, CAPTCHA_POSITION, CAPTCHA_ON_POSITION_FAILED
+  # Значение: 
+  # ONLY_POSITION -> Проверка только на падение (игрок будет заспавнен в пустоте, сервер проверит координаты игрока, скорость, ускорение).
+  # ONLY_CAPTCHA -> Только капча (игрокам будут выданы карты с изображением капчи, игрокам нужно разгадать капчу и отправить содержимое в чат).
+  # CAPTCHA_POSITION -> Падение и проверка капчи одновременно (игрок будет удален, если он не выполнит ни проверку падения, ни проверку капчи).
+  # CAPTCHA_ON_POSITION_FAILED -> Первоначально будет запущена проверка на падение, но если игрок не выполнит эту проверку, будет запущена проверка капчи.
+  check-state: CAPTCHA_POSITION
+  # Смотрите "filter-auto-toggle.check-state-toggle".
+  check-state-non-toggled: CAPTCHA_ON_POSITION_FAILED
+  # Смотрите "filter-auto-toggle.check-state-toggle".
+  geyser-check-state: CAPTCHA_POSITION
+  # Смотрите "filter-auto-toggle.check-state-toggle".
+  geyser-check-state-non-toggled: CAPTCHA_ON_POSITION_FAILED
+  load-world: false
+  # Мировой тип файла:
+  #  SCHEMATIC (MCEdit .schematic, 1.12.2 и ниже, не рекомендуется)
+  #  STRUCTURE (блок структуры .nbt, поддерживается любая версия Minecraft, но рекомендуется последняя).
+  #  WORLDEDIT_SCHEM (WorldEdit .schem, поддерживается любая версия Minecraft, но рекомендуется последняя).
+  world-file-type: STRUCTURE
+  world-file-path: "world.nbt"
+  # Мировое время в тиках (24000 тиков == 1 игровой день)
+  world-ticks: 1000
+  # Мировой уровень освещения (от 0 до 15)
+  world-light-level: 15
+  # Должны ли мы переопределить уровень освещенности блока (чтобы осветить нижнюю часть и конец)
+  world-override-block-light-level: true
+  # Доступно: ADVENTURE, CREATIVE, SURVIVAL, SPECTATOR
+  game-mode: ADVENTURE
+  # Единица времени в секундах для автоматического переключения статистики.
+  unit-of-time-cps: 300
+  # Единица времени в секундах для автоматического переключения и статистики.
+  unit-of-time-pps: 5
+  # Время в миллисекундах, сколько мы должны ждать, прежде чем повторно включить журналы после атак.
+  log-enabler-check-refresh-rate: 1000
+  # Продолжительность (в секундах) между регенерацией капчи.
+  captcha-regenerate-rate: 3600
+  # Координаты для проверки на падения.
+  falling-coords:
+    x: 0
+    y: 512
+    z: 0
+    teleport-id: 44
+  # Список "USERNAME:IP", содержащая информацию об игроках, которые должны присоединиться к серверу без верификации.
+  whitelisted-players:
+    - username: "TestUser123"
+      ip: "127.0.0.1"
+  # Общее минимальное/максимальное количество подключений за единицу времени для переключения проверок на защиту от ботов.
+  # -1, чтобы отключить проверку.
+  # 0 для включения любых подключений в единицу времени.
+  filter-auto-toggle:
+    # Все игроки будут обходить все анти-бот проверки.
+    all-bypass: 0
+    # Лицензионные игроки будут обходить все анти-бот проверки.
+    # Не работает с online-mode-verify: -1
+    online-mode-bypass: 49
+    # Проверка лицензии перед анти-бот проверкой.
+    # Если количество подключений в единицу времени превышает лимит: игрокам с лицензией потребуется повторно подключиться.
+    # Либо: Некоторые атаки могут потреблять больше ресурсов процессора и сети и могут привести к длительному ограничению скорости Mojang.
+    # Работает только в том случае, если у вас установлен плагин аутентификации (LimboAuth). В других случаях вам следует настроить параметр необходимости повторного подключения.
+    online-mode-verify: 79
+    # Переключает check-state/check-state-non-toggled.
+    # Не рекомендуется включать его, если вы хотите защитить свой сервер от спам-ботов.
+    # Если количество подключений в единицу времени превышает лимит: будет использоваться check-state.
+    # Либо: будет использован check-state-non-toggled.
+    check-state-toggle: 0
+    # Игроку необходимо будет повторно подключиться после прохождения проверки на наличие ботов.
+    need-to-reconnect: 129
+    # Изображение в пинг-пакете MOTD сервера будет отключено.
+    disable-motd-picture: 25
+    # Все сообщения журнала от всех плагинов будут отключены.
+    disable-log: 129
+  world-coords:
+    x: 0
+    y: 0
+    z: 0
+  captcha-generator:
+    # Подготавливает пакеты Captcha, использует ~ 0,5 ГБ оперативной памяти, но повышает производительность процессора во время атак ботов. Рекомендуется отключить его, если у вас меньше 2 ГБ оперативной памяти.
+    prepare-captcha-packets: false
+    # Список путей к фоновому изображению для карты с капчой. Любой формат, 128x128 128x128 пикселей (будет автоматически изменен и растянут до нужного размера). [] если пусто.
+    backplate-paths:
+      - ""
+    # Путь к файлам шрифтов для текста на карте с капчой (ttf), может быть пустым.
+    fonts-path:
+      - ""
+    # Используйте стандартные шрифты(SANS_SERIF/SERIF/MONOSPACED), используйте false только в том случае, если вы указали путь к шрифтам!
+    use-standard-fonts: true
+    letter-offset-x: 12
+    letter-offset-y: 0
+    font-letter-spacing-x: -14
+    font-letter-spacing-y: 0
+    render-font-size: 78.0
+    font-letter-width: 44
+    font-letter-height: 128
+    font-outline: true
+    font-rotate: true
+    font-ripple: true
+    font-ripple-amplitude-width: 100.0
+    font-ripple-amplitude-height: 10.0
+    font-outline-rate: 1.25
+    font-outline-offset-x: -4
+    font-outline-offset-y: 4
+    font-outline-override-radius: 1
+    # Установите 0, чтобы отключить.
+    curve-size: 2
+    # Установите 0, чтобы отключить.
+    curves-amount: 3
+    # Цвета RGB без #
+    curves-colors:
+      - "000000"
+    strikethrough: false
+    underline: true
+    pattern: "abcdefghijklmnopqrstuvwxyz1234567890"
+    # Если эта функция включена, вводимые игроками капчи как строчными, так и прописными буквами будут правильными.
+    ignore-case: true
+    length: 3
+    images-count: 1000
+    number-spelling: false
+    # Установите значение true, если вы хотите проверить конфигурацию написания чисел.
+    # Результаты будут сохранены в файле number_spelling.txt
+    save-number-spelling-output: false
+    each-word-on-separate-line: true
+    # Если число заканчивается каким-либо указанным здесь ключом, будет использовано соответствующее значение.
+    # Например: если для исключения 11 указано значение «одиннадцать», число 411 будет записано как «четыреста одиннадцать».
+    number-spelling-exceptions:
+      "11": "одиннадцать"
+      "12": "двенадцать"
+      "13": "тринадцать"
+      "14": "четырнадцать"
+      "15": "пятнадцать"
+      "16": "шестнадцать"
+      "17": "семнадцать"
+      "18": "восемнадцать"
+      "19": "девятнадцать"
+    # null или "" означает, что цифру следует пропустить.
+    # Примечание: все используемые здесь символы (включая пробел) должны быть перечислены по шаблону.
+    number-spelling-words:
+      - - ""
+        - "один"
+        - "два"
+        - "три"
+        - "четыре"
+        - "пять"
+        - "шесть"
+        - "семь"
+        - "восемь"
+        - "девять"
+      - - ""
+        - "десять"
+        - "двадцать"
+        - "тридцать"
+        - "сорок"
+        - "пятьдесят"
+        - "шестьдесят"
+        - "семьдесят"
+        - "восемьдесят"
+        - "девяносто"
+      - - ""
+        - "сто"
+        - "двести"
+        - "триста"
+        - "четыреста"
+        - "пятьсот"
+        - "шестьсот"
+        - "семьсот"
+        - "восемьсот"
+        - "девятьсот"
+    rgb-color-list:
+      - "000000"
+      - "AA0000"
+      - "00AA00"
+      - "0000AA"
+      - "AAAA00"
+      - "AA00AA"
+      - "00AAAA"
+    gradient:
+      gradient-enabled: false
+      gradients-count: 32
+      start-x: 0.0
+      start-y: 40.0
+      end-x: 128.0
+      end-y: 80.0
+      start-x-randomness: 0.0
+      start-y-randomness: 2.0
+      end-x-randomness: 0.0
+      end-y-randomness: 2.0
+      # Числа в диапазоне от 0,0 до 1,0, определяющие распределение цветов вдоль градиента. Может быть пустым.
+      fractions:
+        - 0.0
+        - 0.1
+        - 0.2
+        - 0.3
+        - 0.4
+        - 0.5
+        - 0.6
+        - 0.7
+        - 0.8
+        - 0.9
+  framed-captcha:
+    framed-captcha-enabled: false
+    width: 3
+    height: 3
+    frame-rotation-chance: 0.33
+    autoscale-font: true
+    coords:
+      x: -3
+      y: 128
+      z: 2
+      offset-1-7:
+        x: 0
+        y: -2
+        z: 1
+  # Доступные измерения: OVERWORLD, NETHER, THE_END
+  botfilter-dimension: THE_END
+  coords:
+    captcha-x: 0.0
+    # Если ваш сервер поддерживает Minecraft 1.7, не устанавливайте captcha-y равным 0. https://media.discordapp.net/attachments/878241549857738793/915165038464098314/unknown.png
+    captcha-y: 0.0
+    captcha-z: 0.0
+    captcha-yaw: 90.0
+    captcha-pitch: 38.0
+    falling-check-yaw: 90.0
+    falling-check-pitch: 10.0
+  tcp-listener:
+    # ВНИМАНИЕ! Дальше может быть неправильное объяснение, ведь автор перевода не сильно смыслит в защите.
+    # Также автору лень обращаться к hevav, JNNGL, SkyWatcher_2019 и другим уверенным пользователям плагинов Elytrium.
+    # 
+    # Экспериментальная функция проверки прокси
+    # Проверяет прокси, сравнивая пинг L4 (TCP PSH+ACK -> TCP ACK) и L7 (Minecraft KeepAlive).
+    # Работает лучше с включенной проверкой на падение (более 150 тиков с падением)
+    # Требуется libpcap (libpcap-dev) в Linux; WinPcap/npcap в Windows
+    # Требуется CAP_NET_RAW (или суперпользователь) в Linux
+    # Не работает, если Velocity находится за обратным прокси (haproxy, службы защиты и т. д.)
+    proxy-detector-enabled: false
+    # Разница между пингом TCP (L4) и Minecraft (L7) в миллисекундах для обнаружения прокси.
+    proxy-detector-difference: 5
+    interface-name: "any"
+    # Сколько байт мы должны взять из каждого кадра для анализа. 120 достаточно для любого анализа заголовков TCP+IP
+    snaplen: 120
+    # Сколько миллисекунд должна быть задержка между анализом кадра.
+    listen-delay: 50
+    # Время в миллисекундах для захвата кадров
+    timeout: 10
+    # Журнал L4 и L7 ping
+    debug-on-fail: false
+    debug-on-success: false
+  # Доступные значения: FALSE, TRUE, PERMISSION
+  #  FALSE - команда будет запрещена
+  #  TRUE - команда будет разрешена, если у игрока ложное (FALSE) состояние разрешения
+  #  PERMISSION - команда будет разрешена, если у игрока есть истинное (TRUE) состояние разрешений
+  command-permission-state:
+    # Разрешение: limbofilter.admin.sendfilter
+    send-filter: PERMISSION
+    # Разрешение: limbofilter.admin.reload
+    reload: PERMISSION
+    # Разрешение: limbofilter.admin.stats
+    stats: PERMISSION
+    # Разрешение: limbofilter.admin.help
+    help: TRUE
+  # Оставьте поля пустыми, чтобы отключить их.
+  strings:
+    reload: "{PRFX} &aУспешно перезагружено!"
+    client-settings-kick: "{PRFX}{NL}&cВаш аккаунт не отправляет пакеты настроек."
+    client-brand-kick: "{PRFX}{NL}&cВаш аккаунт не отправляет пакет данных или они заблокированы. "
+    proxy-check-kick: "{PRFX}{NL}&cВаше подключение подозрительно."
+    checking-chat: "{PRFX} Начата проверка бот-фильтра, пожалуйста, не двигайтесь..."
+    checking-title: "{PRFX}"
+    checking-subtitle: "&aПожалуйста, подождите..."
+    checking-captcha-chat: "{PRFX} &aПожалуйста, разгадайте капчу, у вас есть &6{0}&a попыток."
+    checking-wrong-captcha-chat: "{PRFX} &cВы неправильно ввели капчу, у вас осталось &6{0}&c попыток."
+    checking-captcha-title: "&aПожалуйста, решите капчу."
+    checking-captcha-subtitle: "&У вас есть &6{0} &aпопыток."
+    successful-cracked: "{PRFX} &aУспешно пройдена проверка бот-фильтра."
+    successful-premium-kick: "{PRFX}{NL}&aУспешно пройдена проверка бот-фильтра.{NL}&6Пожалуйста, перезайдите на сервер!"
+    captcha-failed-kick: "{PRFX}{NL}&cВы ошиблись при проверке капчи.{NL}&6Пожалуйста, перезайдите на сервер!"
+    falling-check-failed-kick: "{PRFX}{NL}&cПроверка на падение была провалена.{NL}&6Пожалуйста, перезайдите на сервер!"
+    times-up: "{PRFX}{NL}&cВы превысили максимальное время проверки Бот-фильтра.{NL}&6Пожалуйста, перезайдите на сервер!"
+    stats-format: "&c&lВсего Заблокировано: &6&l{0} &c&l| Подключений: &6&l{1}s &c&l| Пингов: &6&l{2}s &c&l| Всего Подключений: &6&l{3} &c&l| L7 Пинг: &6&l{4} &c&l| L4 Пинг: &6&l{5}"
+    stats-enabled: "{PRFX} &aТеперь вы видите статистику над панелью быстрого доступа."
+    stats-disabled: "{PRFX} &cБольше вы не видите статистику над панелью быстрого доступа."
+    send-player-successful: "{PRFX} Успешно отправлено {0} в фильтр лимбо."
+    send-server-successful: "{PRFX} Успешно отправлено {0} игроков из {1} в фильтр лимбо"
+    send-failed: "{PRFX} Там нет зарегистрированных серверов или подключенных игроков с именем {0}."
+    captcha-not-ready-yet: "{PRFX} Капча еще не готова. Повторите попытку через несколько секунд."

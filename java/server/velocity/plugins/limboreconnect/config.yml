@@ -1,0 +1,45 @@
+# Доступные сериализаторы (или форматирование):
+# LEGACY_AMPERSAND - "&c&lExample &c&9Text".
+# LEGACY_SECTION - "§c§lExample §c§9Text".
+# MINIMESSAGE - "<bold><red>Example</red> <blue>Text</blue></bold>". (https://webui.adventure.kyori.net/)
+# GSON - "[{"text":"Example","bold":true,"color":"red"},{"text":" ","bold":true},{"text":"Text","bold":true,"color":"blue"}]". (https://minecraft.tools/en/json_text.php/)
+# GSON_COLOR_DOWNSAMPLING - Похож на GSON, но использует colorDownsamplingGson (Понижает частоту цветов RGB до ближайшего устаревшего цвета Mojang)
+serializer: MINIMESSAGE
+# Отправляет игрока в лимбо, если причина отключения содержит этот текст (используя regex)
+restart-message: "((?i)^(server closed|multiplayer\\.disconnect\\.server_shutdown|server is restarting))+$"
+# Интервал проверки статуса сервера в миллисекундах
+check-interval: 1000
+# Время ожидания проверки статуса сервера в миллисекундах
+ping-timeout: 500
+# Задержка возврата игроков из лимбо обратно на свои сервера в миллисекундах
+join-delay: 500
+# Отправить в лимбо или использовать мир текущего сервера?
+use-limbo: false
+
+world:
+  # Измерение: OVERWORLD, NETHER, THE_END
+  dimension: "OVERWORLD"
+  # Загрузить мир из файла
+  load-world: false
+  world-file-path: "world.schem"
+  world-file-type: WORLDEDIT_SCHEM
+  world-light-level: 15
+  world-coords:
+    x: 0
+    y: 0
+    z: 0
+
+# Пустые сообщения не отправляются
+messages:
+  connecting: "<aqua>Подключение к серверу..."
+  reload: "<green>LimboReconnect перезагружен."
+  title-settings:
+    show-delay: 20 # Время в тиках
+  titles:
+    - title: "Сервер перезагружается..."
+      subtitle: "Пожалуйста, подождите..."
+    - title: "Сервер перезагружается..."
+      subtitle: "Пожалуйста, подождите..."
+    - title: "Сервер перезагружается..."
+      subtitle: "Пожалуйста, подождите..."
+debug: false

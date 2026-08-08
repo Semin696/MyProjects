@@ -1,0 +1,20 @@
+
+main:
+  # Доступные сериализаторы (или форматирование):
+  # LEGACY_AMPERSAND - "&c&lExample &c&9Text".
+  # LEGACY_SECTION - "§c§lExample §c§9Text".
+  # MINIMESSAGE - "<bold><red>Example</red> <blue>Text</blue></bold>". (https://webui.adventure.kyori.net/
+  serializer: "MINIMESSAGE"
+  # Сервер с velocity.toml, который будет проверен на наличие онлайна.
+  server: "survival"
+  # Интервал проверки сервера в секундах.
+  check-interval: 2
+  world:
+    # Измерения: OVERWORLD, NETHER, THE_END
+    dimension: "OVERWORLD"
+
+messages:
+  queue-message: "Ваша позиция в очереди: {0}"
+  server-offline: "<red>Сервер отключен."
+  reload: "<green>LimboQueue перезагружен!"
+  reload-failed: "<red>Перезагрузка не удалась!"
