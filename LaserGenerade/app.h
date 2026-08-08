@@ -89,8 +89,6 @@ void DrawHammer(Graphics& g);
 // ---- Wood / engraving backdrop ----
 float Rand01();
 void EnsureWood(int W, int H);
-void CreateTextBitmaps();
-void DeleteTextBitmaps();
 void RenderBackdrop(Graphics& g, int W, int H);
 
 // ---- Controls ----
@@ -113,5 +111,8 @@ Bitmap* MakeGrayscale(Bitmap* src);
 extern float g_mmW;
 extern float g_mmH;
 extern float g_dpi;
+extern float g_feed;
+extern float g_power;
 Bitmap* FitToLaser(Bitmap* src);
 void ApplyLaserSettings();
+bool GenerateGCode(Bitmap* bmp, const std::wstring& path, float feed, float powerPct, float dpi);

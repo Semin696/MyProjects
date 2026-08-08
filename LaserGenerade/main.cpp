@@ -28,7 +28,7 @@ Btn g_btns[3] = {
     { {}, kBtnClear,  false, false, false, L"Сбросить" },
 };
 
-// ---- Laser settings fields (width mm, height mm, DPI) ----
+// ---- Laser settings fields (width mm, height mm, DPI, feed, power) ----
 struct NumField
 {
     RECT r;
@@ -36,7 +36,7 @@ struct NumField
     bool active;
 };
 
-static NumField g_fields[3];
+static NumField g_fields[5];
 static int g_activeField = -1;
 static RECT g_applyR = {};
 
@@ -45,6 +45,8 @@ static void InitSettingsText()
     g_fields[0].text = L"100";
     g_fields[1].text = L"100";
     g_fields[2].text = L"100";
+    g_fields[3].text = L"600";
+    g_fields[4].text = L"70";
 }
 
 Btn* GetBtn(int id)
@@ -130,35 +132,33 @@ static void ResizeButtons()
 
     // laser settings row (below the buttons)
     int sy = y + hBtn + 18;
-    int fw = 70, fh = 30, gapF = 16;
+    int fw = 62, fh = 30, gapF = 12;
     int cx = x;
-    const wchar_t* labels[3] = { L"Ширина (мм)", L"Высота (мм)", L"DPI" };
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
-        RECT lr = { cx, sy, cx + 90, sy + 16 };
-        // labels are drawn by DrawSettingsRow from text; fields positioned here
         g_fields[i].r = { cx, sy + 18, cx + fw, sy + 18 + fh };
         cx += fw + gapF;
     }
-    g_applyR = { cx + 4, sy + 18, cx + 4 + 96, sy + 18 + fh };
+    g_applyR = { cx + 4, sy + 18, cx + 4 + 92, sy + 18 + fh };
 }
 
 static void DrawSettingsRow(Graphics& g)
 {
-    const wchar_t* labels[3] = { L"Ширина (мм)", L"Высота (мм)", L"DPI" };
+    const wchar_t* labels[5] = { L"Ширина (мм)", L"Высота (мм)", L"DPI",
+                                 L"Скорость (мм/мин)", L"Мощность %" };
     SolidBrush lbl(kTextDim);
     SolidBrush txt(kTextMain);
     StringFormat sf;
     sf.SetAlignment(StringAlignmentCenter);
     sf.SetLineAlignment(StringAlignmentCenter);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
         RECT lr = g_fields[i].r;
         lr.bottom = lr.top - 2;
-        lr.right = lr.left + 90;
+        lr.right = lr.left + 100;
         lr.top = lr.bottom - 16;
-        RectF lf((REAL)lr.left, (REAL)lr.top, (REAL)90, 16);
+        RectF lf((REAL)lr.left, (REAL)lr.top, (REAL)100, 16);
         g.DrawString(labels[i], -1, g_fontSub, lf, &sf, &lbl);
 
         RectF box((REAL)g_fields[i].r.left, (REAL)g_fields[i].r.top,
@@ -171,7 +171,7 @@ static void DrawSettingsRow(Graphics& g)
         g.DrawPath(&pen, p);
         delete p;
 
-        RectF tx(box.X + 8, box.Y, box.Width - 10, box.Height);
+        RectF tx(box.X + 6, box.Y, box.Width - 8, box.Height);
         g.DrawString(g_fields[i].text.c_str(), -1, g_fontBtn, tx, &sf, &txt);
     }
 
@@ -192,14 +192,19 @@ static void ParseSettings()
     g_mmW = (float)_wtof(g_fields[0].text.c_str());
     g_mmH = (float)_wtof(g_fields[1].text.c_str());
     g_dpi = (float)_wtof(g_fields[2].text.c_str());
+    g_feed = (float)_wtof(g_fields[3].text.c_str());
+    g_power = (float)_wtof(g_fields[4].text.c_str());
     if (g_mmW < 1) g_mmW = 1;
     if (g_mmH < 1) g_mmH = 1;
     if (g_dpi < 1) g_dpi = 1;
+    if (g_feed < 1) g_feed = 1;
+    if (g_power < 1) g_power = 1;
+    if (g_power > 100) g_power = 100;
 }
 
 static int HitTestField(int x, int y)
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
         RECT r = g_fields[i].r;
         r.right++; r.bottom++;
@@ -417,7 +422,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             return 0;
         }
         g_activeField = -1;
-        for (int i = 0; i < 3; i++) g_fields[i].active = false;
+        for (int i = 0; i < 5; i++) g_fields[i].active = false;
         InvalidateRect(hwnd, NULL, TRUE);
 
         if (HitTestApply(mx, my))
@@ -449,13 +454,13 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
             {
                 ApplyConfig();
                 g_activeField = -1;
-                g_fields[0].active = g_fields[1].active = g_fields[2].active = false;
+                for (int i = 0; i < 5; i++) g_fields[i].active = false;
                 InvalidateRect(hwnd, NULL, TRUE);
             }
             else if (wParam == VK_TAB)
             {
-                g_activeField = (g_activeField + 1) % 3;
-                for (int i = 0; i < 3; i++) g_fields[i].active = (i == g_activeField);
+                g_activeField = (g_activeField + 1) % 5;
+                for (int i = 0; i < 5; i++) g_fields[i].active = (i == g_activeField);
                 InvalidateRect(hwnd, NULL, TRUE);
             }
             return 0;
@@ -566,7 +571,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     OleInitialize(NULL);
     GdiplusStartup(&g_gdiplusToken, &g_gdiplusStartupInput, NULL);
     CreateFonts();
-    CreateTextBitmaps();
 
     WNDCLASSEXW wc = {};
     wc.cbSize = sizeof(wc);
@@ -600,7 +604,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 
     RevokeDragDrop(g_hwnd);
     DeleteFonts();
-    DeleteTextBitmaps();
     GdiplusShutdown(g_gdiplusToken);
     OleUninitialize();
     return (int)msg.wParam;

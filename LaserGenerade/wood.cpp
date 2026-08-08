@@ -1,10 +1,6 @@
 #include "app.h"
 
-// ---- Laser engraving background ----
-static const wchar_t kEngravedText[] = L"ДРЕВЕСИНА ЛАЗЕР";
-static const int kEngraveFontSize = 44;
-static const float kEngraveTop = 152.0f;
-
+// ---- Wood background ----
 static unsigned int g_rngState = 0xC0FFEEu;
 
 float g_animTime = 0.0f;
@@ -17,10 +13,6 @@ float Rand01()
 
 static Bitmap* g_wood = nullptr;
 static int g_woodW = 0, g_woodH = 0;
-
-static Bitmap* g_textChar = nullptr;
-static Bitmap* g_textScorch = nullptr;
-static float g_textW = 0.0f, g_textH = 0.0f;
 
 static Bitmap* GenerateWood(int W, int H)
 {
@@ -108,102 +100,9 @@ void EnsureWood(int W, int H)
     g_woodH = H;
 }
 
-void CreateTextBitmaps()
-{
-    Font f(L"Segoe UI", (REAL)kEngraveFontSize, FontStyleBold, UnitPixel);
-
-    Bitmap measure(1, 1, PixelFormat32bppARGB);
-    Graphics mg(&measure);
-    RectF m;
-    mg.MeasureString(kEngravedText, -1, &f, PointF(0, 0), &m);
-    g_textW = m.Width + 10.0f;
-    g_textH = m.Height + 6.0f;
-    int tw = (int)g_textW + 4;
-    int th = (int)g_textH + 4;
-
-    // charred letters (dark core + scorch halo)
-    g_textChar = new Bitmap(tw, th, PixelFormat32bppARGB);
-    {
-        Graphics g(g_textChar);
-        g.SetTextRenderingHint(TextRenderingHintAntiAlias);
-        SolidBrush scorch(Color(150, 158, 96, 48));
-        g.DrawString(kEngravedText, -1, &f, PointF(3, 3), &scorch);
-        SolidBrush halo(Color(130, 100, 60, 30));
-        g.DrawString(kEngravedText, -1, &f, PointF(2, 2), &halo);
-        SolidBrush core(Color(255, 32, 18, 9));
-        g.DrawString(kEngravedText, -1, &f, PointF(2, 2), &core);
-    }
-
-    // scorched (orange, for the zone right behind the beam)
-    g_textScorch = new Bitmap(tw, th, PixelFormat32bppARGB);
-    {
-        Graphics g(g_textScorch);
-        g.SetTextRenderingHint(TextRenderingHintAntiAlias);
-        SolidBrush s(Color(220, 176, 96, 44));
-        g.DrawString(kEngravedText, -1, &f, PointF(3, 3), &s);
-        SolidBrush s2(Color(255, 120, 62, 26));
-        g.DrawString(kEngravedText, -1, &f, PointF(2, 2), &s2);
-    }
-}
-
-void DeleteTextBitmaps()
-{
-    delete g_textChar;  g_textChar = nullptr;
-    delete g_textScorch; g_textScorch = nullptr;
-    delete g_wood;      g_wood = nullptr;
-    g_woodW = g_woodH = 0;
-}
-
 void RenderBackdrop(Graphics& g, int W, int H)
 {
     if (W <= 0 || H <= 0) return;
     EnsureWood(W, H);
     g.DrawImage(g_wood, 0, 0, W, H);
-
-    float t = g_animTime;
-    float textLeft = ((float)W - g_textW) * 0.5f;
-    float endX = textLeft + g_textW;
-
-    const float scanDur = 3.8f;
-    float scan = t < scanDur ? t / scanDur : 1.0f;
-    bool beamOn = t < scanDur;
-    float beamX = textLeft + scan * (endX - textLeft) + sinf(t * 3.0f) * 1.5f;
-
-    // engrave letters left of the beam
-    if (beamX > textLeft)
-    {
-        GraphicsState st = g.Save();
-
-        RectF charClip(textLeft, kEngraveTop - 2, beamX - textLeft, g_textH + 4);
-        g.SetClip(charClip);
-        g.DrawImage(g_textChar, textLeft, kEngraveTop - 2, g_textW, g_textH + 4);
-
-        RectF scorchClip(beamX - 36, kEngraveTop - 2, 36, g_textH + 4);
-        g.SetClip(scorchClip);
-        g.DrawImage(g_textScorch, textLeft, kEngraveTop - 2, g_textW, g_textH + 4);
-
-        g.Restore(st);
-    }
-
-    // laser beam
-    if (beamOn)
-    {
-        float flick = 0.72f + 0.28f * sinf(t * 40.0f) + 0.12f * sinf(t * 63.0f);
-        if (flick < 0.35f) flick = 0.35f;
-
-        // soft glow column
-        SolidBrush glow(Color((BYTE)(70 * flick), 255, 120, 40));
-        g.FillRectangle(&glow, RectF(beamX - 11, kEngraveTop - 26, 22, g_textH + 52));
-
-        // beam core
-        Pen corePen(Color((BYTE)(235 * flick), 255, 255, 230), 2.0f);
-        g.DrawLine(&corePen, beamX, kEngraveTop - 22, beamX, kEngraveTop + g_textH + 26);
-
-        // bright head
-        float hy = kEngraveTop + g_textH * 0.5f;
-        SolidBrush head(Color((BYTE)(200 * flick), 255, 240, 200));
-        g.FillEllipse(&head, RectF(beamX - 5, hy - 5, 10, 10));
-        SolidBrush hot(Color(255, 255, 255, 255));
-        g.FillEllipse(&hot, RectF(beamX - 1.5f, hy - 1.5f, 3, 3));
-    }
 }
