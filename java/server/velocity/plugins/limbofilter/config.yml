@@ -6,7 +6,7 @@ version: "1.1.8"
 # GSON - "[{"text":"Example","bold":true,"color":"red"},{"text":" ","bold":true},{"text":"Text","bold":true,"color":"blue"}]". (https://minecraft.tools/en/json_text.php/)
 # GSON_COLOR_DOWNSAMPLING - Похож на GSON, но использует colorDownsamplingGson (Понижает частоту цветов RGB до ближайшего устаревшего цвета Mojang).
 serializer: LEGACY_AMPERSAND
-prefix: "LimboFilter &6>>&f"
+prefix: "Фильтер &6>>&f"
 
 # Не используйте \n, используйте {NL} для новой строки и {PREFIX} для префикса.
 main:
