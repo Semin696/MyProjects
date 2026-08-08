@@ -1,5 +1,7 @@
 package com.Zrips.CMI;
 
+import com.Zrips.CMI.Modules.Kits.KitsManager;
+
 /**
  * Compile-time stub of the CMI API (not packaged into the jar).
  * At runtime the real CMI classes are used via the softdepend on CMI.
@@ -10,7 +12,7 @@ public class CMI {
         return null;
     }
 
-    public KitManager getKitManager() {
+    public KitsManager getKitsManager() {
         return null;
     }
 }

@@ -1,8 +1,8 @@
 package org.nig.smp.duels.cmi;
 
 import com.Zrips.CMI.CMI;
-import com.Zrips.CMI.Kit;
-import com.Zrips.CMI.KitManager;
+import com.Zrips.CMI.Modules.Kits.Kit;
+import com.Zrips.CMI.Modules.Kits.KitsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +28,7 @@ public final class CMIKitBridge {
             return names;
         }
         try {
-            Map<String, Kit> kits = manager().getKits();
+            Map<String, Kit> kits = manager().getKitMap();
             if (kits != null) {
                 names.addAll(kits.keySet());
             }
@@ -61,20 +61,20 @@ public final class CMIKitBridge {
             if (kit == null) {
                 return false;
             }
-            kit.loadkit(player);
+            manager().giveKit(player, kit);
             return true;
         } catch (Exception | LinkageError ignored) {
         }
         return false;
     }
 
-    private static KitManager manager() {
+    private static KitsManager manager() {
         CMI cmi = CMI.getInstance();
-        return cmi == null ? null : cmi.getKitManager();
+        return cmi == null ? null : cmi.getKitsManager();
     }
 
     private static Kit kit(String name) {
-        KitManager manager = manager();
+        KitsManager manager = manager();
         return manager == null ? null : manager.getKit(name);
     }
 }
