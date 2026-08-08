@@ -41,4 +41,11 @@ public class SessionManager {
             conn.send(data);
         }
     }
+
+    public void broadcastAll(JsonObject msg) {
+        String data = msg.toString();
+        for (WebSocketConnection conn : all) {
+            conn.send(data);
+        }
+    }
 }

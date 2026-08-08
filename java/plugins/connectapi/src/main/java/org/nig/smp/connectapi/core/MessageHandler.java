@@ -31,6 +31,7 @@ public class MessageHandler {
         hello.addProperty("name", "ConnectApi");
         hello.addProperty("authRequired", true);
         conn.send(hello.toString());
+        status.sendStatus(conn);
     }
 
     public void onClose(WebSocketConnection conn, String reason) {

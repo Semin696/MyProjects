@@ -477,29 +477,55 @@
   var dot = document.getElementById('dot');
   var statusText = document.getElementById('statusText');
 
-  function checkStatus() {
-    dot.className = 'pulse-dot';
-    return fetch('https://api.mcsrvstat.us/2/play.spacetrace.sryze.cc:25283')
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (d && d.online) {
-          dot.classList.add('on');
-          var n = d.players ? d.players.online : 0;
-          var m = d.players ? d.players.max : 0;
-          statusText.textContent = 'Сервер онлайн · ' + n + '/' + m + ' игроков';
-        } else {
-          dot.classList.add('off');
-          statusText.textContent = 'Сервер офлайн';
-        }
-      })
-      .catch(function () {
-        dot.classList.add('off');
-        statusText.textContent = 'Сервер: статус недоступен';
-      });
+  var addr = 'ws://play.spacetrace.sryze.cc:38710';
+  if (window.location.protocol === 'https:') {
+    addr = 'wss://' + addr.replace(/^ws:\/\//, '');
   }
 
-  checkStatus();
-  setInterval(checkStatus, 30000);
+  function setStatus(cls, text) {
+    dot.className = 'pulse-dot ' + cls;
+    statusText.textContent = text;
+  }
+
+  var ws = null;
+  var wsTries = 0;
+  var wsOk = false;
+
+  function connect() {
+    try {
+      ws = new WebSocket(addr);
+    } catch (e) {
+      return;
+    }
+    ws.onopen = function () {
+      wsTries = 0;
+      wsOk = true;
+    };
+    ws.onmessage = function (e) {
+      var d;
+      try { d = JSON.parse(e.data); } catch (err) { return; }
+      if (d.op !== 'status') return;
+      if (d.online !== undefined) {
+        var n = d.online;
+        var m = d.max;
+        setStatus(n > 0 ? 'on' : 'on', 'Сервер онлайн · ' + n + '/' + m + ' игроков');
+      }
+    };
+    ws.onclose = function () {
+      wsOk = false;
+      if (wsTries < 3) {
+        wsTries++;
+        setTimeout(connect, 5000);
+      } else {
+        setStatus('off', 'Сервер офлайн');
+      }
+    };
+    ws.onerror = function () {
+      try { ws.close(); } catch (e) {}
+    };
+  }
+
+  connect();
 })();
 </script>
 </body>

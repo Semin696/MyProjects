@@ -27,10 +27,8 @@ public class StatusManager implements Listener {
 
     public void start() {
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-            if (sessions.countAuthed() > 0) {
-                sessions.broadcast(statusMessage());
-            }
-        }, 20L * 5, 20L * 5);
+            sessions.broadcastAll(statusMessage());
+        }, 20L * 2, 20L * 5);
     }
 
     public void sendStatus(WebSocketConnection conn) {
