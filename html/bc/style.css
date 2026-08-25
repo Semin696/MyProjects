@@ -222,6 +222,15 @@ body {
   box-shadow: 0 6px 26px rgba(224, 82, 82, 0.4);
 }
 
+.button.ghost {
+  background: linear-gradient(135deg, #4a4a4a, #333333);
+  box-shadow: none;
+}
+
+.button.ghost:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
 .button.tiny {
   padding: 7px 14px;
   font-size: 11px;
@@ -271,6 +280,86 @@ body {
   color: var(--muted);
   font-size: 12px;
   letter-spacing: 1px;
+}
+
+/* ---------- Эмодзи ---------- */
+
+.emoji-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(165deg, #333333, #282828);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.emoji-panel.hidden {
+  display: none;
+}
+
+.emoji-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emoji-tab {
+  background: #2b2b2b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.emoji-tab:hover {
+  color: var(--text);
+}
+
+.emoji-tab.active {
+  background: linear-gradient(135deg, var(--green1), var(--green2));
+  color: #fff;
+  border-color: transparent;
+}
+
+.emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.emoji-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.emoji-grid::-webkit-scrollbar-thumb {
+  background: #444444;
+  border-radius: 4px;
+}
+
+.emoji-btn {
+  font-size: 20px;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.emoji-btn:hover {
+  background: #3d3d3d;
+  transform: scale(1.2);
 }
 
 /* ---------- Статус и ссылки ---------- */

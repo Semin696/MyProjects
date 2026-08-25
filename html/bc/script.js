@@ -6,6 +6,41 @@ const WEBHOOKS = [
 
 const RIGHTS = ["text", "image", "admin"];
 
+const EMOJI_GROUPS = [
+  {
+    name: "Смайлы",
+    list: "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘 😗 😚 😙 🥲 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🤫 🤔 🤐 🤨 😐 😑 😶 😏 😒 🙄 😬 😮‍💨 🤥 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🤧 🥵 🥶 🥴 😵 🤯 🤠 🥳 🥸 😎 🤓 🧐 😕 😟 🙁 😮 😯 😲 😳 🥺 😦 😧 😨 😰 😥 😢 😭 😱 😖 😣 😞 😓 😩 😫 🥱 😤 😡 😠 🤬 😈 👿 💀 ☠️ 💩 🤡 👹 👺 👻 👽 🤖".split(" "),
+  },
+  {
+    name: "Жесты",
+    list: "👋 🤚 🖐️ ✋ 🖖 👌 🤌 🤏 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ 👍 👎 ✊ 👊 🤛 🤜 👏 🙌 👐 🤲 🤝 🙏 ✍️ 💅 🤳 💪 🦾 🦿 🦵 🦶 👂 🦻 👃 🧠 🫀 🫁 🦷 🦴 👀 👁️ 👅 👄 💋 🩸".split(" "),
+  },
+  {
+    name: "Животные",
+    list: "🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵 🙈 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🐛 🦋 🐌 🐞 🐜 🕷️ 🦂 🐢 🐍 🦎 🦖 🦕 🐙 🦑 🦐 🦞 🦀 🐡 🐠 🐟 🐬 🐳 🐋 🦈 🐊 🐅 🐆 🦓 🦍 🦧 🐘 🦛 🦏 🐪 🦒 🦘 🐃 🐂 🐄 🐎 🐖 🐏 🐑 🦙 🐐 🦌 🐕 🐩 🦮 🐈 🐓 🦃 🦚 🦜 🦢 🕊️ 🐇 🦝 🦨 🦡 🦫 🦦 🦥 🐁 🐀 🦔".split(" "),
+  },
+  {
+    name: "Еда",
+    list: "🍏 🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🌽 🥕 🧄 🧅 🥔 🍠 🥐 🥯 🍞 🥖 🥨 🧀 🥚 🍳 🧈 🥞 🧇 🥓 🥩 🍗 🍖 🌭 🍔 🍟 🍕 🥪 🥙 🧆 🌮 🌯 🥗 🥘 🍝 🍜 🍲 🍛 🍣 🍱 🥟 🦪 🍤 🍙 🍚 🍘 🍥 🥠 🥮 🍢 🍡 🍧 🍨 🍦 🥧 🧁 🍰 🎂 🍮 🍭 🍬 🍫 🍿 🍩 🍪 🌰 🥜 🍯 🥛 🍼 ☕ 🍵 🧃 🥤 🧋 🍶 🍺 🍻 🥂 🍷 🥃 🍸 🍹 🧉 🍾 🧊".split(" "),
+  },
+  {
+    name: "Спорт",
+    list: "⚽ 🏀 🏈 ⚾ 🥎 🎾 🏐 🏉 🥏 🎱 🪀 🏓 🏸 🏒 🏑 🥍 🏏 🥊 🥋 🎽 🛹 🛼 🛷 ⛸️ 🥌 🎿 ⛷️ 🏂 🏋️ 🤼 🤸 ⛹️ 🤺 🤾 🏌️ 🏇 🧘 🏄 🏊 🤽 🚣 🧗 🚵 🚴 🏆 🥇 🥈 🥉 🏅 🎖️ 🏵️ 🎗️ 🎫 🎟️ 🎪".split(" "),
+  },
+  {
+    name: "Путешествия",
+    list: "🚗 🚕 🚙 🚌 🚎 🏎️ 🚓 🚑 🚒 🚐 🚚 🚛 🚜 🛴 🚲 🛵 🏍️ 🛺 🚨 🚔 🚍 🚘 🚖 🚡 🚠 🚟 🚃 🚋 🚞 🚝 🚄 🚅 🚈 🚂 🚆 🚇 🚊 🚉 ✈️ 🛫 🛬 🛩️ 💺 🛰️ 🚀 🛸 🚁 🛶 ⛵ 🚤 🛥️ 🛳️ ⛴️ 🚢 ⚓ 🪝 ⛽ 🚧 🚦 🚥 🗺️ 🗿 🗽 🗼 🏰 🏯 🏟️ 🎡 🎢 🎠 ⛲ ⛱️ 🏖️ 🏝️ 🏜️ 🌋 ⛰️ 🏔️ 🗻 🏕️ ⛺ 🏠 🏡 🏘️ 🏗️ 🏭 🏢 🏬 🏣 🏤 🏥 🏦 🏨 🏪 🏫 🏩 💒 🏛️ ⛪ 🕌 🛕 ⛩️ 🌁 🌃 🏙️ 🌄 🌅 🌆 🌇 🌉".split(" "),
+  },
+  {
+    name: "Объекты",
+    list: "⌚ 📱 💻 ⌨️ 🖥️ 🖨️ 🖱️ 💽 💾 💿 📀 📼 📷 📸 📹 🎥 📞 ☎️ 📟 📠 📺 📻 🎙️ 🎚️ 🎛️ 🧭 ⏱️ ⏲️ ⏰ 🕰️ ⌛ ⏳ 📡 🔋 🔌 💡 🔦 🕯️ 🧯 🛢️ 💸 💵 💴 💶 💷 🪙 💰 💳 💎 ⚖️ 🪜 🧰 🔧 🔨 ⚒️ 🛠️ ⛏️ 🔩 ⚙️ 🧱 ⛓️ 🧲 🔫 💣 🧨 🪓 🔪 🗡️ ⚔️ 🛡️ 🚬 ⚰️ 🪦 ⚱️ 🏺 🔮 📿 🧿 ⚗️ 🔭 🔬 🕳️ 💊 💉 🧬 🦠 🧫 🧪 🌡️ 🧹 🧺 🧻 🚽 🚰 🚿 🛁 🛀 🧼 🪒 🧽 🧴 🛎️ 🔑 🗝️ 🚪 🪑 🛋️ 🛏️ 🛌 🧸 🖼️ 🛍️ 🛒 🎁 🎈 🎏 🎀 🎊 🎉 🪄 🪅".split(" "),
+  },
+  {
+    name: "Символы",
+    list: "❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 ☮️ ✝️ ☪️ 🕉️ ☸️ ✡️ 🔯 🕎 ☯️ ☦️ ⛎ ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 🆔 ⚛️ 🉑 ☢️ ☣️ 📴 📳 ✴️ 🆚 💯 🔥 ✨ 🌟 ⭐ 💫 💥 💢 ❄️ 🌈 ☀️ ⛅ ☁️ 🌧️ ⛈️ 🌩️ 🌨️ ☃️ ⛄ 🌬️ 💨 🌪️ 🌫️ 🌊 💧 💦 ☔ ✅ ❌ ❓ ❗ ‼️ ⁉️ 💬 🗯️ 💭 🔔 🔕 ♻️ 🔱 📴 🆕 🆗 🆒 🆙 🔝 🈁 ⚠️ 🚸 🔰 ⛔ 🚫 💹 🅰️ 🅱️ 🆎 🅾️ 🆘".split(" "),
+  },
+];
+
 const LS = { admin: "bc_admin_code", codes: "bc_codes", version: "bc_session_version" };
 const SS = { session: "bc_session", version: "bc_session_version" };
 
@@ -31,6 +66,8 @@ const kickAllBtn = $("kickAllBtn");
 const adminStatus = $("adminStatus");
 const whoami = $("whoami");
 const logoutBtn = $("logoutBtn");
+const emojiToggle = $("emojiToggle");
+const emojiPanel = $("emojiPanel");
 
 let adminCode = localStorage.getItem(LS.admin);
 let session = null;
@@ -211,6 +248,51 @@ function setBusy(busy) {
   sendTextBtn.disabled = busy;
   sendImageBtn.disabled = busy;
 }
+
+let activeEmojiGroup = 0;
+
+function renderEmojiPanel() {
+  emojiPanel.innerHTML = "";
+
+  const tabs = document.createElement("div");
+  tabs.className = "emoji-tabs";
+  EMOJI_GROUPS.forEach((g, i) => {
+    const tab = document.createElement("button");
+    tab.className = "emoji-tab" + (i === activeEmojiGroup ? " active" : "");
+    tab.textContent = g.name;
+    tab.addEventListener("click", () => {
+      activeEmojiGroup = i;
+      renderEmojiPanel();
+    });
+    tabs.appendChild(tab);
+  });
+  emojiPanel.appendChild(tabs);
+
+  const grid = document.createElement("div");
+  grid.className = "emoji-grid";
+  EMOJI_GROUPS[activeEmojiGroup].list.forEach((em) => {
+    const btn = document.createElement("button");
+    btn.className = "emoji-btn";
+    btn.textContent = em;
+    btn.addEventListener("click", () => insertEmoji(em));
+    grid.appendChild(btn);
+  });
+  emojiPanel.appendChild(grid);
+}
+
+function insertEmoji(em) {
+  const start = textInput.selectionStart ?? textInput.value.length;
+  const end = textInput.selectionEnd ?? start;
+  textInput.value = textInput.value.slice(0, start) + em + textInput.value.slice(end);
+  const pos = start + em.length;
+  textInput.focus();
+  textInput.setSelectionRange(pos, pos);
+}
+
+emojiToggle.addEventListener("click", () => {
+  emojiPanel.classList.toggle("hidden");
+  if (!emojiPanel.classList.contains("hidden")) renderEmojiPanel();
+});
 
 async function sendWebhook(url, options) {
   const res = await fetch(url, { method: "POST", ...options });
