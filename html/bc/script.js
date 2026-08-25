@@ -1,108 +1,210 @@
-const WEBHOOK_KEY = "bc_webhook_url";
+const WEBHOOKS = [
+  // Впиши сюда свои вебхуки (имя + ссылка). В самом сайте их добавить или удалить нельзя.
+  { name: "Основной", url: "" },
+  { name: "Резервный", url: "" },
+];
 
-const webhookCard = document.getElementById("webhookCard");
-const messageCard = document.getElementById("messageCard");
-const webhookInput = document.getElementById("webhookInput");
-const webhookNext = document.getElementById("webhookNext");
-const textInput = document.getElementById("textInput");
-const sendTextBtn = document.getElementById("sendText");
-const sendImageBtn = document.getElementById("sendImage");
-const imageInput = document.getElementById("imageInput");
-const statusEl = document.getElementById("status");
-const changeWebhookBtn = document.getElementById("changeWebhook");
+const RIGHTS = ["text", "image", "admin"];
 
-let webhookUrl = localStorage.getItem(WEBHOOK_KEY) || "";
+const LS = { admin: "bc_admin_code", codes: "bc_codes", version: "bc_session_version" };
+const SS = { session: "bc_session", version: "bc_session_version" };
 
-function isValidWebhook(url) {
-  return /^https:\/\/(canary\.|ptb\.)?(discord|discordapp)\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(
-    url.trim()
-  );
+const $ = (id) => document.getElementById(id);
+
+const loginCard = $("loginCard");
+const messageCard = $("messageCard");
+const adminCard = $("adminCard");
+const codeInput = $("codeInput");
+const loginBtn = $("loginBtn");
+const loginStatus = $("loginStatus");
+const webhookSelect = $("webhookSelect");
+const textInput = $("textInput");
+const sendTextBtn = $("sendText");
+const sendImageBtn = $("sendImage");
+const imageInput = $("imageInput");
+const statusEl = $("status");
+const newCodeInput = $("newCodeInput");
+const newRightsInput = $("newRightsInput");
+const addCodeBtn = $("addCodeBtn");
+const codesList = $("codesList");
+const kickAllBtn = $("kickAllBtn");
+const adminStatus = $("adminStatus");
+const whoami = $("whoami");
+const logoutBtn = $("logoutBtn");
+
+let adminCode = localStorage.getItem(LS.admin);
+let session = null;
+
+function randomCode(len = 8) {
+  const abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const arr = crypto.getRandomValues(new Uint32Array(len));
+  return Array.from(arr, (n) => abc[n % abc.length]).join("");
 }
 
-function showWebhookScreen() {
-  webhookCard.classList.remove("hidden");
-  messageCard.classList.add("hidden");
-  webhookInput.value = webhookUrl;
-  webhookInput.focus();
-}
-
-function showMessageScreen() {
-  webhookCard.classList.add("hidden");
-  messageCard.classList.remove("hidden");
-  setStatus("");
-}
-
-function setStatus(text, type) {
-  statusEl.textContent = text;
-  statusEl.className = "status" + (type ? " " + type : "");
-}
-
-function saveWebhook() {
-  const url = webhookInput.value.trim();
-  if (!isValidWebhook(url)) {
-    setStatus("Неверная ссылка на вебхук", "err");
-    return;
-  }
-  webhookUrl = url;
-  localStorage.setItem(WEBHOOK_KEY, webhookUrl);
-  setStatus("");
-  showMessageScreen();
-}
-
-async function sendWebhook(options) {
-  const res = await fetch(webhookUrl, { method: "POST", ...options });
-  if (res.status === 429) {
-    throw new Error("Слишком часто. Подожди немного");
-  }
-  if (!res.ok) {
-    throw new Error("Ошибка отправки (" + res.status + ")");
-  }
-}
-
-async function sendText() {
-  const content = textInput.value.trim();
-  if (!content) {
-    setStatus("Введите текст", "err");
-    return;
-  }
-  setBusy(true);
-  setStatus("Отправка...");
+function getCodes() {
   try {
-    await sendWebhook({
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
-    });
-    textInput.value = "";
-    setStatus("Отправлено", "ok");
-  } catch (e) {
-    setStatus(e.message.includes("Failed to fetch") ? "Нет соединения" : e.message, "err");
+    return JSON.parse(localStorage.getItem(LS.codes)) || [];
+  } catch {
+    return [];
   }
-  setBusy(false);
 }
 
-async function sendWithImage(file) {
-  if (!file) return;
-  if (!file.type.startsWith("image/")) {
-    setStatus("Это не картинка", "err");
-    return;
-  }
-  if (file.size > 8 * 1024 * 1024) {
-    setStatus("Файл больше 8 МБ", "err");
-    return;
-  }
-  setBusy(true);
-  setStatus("Отправка...");
-  try {
-    const fd = new FormData();
-    fd.append("payload_json", JSON.stringify({ content: textInput.value.trim() }));
-    fd.append("files[0]", file, file.name);
-    await sendWebhook({ body: fd });
+function setCodes(list) {
+  localStorage.setItem(LS.codes, JSON.stringify(list));
+}
+
+function parseRights(str) {
+  return String(str || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter((r) => RIGHTS.includes(r));
+}
+
+function hasRight(r) {
+  if (!session) return false;
+  if (session.admin) return true;
+  return session.rights.includes(r);
+}
+
+function setStatus(el, text, type) {
+  el.textContent = text;
+  el.className = "status" + (type ? " " + type : "");
+}
+
+function startSession(s) {
+  session = s;
+  sessionStorage.setItem(SS.session, JSON.stringify(s));
+  sessionStorage.setItem(SS.version, localStorage.getItem(LS.version) || "0");
+  applySession();
+}
+
+function endSession(message) {
+  session = null;
+  sessionStorage.removeItem(SS.session);
+  sessionStorage.removeItem(SS.version);
+  applySession();
+  if (message) setStatus(loginStatus, message, "err");
+}
+
+function applySession() {
+  loginCard.classList.toggle("hidden", !!session);
+  messageCard.classList.toggle("hidden", !session);
+  adminCard.classList.toggle("hidden", !(session && session.admin));
+  logoutBtn.classList.toggle("hidden", !session);
+  whoami.textContent = session
+    ? session.code + " · " + (session.admin ? "админ" : session.rights.join(", "))
+    : "";
+  sendTextBtn.classList.toggle("hidden", !hasRight("text"));
+  sendImageBtn.classList.toggle("hidden", !hasRight("image"));
+  if (session) {
+    fillWebhooks();
     textInput.value = "";
-    setStatus("Отправлено с картинкой", "ok");
-  } catch (e) {
-    setStatus(e.message.includes("Failed to fetch") ? "Нет соединения" : e.message, "err");
+    setStatus(statusEl, "");
   }
-  setBusy(false);
+  if (session && session.admin) {
+    renderCodes();
+    setStatus(adminStatus, "");
+  }
+}
+
+function login() {
+  const code = codeInput.value.trim().toUpperCase();
+  if (!code) return setStatus(loginStatus, "Введите код", "err");
+  if (code === adminCode) {
+    codeInput.value = "";
+    return startSession({ code, admin: true, rights: RIGHTS });
+  }
+  const found = getCodes().find((c) => c.code === code);
+  if (!found) return setStatus(loginStatus, "Неверный код", "err");
+  codeInput.value = "";
+  startSession({ code: found.code, admin: false, rights: parseRights(found.rights) });
+}
+
+function fillWebhooks() {
+  webhookSelect.innerHTML = "";
+  WEBHOOKS.forEach((w, i) => {
+    const o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = w.name;
+    webhookSelect.appendChild(o);
+  });
+}
+
+function currentWebhook() {
+  return WEBHOOKS[Number(webhookSelect.value)] || WEBHOOKS[0];
+}
+
+function renderCodes() {
+  codesList.innerHTML = "";
+  const list = getCodes();
+  if (!list.length) {
+    const empty = document.createElement("div");
+    empty.className = "codes-empty";
+    empty.textContent = "Кодов пока нет";
+    codesList.appendChild(empty);
+    return;
+  }
+  list.forEach((c) => {
+    const row = document.createElement("div");
+    row.className = "code-row";
+
+    const codeEl = document.createElement("span");
+    codeEl.className = "code";
+    codeEl.textContent = c.code;
+
+    const rightsEl = document.createElement("span");
+    rightsEl.className = "rights";
+    rightsEl.textContent = parseRights(c.rights).join(", ") || "без прав";
+
+    const del = document.createElement("button");
+    del.className = "button danger tiny";
+    del.textContent = "удалить";
+    del.addEventListener("click", () => deleteCode(c.code));
+
+    row.append(codeEl, rightsEl, del);
+    codesList.appendChild(row);
+  });
+}
+
+function addCode() {
+  const code = newCodeInput.value.trim().toUpperCase();
+  const rights = parseRights(newRightsInput.value);
+  if (!code) return setStatus(adminStatus, "Введите код", "err");
+  if (!rights.length) return setStatus(adminStatus, "Укажите права: text, image", "err");
+  if (code === adminCode || getCodes().some((c) => c.code === code))
+    return setStatus(adminStatus, "Такой код уже есть", "err");
+  const list = getCodes();
+  list.push({ code, rights: rights.join(",") });
+  setCodes(list);
+  newCodeInput.value = "";
+  newRightsInput.value = "";
+  renderCodes();
+  setStatus(adminStatus, "Код добавлен", "ok");
+}
+
+function deleteCode(code) {
+  setCodes(getCodes().filter((c) => c.code !== code));
+  if (session && !session.admin && session.code === code) {
+    endSession("Код удалён администратором");
+  } else {
+    renderCodes();
+    setStatus(adminStatus, "Код удалён", "ok");
+  }
+}
+
+function kickAll() {
+  localStorage.setItem(LS.version, String(Date.now()));
+  endSession("Все сессии отключены");
+}
+
+function checkVersion() {
+  if (!session) return;
+  if ((localStorage.getItem(LS.version) || "0") !== sessionStorage.getItem(SS.version)) {
+    return endSession("Сессия отключена администратором");
+  }
+  if (!session.admin && !getCodes().some((c) => c.code === session.code)) {
+    endSession("Код удалён администратором");
+  }
 }
 
 function setBusy(busy) {
@@ -110,13 +212,61 @@ function setBusy(busy) {
   sendImageBtn.disabled = busy;
 }
 
-webhookNext.addEventListener("click", saveWebhook);
-webhookInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") saveWebhook();
+async function sendWebhook(url, options) {
+  const res = await fetch(url, { method: "POST", ...options });
+  if (res.status === 429) throw new Error("Слишком часто. Подожди немного");
+  if (!res.ok) throw new Error("Ошибка отправки (" + res.status + ")");
+}
+
+async function sendText() {
+  const content = textInput.value.trim();
+  if (!content) return setStatus(statusEl, "Введите текст", "err");
+  const url = currentWebhook().url;
+  if (!url) return setStatus(statusEl, "Вебхук не настроен", "err");
+  setBusy(true);
+  setStatus(statusEl, "Отправка...");
+  try {
+    await sendWebhook(url, {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    textInput.value = "";
+    setStatus(statusEl, "Отправлено", "ok");
+  } catch (e) {
+    setStatus(statusEl, e.message.includes("Failed to fetch") ? "Нет соединения" : e.message, "err");
+  }
+  setBusy(false);
+}
+
+async function sendWithImage(file) {
+  if (!file) return;
+  if (!file.type.startsWith("image/")) return setStatus(statusEl, "Это не картинка", "err");
+  if (file.size > 8 * 1024 * 1024) return setStatus(statusEl, "Файл больше 8 МБ", "err");
+  const url = currentWebhook().url;
+  if (!url) return setStatus(statusEl, "Вебхук не настроен", "err");
+  setBusy(true);
+  setStatus(statusEl, "Отправка...");
+  try {
+    const fd = new FormData();
+    fd.append("payload_json", JSON.stringify({ content: textInput.value.trim() }));
+    fd.append("files[0]", file, file.name);
+    await sendWebhook(url, { body: fd });
+    textInput.value = "";
+    setStatus(statusEl, "Отправлено с картинкой", "ok");
+  } catch (e) {
+    setStatus(statusEl, e.message.includes("Failed to fetch") ? "Нет соединения" : e.message, "err");
+  }
+  setBusy(false);
+}
+
+loginBtn.addEventListener("click", login);
+codeInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") login();
 });
 
-sendTextBtn.addEventListener("click", sendText);
+logoutBtn.addEventListener("click", () => endSession());
 
+sendTextBtn.addEventListener("click", sendText);
 textInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -125,21 +275,44 @@ textInput.addEventListener("keydown", (e) => {
 });
 
 sendImageBtn.addEventListener("click", () => imageInput.click());
-
 imageInput.addEventListener("change", () => {
-  const file = imageInput.files[0];
+  const f = imageInput.files[0];
   imageInput.value = "";
-  if (file) sendWithImage(file);
+  if (f) sendWithImage(f);
 });
 
-changeWebhookBtn.addEventListener("click", () => {
-  localStorage.removeItem(WEBHOOK_KEY);
-  webhookUrl = "";
-  showWebhookScreen();
+addCodeBtn.addEventListener("click", addCode);
+newCodeInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addCode();
 });
+newRightsInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addCode();
+});
+kickAllBtn.addEventListener("click", kickAll);
 
-if (webhookUrl && isValidWebhook(webhookUrl)) {
-  showMessageScreen();
-} else {
-  showWebhookScreen();
+window.addEventListener("storage", (e) => {
+  if (e.key === LS.version || e.key === LS.codes) checkVersion();
+});
+window.addEventListener("focus", checkVersion);
+
+if (!adminCode) {
+  adminCode = randomCode();
+  localStorage.setItem(LS.admin, adminCode);
 }
+
+console.log(
+  "%c MCRLSMP %c Код администратора: " + adminCode + " ",
+  "background:linear-gradient(135deg,#37d45e,#0f7a2b);color:#fff;font-size:18px;font-weight:bold;padding:6px 14px;border-radius:10px 0 0 10px;",
+  "background:#222;color:#7dff9a;font-size:18px;font-weight:bold;padding:6px 14px;border-radius:0 10px 10px 0;"
+);
+
+const saved = sessionStorage.getItem(SS.session);
+if (saved) {
+  try {
+    session = JSON.parse(saved);
+    checkVersion();
+  } catch {
+    session = null;
+  }
+}
+applySession();

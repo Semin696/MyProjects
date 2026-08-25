@@ -13,38 +13,80 @@
 
   <header class="header">
     <img src="logo.svg" alt="MCRLSMP" class="logo">
+    <div class="header-info">
+      <span id="whoami" class="whoami"></span>
+      <button class="link hidden" id="logoutBtn">выйти</button>
+    </div>
   </header>
 
   <main class="container">
 
-    <!-- Экран 1: ввод ссылки на вебхук -->
-    <section class="card" id="webhookCard">
+    <!-- Вход по коду -->
+    <section class="card" id="loginCard">
+      <h2 class="card-title">Авторизация</h2>
       <input
         type="text"
-        id="webhookInput"
+        id="codeInput"
         class="input"
-        placeholder="Введите ссылку на вубхук"
+        placeholder="Введите код доступа"
         autocomplete="off"
         spellcheck="false">
-      <button class="button" id="webhookNext">Далее</button>
+      <button class="button" id="loginBtn">Войти</button>
+      <div class="status" id="loginStatus"></div>
+      <div class="hint">Код администратора — в консоли браузера (F12)</div>
     </section>
 
-    <!-- Экран 2: отправка сообщения -->
+    <!-- Отправка -->
     <section class="card hidden" id="messageCard">
+      <h2 class="card-title">Отправка в вебхук</h2>
+
+      <label class="field-label" for="webhookSelect">Вебхук</label>
+      <select id="webhookSelect" class="input select"></select>
+
       <textarea
         id="textInput"
         class="input textarea"
         placeholder="Введите текст"
         rows="4"></textarea>
 
-      <button class="button" id="sendText">отправить</button>
-      <button class="button small" id="sendImage">Отправить с&nbsp;картинкой</button>
+      <div class="row">
+        <button class="button" id="sendText">отправить</button>
+        <button class="button small" id="sendImage">Отправить с&nbsp;картинкой</button>
+      </div>
 
       <input type="file" id="imageInput" accept="image/*" hidden>
 
       <div class="status" id="status"></div>
+    </section>
 
-      <button class="link" id="changeWebhook">сменить вебхук</button>
+    <!-- Админ-панель -->
+    <section class="card hidden" id="adminCard">
+      <h2 class="card-title">Админ-панель</h2>
+
+      <label class="field-label" for="newCodeInput">Новый код</label>
+      <input
+        type="text"
+        id="newCodeInput"
+        class="input"
+        placeholder="Например: FRIEND1"
+        autocomplete="off"
+        spellcheck="false">
+
+      <label class="field-label" for="newRightsInput">Права (text, image — через запятую)</label>
+      <input
+        type="text"
+        id="newRightsInput"
+        class="input"
+        placeholder="text,image"
+        autocomplete="off"
+        spellcheck="false">
+
+      <button class="button" id="addCodeBtn">Добавить код</button>
+
+      <div class="codes-list" id="codesList"></div>
+
+      <button class="button danger" id="kickAllBtn">Отключить всех, кто по коду</button>
+      <div class="status" id="adminStatus"></div>
     </section>
 
   </main>

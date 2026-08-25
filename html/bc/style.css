@@ -5,15 +5,16 @@
 }
 
 :root {
-  --bg: #1a1a1a;
-  --panel: #6e6e6e;
-  --header: #606060;
-  --card: #4d4d4d;
-  --field: #2b2b2b;
-  --field-hover: #333333;
-  --text: #ffffff;
+  --bg1: #161616;
+  --bg2: #0a0d0a;
+  --text: #f2f2f2;
+  --muted: #b9b9b9;
+  --green1: #37d45e;
+  --green2: #0f7a2b;
   --ok: #7dff9a;
-  --err: #ff7d7d;
+  --err: #ff8585;
+  --danger1: #e05252;
+  --danger2: #9c2626;
 }
 
 html,
@@ -22,7 +23,12 @@ body {
 }
 
 body {
-  background: var(--bg);
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(55, 212, 94, 0.16), transparent 60%),
+    radial-gradient(700px 420px at -10% 110%, rgba(56, 130, 246, 0.1), transparent 60%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+  background-attachment: fixed;
   font-family: "Comfortaa", system-ui, sans-serif;
   color: var(--text);
   letter-spacing: 2px;
@@ -31,13 +37,16 @@ body {
 /* ---------- Шапка ---------- */
 
 .header {
-  position: relative;
   display: flex;
   align-items: center;
-  background: var(--header);
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(74, 74, 74, 0.9), rgba(42, 42, 42, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   height: 100px;
   margin: 12px;
+  padding-right: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 .logo {
@@ -46,31 +55,70 @@ body {
   border-radius: 20px;
   object-fit: cover;
   margin-left: -2px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    0 0 26px rgba(55, 212, 94, 0.35);
 }
 
-/* ---------- Основной контейнер ---------- */
+.header-info {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.whoami {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+/* ---------- Контейнер ---------- */
 
 .container {
-  background: var(--panel);
+  background: linear-gradient(160deg, rgba(96, 96, 96, 0.5), rgba(56, 56, 56, 0.5));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(6px);
   border-radius: 24px;
   margin: 4px 12px 12px;
   min-height: calc(100vh - 140px);
-  padding: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
 }
 
 /* ---------- Карточка ---------- */
 
 .card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 16px;
+  background: linear-gradient(165deg, #3d3d3d, #2b2b2b);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 22px;
   width: 100%;
   max-width: 680px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #a4ffb8, var(--green1), #1f9d3f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.field-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: -6px;
 }
 
 .hidden {
@@ -81,52 +129,71 @@ body {
 
 .input {
   width: 100%;
-  background: var(--field);
+  background: linear-gradient(180deg, #242424, #1d1d1d);
   color: var(--text);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   outline: none;
   border-radius: 14px;
-  padding: 28px 24px;
+  padding: 22px;
   font-family: inherit;
-  font-size: 26px;
-  letter-spacing: 4px;
+  font-size: 20px;
+  letter-spacing: 2px;
   text-align: center;
-  resize: none;
-  transition: background 0.2s;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 
 .input::placeholder {
-  color: #e8e8e8;
-  opacity: 0.95;
+  color: #dcdcdc;
+  opacity: 0.85;
 }
 
 .input:focus {
-  background: var(--field-hover);
+  border-color: rgba(55, 212, 94, 0.6);
+  box-shadow: 0 0 0 3px rgba(55, 212, 94, 0.15);
 }
 
 .textarea {
   text-align: left;
-  min-height: 140px;
+  min-height: 130px;
+  resize: vertical;
+}
+
+.select {
+  appearance: none;
+  text-align: left;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%2337d45e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+}
+
+.select option {
+  background: #242424;
+  color: #fff;
 }
 
 /* ---------- Кнопки ---------- */
 
 .button {
-  background: var(--field);
-  color: var(--text);
+  align-self: flex-start;
+  background: linear-gradient(135deg, var(--green1), var(--green2));
+  color: #fff;
   border: none;
   outline: none;
   border-radius: 12px;
-  padding: 14px 26px;
+  padding: 14px 28px;
   font-family: inherit;
-  font-size: 18px;
-  letter-spacing: 3px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 2px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 18px rgba(55, 212, 94, 0.25);
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 .button:hover {
-  background: var(--field-hover);
+  filter: brightness(1.12);
+  box-shadow: 0 6px 26px rgba(55, 212, 94, 0.4);
 }
 
 .button:active {
@@ -140,10 +207,70 @@ body {
 
 .button.small {
   font-size: 13px;
-  letter-spacing: 2px;
-  max-width: 180px;
+  padding: 12px 18px;
+  max-width: 200px;
   line-height: 1.5;
   text-align: center;
+}
+
+.button.danger {
+  background: linear-gradient(135deg, var(--danger1), var(--danger2));
+  box-shadow: 0 4px 18px rgba(224, 82, 82, 0.25);
+}
+
+.button.danger:hover {
+  box-shadow: 0 6px 26px rgba(224, 82, 82, 0.4);
+}
+
+.button.tiny {
+  padding: 7px 14px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Список кодов ---------- */
+
+.codes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.codes-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.code-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: linear-gradient(135deg, #343434, #2a2a2a);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+
+.code-row .code {
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--ok);
+}
+
+.code-row .rights {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
 }
 
 /* ---------- Статус и ссылки ---------- */
@@ -151,7 +278,7 @@ body {
 .status {
   font-size: 14px;
   letter-spacing: 1px;
-  min-height: 20px;
+  min-height: 18px;
 }
 
 .status.ok {
@@ -165,17 +292,24 @@ body {
 .link {
   background: none;
   border: none;
-  color: #cfcfcf;
+  color: var(--muted);
   font-family: inherit;
   font-size: 12px;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   cursor: pointer;
   text-decoration: underline;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .link:hover {
+  color: var(--text);
   opacity: 1;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
 }
 
 /* ---------- Адаптив ---------- */
@@ -191,12 +325,12 @@ body {
   }
 
   .input {
-    font-size: 18px;
-    padding: 20px 16px;
-    letter-spacing: 2px;
+    font-size: 16px;
+    padding: 18px 14px;
+    letter-spacing: 1px;
   }
 
   .card {
-    max-width: 100%;
+    padding: 16px;
   }
 }
