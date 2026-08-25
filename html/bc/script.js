@@ -98,7 +98,8 @@ async function sendWithImage(file) {
       "payload_json",
       new Blob([JSON.stringify({ content: textInput.value.trim() })], {
         type: "application/json",
-      })
+      }),
+      "payload.json"
     );
     fd.append("files[0]", file, file.name);
     await sendWebhook({ body: fd });
