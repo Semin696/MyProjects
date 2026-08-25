@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCRLSMP — Webhook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <img src="logo.svg" alt="MCRLSMP" class="logo">
+  </header>
+
+  <main class="container">
+
+    <!-- Экран 1: ввод ссылки на вебхук -->
+    <section class="card" id="webhookCard">
+      <input
+        type="text"
+        id="webhookInput"
+        class="input"
+        placeholder="Введите ссылку на вубхук"
+        autocomplete="off"
+        spellcheck="false">
+      <button class="button" id="webhookNext">Далее</button>
+    </section>
+
+    <!-- Экран 2: отправка сообщения -->
+    <section class="card hidden" id="messageCard">
+      <textarea
+        id="textInput"
+        class="input textarea"
+        placeholder="Введите текст"
+        rows="4"></textarea>
+
+      <button class="button" id="sendText">отправить</button>
+      <button class="button small" id="sendImage">Отправить с&nbsp;картинкой</button>
+
+      <input type="file" id="imageInput" accept="image/*" hidden>
+
+      <div class="status" id="status"></div>
+
+      <button class="link" id="changeWebhook">сменить вебхук</button>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
