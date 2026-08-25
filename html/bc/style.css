@@ -282,6 +282,16 @@ body {
   letter-spacing: 1px;
 }
 
+.code-row .url {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 240px;
+}
+
 /* ---------- Эмодзи ---------- */
 
 .emoji-panel {

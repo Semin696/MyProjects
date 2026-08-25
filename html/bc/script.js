@@ -1,7 +1,8 @@
-const WEBHOOKS = [
-  // Впиши сюда свои вебхуки (имя + ссылка). В самом сайте их добавить или удалить нельзя.
-  { name: "Основной", url: "" },
-  { name: "Резервный", url: "" },
+const DEFAULT_WEBHOOKS = [
+  {
+    name: "Основной",
+    url: "https://discord.com/api/webhooks/1541690618932101170/ZPhMP8YsaSiOQLShOQYRGrswDyrl5UUgXmp4KpjbAEddJnsGCd6IrwFLr9mxd9BQ2OQE",
+  },
 ];
 
 const RIGHTS = ["text", "image", "admin"];
@@ -41,7 +42,12 @@ const EMOJI_GROUPS = [
   },
 ];
 
-const LS = { admin: "bc_admin_code", codes: "bc_codes", version: "bc_session_version" };
+const LS = {
+  admin: "bc_admin_code",
+  codes: "bc_codes",
+  version: "bc_session_version",
+  webhooks: "bc_webhooks",
+};
 const SS = { session: "bc_session", version: "bc_session_version" };
 
 const $ = (id) => document.getElementById(id);
@@ -68,6 +74,10 @@ const whoami = $("whoami");
 const logoutBtn = $("logoutBtn");
 const emojiToggle = $("emojiToggle");
 const emojiPanel = $("emojiPanel");
+const whNameInput = $("whNameInput");
+const whUrlInput = $("whUrlInput");
+const addWebhookBtn = $("addWebhookBtn");
+const webhooksList = $("webhooksList");
 
 let adminCode = localStorage.getItem(LS.admin);
 let session = null;
@@ -88,6 +98,24 @@ function getCodes() {
 
 function setCodes(list) {
   localStorage.setItem(LS.codes, JSON.stringify(list));
+}
+
+function isValidWebhookUrl(url) {
+  return /^https:\/\/(canary\.|ptb\.)?(discord|discordapp)\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(
+    url.trim()
+  );
+}
+
+function getWebhooks() {
+  try {
+    return JSON.parse(localStorage.getItem(LS.webhooks)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function setWebhooks(list) {
+  localStorage.setItem(LS.webhooks, JSON.stringify(list));
 }
 
 function parseRights(str) {
@@ -140,6 +168,7 @@ function applySession() {
   }
   if (session && session.admin) {
     renderCodes();
+    renderWebhooks();
     setStatus(adminStatus, "");
   }
 }
@@ -158,17 +187,96 @@ function login() {
 }
 
 function fillWebhooks() {
+  const list = getWebhooks();
+  const prev = webhookSelect.value;
   webhookSelect.innerHTML = "";
-  WEBHOOKS.forEach((w, i) => {
+  list.forEach((w, i) => {
     const o = document.createElement("option");
     o.value = String(i);
     o.textContent = w.name;
     webhookSelect.appendChild(o);
   });
+  if (prev && Number(prev) < list.length) webhookSelect.value = prev;
 }
 
 function currentWebhook() {
-  return WEBHOOKS[Number(webhookSelect.value)] || WEBHOOKS[0];
+  const list = getWebhooks();
+  return list[Number(webhookSelect.value)] || list[0] || { name: "", url: "" };
+}
+
+function renderWebhooks() {
+  webhooksList.innerHTML = "";
+  const list = getWebhooks();
+  if (!list.length) {
+    const empty = document.createElement("div");
+    empty.className = "codes-empty";
+    empty.textContent = "Вебхуков пока нет";
+    webhooksList.appendChild(empty);
+    return;
+  }
+  list.forEach((w, i) => {
+    const row = document.createElement("div");
+    row.className = "code-row";
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "code";
+    nameEl.textContent = w.name;
+
+    const urlEl = document.createElement("span");
+    urlEl.className = "url";
+    urlEl.textContent = w.url;
+    urlEl.title = w.url;
+
+    const renameBtn = document.createElement("button");
+    renameBtn.className = "button ghost tiny";
+    renameBtn.textContent = "имя";
+    renameBtn.addEventListener("click", () => renameWebhook(i));
+
+    const del = document.createElement("button");
+    del.className = "button danger tiny";
+    del.textContent = "удалить";
+    del.addEventListener("click", () => deleteWebhook(i));
+
+    row.append(nameEl, urlEl, renameBtn, del);
+    webhooksList.appendChild(row);
+  });
+}
+
+function addWebhook() {
+  const name = whNameInput.value.trim();
+  const url = whUrlInput.value.trim();
+  if (!name) return setStatus(adminStatus, "Введите название", "err");
+  if (!isValidWebhookUrl(url))
+    return setStatus(adminStatus, "Неверная ссылка на вебхук", "err");
+  const list = getWebhooks();
+  list.push({ name, url });
+  setWebhooks(list);
+  whNameInput.value = "";
+  whUrlInput.value = "";
+  fillWebhooks();
+  webhookSelect.value = String(list.length - 1);
+  renderWebhooks();
+  setStatus(adminStatus, "Вебхук добавлен", "ok");
+}
+
+function renameWebhook(i) {
+  const list = getWebhooks();
+  const name = prompt("Новое название:", list[i].name);
+  if (name === null) return;
+  if (!name.trim()) return setStatus(adminStatus, "Название не может быть пустым", "err");
+  list[i].name = name.trim();
+  setWebhooks(list);
+  fillWebhooks();
+  renderWebhooks();
+}
+
+function deleteWebhook(i) {
+  const list = getWebhooks();
+  list.splice(i, 1);
+  setWebhooks(list);
+  fillWebhooks();
+  renderWebhooks();
+  setStatus(adminStatus, "Вебхук удалён", "ok");
 }
 
 function renderCodes() {
@@ -249,6 +357,11 @@ function setBusy(busy) {
   sendImageBtn.disabled = busy;
 }
 
+function withFooter(content) {
+  const footer = "-# отправлено с кода: " + session.code;
+  return content ? content + "\n\n" + footer : footer;
+}
+
 let activeEmojiGroup = 0;
 
 function renderEmojiPanel() {
@@ -310,7 +423,7 @@ async function sendText() {
   try {
     await sendWebhook(url, {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content: withFooter(content) }),
     });
     textInput.value = "";
     setStatus(statusEl, "Отправлено", "ok");
@@ -330,7 +443,7 @@ async function sendWithImage(file) {
   setStatus(statusEl, "Отправка...");
   try {
     const fd = new FormData();
-    fd.append("payload_json", JSON.stringify({ content: textInput.value.trim() }));
+    fd.append("payload_json", JSON.stringify({ content: withFooter(textInput.value.trim()) }));
     fd.append("files[0]", file, file.name);
     await sendWebhook(url, { body: fd });
     textInput.value = "";
@@ -372,14 +485,29 @@ newRightsInput.addEventListener("keydown", (e) => {
 });
 kickAllBtn.addEventListener("click", kickAll);
 
+addWebhookBtn.addEventListener("click", addWebhook);
+whNameInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addWebhook();
+});
+whUrlInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addWebhook();
+});
+
 window.addEventListener("storage", (e) => {
   if (e.key === LS.version || e.key === LS.codes) checkVersion();
+  if (e.key === LS.webhooks) {
+    fillWebhooks();
+    if (session && session.admin) renderWebhooks();
+  }
 });
-window.addEventListener("focus", checkVersion);
 
 if (!adminCode) {
   adminCode = randomCode();
   localStorage.setItem(LS.admin, adminCode);
+}
+
+if (!localStorage.getItem(LS.webhooks)) {
+  setWebhooks(DEFAULT_WEBHOOKS);
 }
 
 console.log(

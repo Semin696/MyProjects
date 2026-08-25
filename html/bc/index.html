@@ -88,6 +88,30 @@
 
       <div class="codes-list" id="codesList"></div>
 
+      <h2 class="card-title">Вебхуки</h2>
+
+      <label class="field-label" for="whNameInput">Название вебхука</label>
+      <input
+        type="text"
+        id="whNameInput"
+        class="input"
+        placeholder="Например: Основной"
+        autocomplete="off"
+        spellcheck="false">
+
+      <label class="field-label" for="whUrlInput">Ссылка на вебхук</label>
+      <input
+        type="text"
+        id="whUrlInput"
+        class="input"
+        placeholder="https://discord.com/api/webhooks/..."
+        autocomplete="off"
+        spellcheck="false">
+
+      <button class="button" id="addWebhookBtn">Добавить вебхук</button>
+
+      <div class="codes-list" id="webhooksList"></div>
+
       <button class="button danger" id="kickAllBtn">Отключить всех, кто по коду</button>
       <div class="status" id="adminStatus"></div>
     </section>
