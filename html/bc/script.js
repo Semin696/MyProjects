@@ -94,13 +94,7 @@ async function sendWithImage(file) {
   setStatus("Отправка...");
   try {
     const fd = new FormData();
-    fd.append(
-      "payload_json",
-      new Blob([JSON.stringify({ content: textInput.value.trim() })], {
-        type: "application/json",
-      }),
-      "payload.json"
-    );
+    fd.append("payload_json", JSON.stringify({ content: textInput.value.trim() }));
     fd.append("files[0]", file, file.name);
     await sendWebhook({ body: fd });
     textInput.value = "";
