@@ -357,11 +357,6 @@ function setBusy(busy) {
   sendImageBtn.disabled = busy;
 }
 
-function withFooter(content) {
-  const footer = "-# отправлено с кода: " + session.code;
-  return content ? content + "\n\n" + footer : footer;
-}
-
 let activeEmojiGroup = 0;
 
 function renderEmojiPanel() {
@@ -423,7 +418,7 @@ async function sendText() {
   try {
     await sendWebhook(url, {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: withFooter(content) }),
+      body: JSON.stringify({ content }),
     });
     textInput.value = "";
     setStatus(statusEl, "Отправлено", "ok");
@@ -443,7 +438,7 @@ async function sendWithImage(file) {
   setStatus(statusEl, "Отправка...");
   try {
     const fd = new FormData();
-    fd.append("payload_json", JSON.stringify({ content: withFooter(textInput.value.trim()) }));
+    fd.append("payload_json", JSON.stringify({ content: textInput.value.trim() }));
     fd.append("files[0]", file, file.name);
     await sendWebhook(url, { body: fd });
     textInput.value = "";

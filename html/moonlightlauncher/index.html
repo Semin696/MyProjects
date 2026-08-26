@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoonlightLauncher — скачать лаунчер</title>
+  <meta name="description" content="MoonlightLauncher — удобный игровой лаунчер. Скачайте последнюю версию бесплатно.">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="stars" aria-hidden="true"></div>
+  <div class="moon-glow" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="brand" href="#">
+      <img src="logo.svg" alt="" class="brand-logo">
+      <span>Moonlight<span class="accent">Launcher</span></span>
+    </a>
+    <nav class="nav">
+      <a href="#download">Скачать</a>
+      <a href="#features">Возможности</a>
+      <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <img src="logo.svg" alt="Логотип MoonlightLauncher" class="hero-logo">
+      <h1>Moonlight<span class="accent">Launcher</span></h1>
+      <p class="subtitle">Быстрый и удобный лаунчер. Одна кнопка — и ты в игре.</p>
+      <div class="hero-actions">
+        <a href="#download" class="btn primary big">Скачать лаунчер</a>
+        <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener" class="btn ghost big">Исходный код</a>
+      </div>
+    </section>
+
+    <section class="section" id="download">
+      <h2>Скачать</h2>
+      <p class="section-sub">Последние сборки из папки <code>realise</code> репозитория</p>
+
+      <div class="card download-card">
+        <div class="download-list" id="downloadList">
+          <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <p>Ищем последнюю версию...</p>
+          </div>
+        </div>
+        <div class="status hidden" id="errorState">
+          <p>Файлы ещё не загружены в репозиторий.</p>
+          <p class="hint">Скоро здесь появится ссылка на скачивание. Следите за обновлениями на GitHub.</p>
+          <a class="btn ghost" href="https://github.com/Semin696/moonlightlauncher/tree/main/realise" target="_blank" rel="noopener">Открыть репозиторий</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <h2>Возможности</h2>
+      <div class="features-grid">
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <h3>Быстрый запуск</h3>
+          <p>Мгновенный старт игры без лишних шагов и настроек.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔄</div>
+          <h3>Автообновления</h3>
+          <p>Лаунчер сам проверяет и устанавливает свежие версии.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🌙</div>
+          <h3>Тёмная тема</h3>
+          <p>Приятный ночной интерфейс, не режущий глаза.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🛡️</div>
+          <h3>Безопасно</h3>
+          <p>Открытый исходный код — всё можно проверить самому.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 MoonlightLauncher · <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
