@@ -1,0 +1,7 @@
+{
+  "name": "moonlight-visual-site",
+  "private": true,
+  "dependencies": {
+    "mysql2": "^3.24.2"
+  }
+}

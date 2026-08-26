@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoonlightLauncher — скачать лаунчер</title>
-  <meta name="description" content="MoonlightLauncher — удобный игровой лаунчер. Скачайте последнюю версию бесплатно.">
+  <title>MoonLight Visual — скачать лаунчер</title>
+  <meta name="description" content="MoonLight Visual — удобный игровой лаунчер. Скачайте последнюю версию бесплатно.">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,44 +19,25 @@
   <header class="header">
     <a class="brand" href="#">
       <img src="logo.png" alt="" class="brand-logo">
-      <span>Moonlight<span class="accent">Launcher</span></span>
+      <span>MoonLight <span class="accent">Visual</span></span>
     </a>
     <nav class="nav">
-      <a href="#download">Скачать</a>
+      <a href="#" id="navDownloadLink">Скачать</a>
       <a href="#features">Возможности</a>
-      <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener">GitHub</a>
     </nav>
+    <div class="auth-area" id="authArea"></div>
   </header>
 
   <main>
 
     <section class="hero">
-      <img src="logo.png" alt="Логотип MoonlightLauncher" class="hero-logo">
-      <h1>Moonlight<span class="accent">Launcher</span></h1>
+      <img src="logo.png" alt="Логотип MoonLight Visual" class="hero-logo">
+      <h1>MoonLight <span class="accent">Visual</span></h1>
       <p class="subtitle">Быстрый и удобный лаунчер. Одна кнопка — и ты в игре.</p>
       <div class="hero-actions">
-        <a href="#download" class="btn primary big">Скачать лаунчер</a>
-        <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener" class="btn ghost big">Исходный код</a>
+        <button class="btn primary big" id="heroDownloadBtn">Скачать лаунчер</button>
       </div>
-    </section>
-
-    <section class="section" id="download">
-      <h2>Скачать</h2>
-      <p class="section-sub">Последние сборки из папки <code>realise</code> репозитория</p>
-
-      <div class="card download-card">
-        <div class="download-list" id="downloadList">
-          <div class="loading" id="loadingState">
-            <div class="spinner"></div>
-            <p>Ищем последнюю версию...</p>
-          </div>
-        </div>
-        <div class="status hidden" id="errorState">
-          <p>Файлы ещё не загружены в репозиторий.</p>
-          <p class="hint">Скоро здесь появится ссылка на скачивание. Следите за обновлениями на GitHub.</p>
-          <a class="btn ghost" href="https://github.com/Semin696/moonlightlauncher/tree/main/realise" target="_blank" rel="noopener">Открыть репозиторий</a>
-        </div>
-      </div>
+      <p class="hero-hint hidden" id="heroHint"></p>
     </section>
 
     <section class="section" id="features">
@@ -65,10 +46,16 @@
         <div class="feature">
           <div class="feature-icon">⚡</div>
           <h3>Быстрый запуск</h3>
-          <p>Мгновенный старт игры без лишних шагов и настроек.</p>
+          <p>Быстрый старт.</p>
         </div>
         <div class="feature">
-          <div class="feature-icon">🔄</div>
+          <div class="feature-icon">
+            <svg class="feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v11"/>
+              <path d="M6.5 10.5L12 16l5.5-5.5"/>
+              <path d="M5 20h14"/>
+            </svg>
+          </div>
           <h3>Автообновления</h3>
           <p>Лаунчер сам проверяет и устанавливает свежие версии.</p>
         </div>
@@ -77,19 +64,132 @@
           <h3>Тёмная тема</h3>
           <p>Приятный ночной интерфейс, не режущий глаза.</p>
         </div>
-        <div class="feature">
-          <div class="feature-icon">🛡️</div>
-          <h3>Безопасно</h3>
-          <p>Открытый исходный код — всё можно проверить самому.</p>
-        </div>
       </div>
     </section>
 
   </main>
 
   <footer class="footer">
-    <p>© 2026 MoonlightLauncher · <a href="https://github.com/Semin696/moonlightlauncher" target="_blank" rel="noopener">GitHub</a></p>
+    <p>© 2026 MoonLight Visual</p>
   </footer>
+
+  <div class="modal-overlay hidden" id="authOverlay">
+    <div class="modal">
+      <button class="modal-close" data-close="authOverlay">×</button>
+      <h2 class="modal-title">MoonLight Visual</h2>
+      <div class="tabs">
+        <button class="tab active" data-auth-tab="login">Вход</button>
+        <button class="tab" data-auth-tab="register">Регистрация</button>
+      </div>
+
+      <form id="loginForm" class="modal-form">
+        <label class="field-label" for="loginUser">Никнейм</label>
+        <input type="text" id="loginUser" class="input" autocomplete="username" spellcheck="false">
+        <label class="field-label" for="loginPass">Пароль</label>
+        <input type="password" id="loginPass" class="input" autocomplete="current-password">
+        <button type="submit" class="btn primary wide">Войти</button>
+      </form>
+
+      <form id="registerForm" class="modal-form hidden">
+        <label class="field-label" for="regUser">Никнейм</label>
+        <input type="text" id="regUser" class="input" autocomplete="off" spellcheck="false">
+        <label class="field-label" for="regPass">Пароль</label>
+        <input type="password" id="regPass" class="input" autocomplete="new-password">
+        <button type="submit" class="btn primary wide">Создать аккаунт</button>
+      </form>
+
+      <div class="status" id="authStatus"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="ownerOverlay">
+    <div class="modal wide-modal">
+      <button class="modal-close" data-close="ownerOverlay">×</button>
+      <h2 class="modal-title">Панель владельца</h2>
+      <p class="hint">Генерируйте коды для тестеров. Один код активирует одну подписку.</p>
+      <label class="field-label" for="codeType">Тип кода</label>
+      <select id="codeType" class="input">
+        <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
+        <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
+        <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
+      </select>
+      <button class="btn primary wide" id="genCodeBtn">Сгенерировать код</button>
+      <div class="codes-list" id="codesList"></div>
+      <div class="status" id="ownerStatus"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="profileOverlay">
+    <div class="modal">
+      <button class="modal-close" data-close="profileOverlay">×</button>
+      <div class="profile-head">
+        <div class="avatar" id="profileAvatar">?</div>
+        <div>
+          <div class="profile-name" id="profileName"></div>
+          <div class="profile-role" id="profileRole"></div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-profile-tab="info">Профиль</button>
+        <button class="tab" data-profile-tab="launcher">Лаунчер</button>
+        <button class="tab" data-profile-tab="sub">Подписка</button>
+      </div>
+
+      <div id="profileTabInfo" class="modal-form">
+        <div class="profile-rows">
+          <div class="profile-row">
+            <span>Статус</span>
+            <span id="profileSub"></span>
+          </div>
+          <div class="profile-row">
+            <span>Дата регистрации</span>
+            <span id="profileDate"></span>
+          </div>
+        </div>
+        <button class="btn primary wide hidden" id="profileOwnerBtn">Панель владельца</button>
+        <button class="btn danger wide" id="profileLogoutBtn">Выйти из аккаунта</button>
+      </div>
+
+      <div id="profileTabLauncher" class="modal-form hidden">
+        <div class="profile-rows">
+          <div class="profile-row">
+            <span>Активные подписки</span>
+            <span id="launcherSubs"></span>
+          </div>
+        </div>
+        <div id="launcherGate" class="hidden">
+          <p class="hint center">Для скачивания нужна подписка. Подписка не продаётся — активируйте код во вкладке «Подписка».</p>
+          <button class="btn primary wide" id="toSubTabBtn">Перейти к подписке</button>
+        </div>
+        <div id="launcherDownloads" class="hidden">
+          <div class="download-list" id="downloadList"></div>
+          <div class="status hidden" id="errorState">
+            <p>Лаунчер пока не загружен.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="profileTabSub" class="modal-form hidden">
+        <div class="sub-plans">
+          <div class="sub-plan">
+            <div class="sub-plan-name">1 месяц</div>
+            <div class="sub-plan-price">—</div>
+            <span class="badge nosub">Недоступно</span>
+          </div>
+          <div class="sub-plan">
+            <div class="sub-plan-name">Навсегда</div>
+            <div class="sub-plan-price">—</div>
+            <span class="badge nosub">Недоступно</span>
+          </div>
+        </div>
+        <p class="hint center">Подписка сейчас не продаётся. Есть код от владельца? Активируйте его:</p>
+        <label class="field-label" for="subCodeInput">Код активации</label>
+        <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-TESTER-XXXXXX" spellcheck="false" autocomplete="off">
+        <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
+        <div class="status" id="subStatus"></div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
