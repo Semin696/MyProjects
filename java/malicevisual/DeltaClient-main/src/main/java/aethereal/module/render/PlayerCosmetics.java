@@ -6,7 +6,6 @@ import aethereal.core.EventTarget;
 import aethereal.core.Module;
 import aethereal.core.ModuleRegister;
 import aethereal.core.Skeleton;
-import aethereal.event.DrawEvent;
 import aethereal.render.ColorUtil;
 import aethereal.setting.BooleanSetting;
 import aethereal.setting.ColorSetting;
@@ -19,7 +18,6 @@ import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -30,33 +28,66 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
-@ModuleRegister(name = "Косметика", description = "Шапки, рюкзаки, крылья, нимб и питомец над левым плечом", category = Category.Render)
+@ModuleRegister(name = "Косметика", description = "3D косметика, привязанная к частям тела игрока", category = Category.Render)
 public class PlayerCosmetics extends Module {
+    private static final String[] ATTACH = {"Голова", "Тело", "Спина", "Левое плечо", "Правое плечо", "Левая рука", "Правая рука"};
+
     private final BooleanSetting hat = new BooleanSetting("Шапка", true);
-    private final ModeSetting hatStyle = new ModeSetting("Стиль шапки", "Корона", "Корона", "Волшебник", "Рога", "Ушки", "Конус", "Кепка").a(() -> this.hat.c());
+    private final ModeSetting hatStyle = new ModeSetting("Стиль шапки", "Сундук", "Сундук", "Шалкер", "Корона", "Волшебник", "Рога", "Ушки", "Конус", "Кепка").a(() -> this.hat.c());
+    private final ModeSetting hatAttach = new ModeSetting("Крепление шапки", "Голова", ATTACH).a(() -> this.hat.c());
+    private final SliderSetting hatX = new SliderSetting("Шапка X", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.hat.c());
+    private final SliderSetting hatY = new SliderSetting("Шапка Y", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.hat.c());
+    private final SliderSetting hatZ = new SliderSetting("Шапка Z", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.hat.c());
+
     private final BooleanSetting backpack = new BooleanSetting("Рюкзак", true);
     private final ModeSetting backpackStyle = new ModeSetting("Стиль рюкзака", "Кристалл", "Сумка", "Кристалл", "Джетпак", "Школьный", "Крылатый").a(() -> this.backpack.c());
+    private final ModeSetting backpackAttach = new ModeSetting("Крепление рюкзака", "Спина", ATTACH).a(() -> this.backpack.c());
+    private final SliderSetting backpackX = new SliderSetting("Рюкзак X", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.backpack.c());
+    private final SliderSetting backpackY = new SliderSetting("Рюкзак Y", 0.05f, -1.0f, 1.0f, 0.01f).a(() -> this.backpack.c());
+    private final SliderSetting backpackZ = new SliderSetting("Рюкзак Z", 0.18f, -1.0f, 1.0f, 0.01f).a(() -> this.backpack.c());
+
     private final BooleanSetting pet = new BooleanSetting("Питомец", true);
-    private final ModeSetting petStyle = new ModeSetting("Стиль питомца", "Орб", "Орб", "Лиса", "Дракончик", "Призрак", "Звезда").a(() -> this.pet.c());
+    private final ModeSetting petStyle = new ModeSetting("Стиль питомца", "Цыплёнок", "Цыплёнок", "Свинка", "Серый волчёнок").a(() -> this.pet.c());
+    private final ModeSetting petAttach = new ModeSetting("Крепление питомца", "Левое плечо", ATTACH).a(() -> this.pet.c());
+    private final SliderSetting petX = new SliderSetting("Питомец X", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.pet.c());
+    private final SliderSetting petY = new SliderSetting("Питомец Y", 0.12f, -1.0f, 1.0f, 0.01f).a(() -> this.pet.c());
+    private final SliderSetting petZ = new SliderSetting("Питомец Z", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.pet.c());
+
     private final BooleanSetting halo = new BooleanSetting("Нимб", true);
     private final ModeSetting haloStyle = new ModeSetting("Стиль нимба", "Неон", "Классический", "Святой", "Неон", "Демон").a(() -> this.halo.c());
+    private final ModeSetting haloAttach = new ModeSetting("Крепление нимба", "Голова", ATTACH).a(() -> this.halo.c());
+    private final SliderSetting haloX = new SliderSetting("Нимб X", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.halo.c());
+    private final SliderSetting haloY = new SliderSetting("Нимб Y", 0.35f, -1.0f, 1.0f, 0.01f).a(() -> this.halo.c());
+    private final SliderSetting haloZ = new SliderSetting("Нимб Z", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.halo.c());
+
     private final BooleanSetting wings = new BooleanSetting("Крылья", true);
     private final ModeSetting wingStyle = new ModeSetting("Стиль крыльев", "Ангел", "Ангел", "Демон", "Дракон", "Бабочка", "Феникс").a(() -> this.wings.c());
+    private final ModeSetting wingAttach = new ModeSetting("Крепление крыльев", "Спина", ATTACH).a(() -> this.wings.c());
+    private final SliderSetting wingX = new SliderSetting("Крылья X", 0.0f, -1.0f, 1.0f, 0.01f).a(() -> this.wings.c());
+    private final SliderSetting wingY = new SliderSetting("Крылья Y", 0.05f, -1.0f, 1.0f, 0.01f).a(() -> this.wings.c());
+    private final SliderSetting wingZ = new SliderSetting("Крылья Z", 0.12f, -1.0f, 1.0f, 0.01f).a(() -> this.wings.c());
+
     private final ModeSetting who = new ModeSetting("Показывать", "Себе и друзьям", "Только себе", "Себе и друзьям", "Всем с Malice");
     private final BooleanSetting syncTheme = new BooleanSetting("Цвет из темы", true);
-    private final ColorSetting customColor = new ColorSetting("Цвет", Integer.valueOf(ColorUtil.convertToARGB(224, 92, 208, 255))).a(() -> {
-        return Boolean.valueOf(!this.syncTheme.c().booleanValue());
-    });
+    private final ColorSetting customColor = new ColorSetting("Цвет", Integer.valueOf(ColorUtil.convertToARGB(224, 92, 208, 255))).a(() -> Boolean.valueOf(!this.syncTheme.c().booleanValue()));
     private final SliderSetting scale = new SliderSetting("Размер", 1.0f, 0.6f, 1.8f, 0.05f);
 
     public PlayerCosmetics() {
-        a(this.hat, this.hatStyle, this.backpack, this.backpackStyle, this.pet, this.petStyle,
-                this.halo, this.haloStyle, this.wings, this.wingStyle, this.who, this.syncTheme, this.customColor, this.scale);
+        a(this.hat, this.hatStyle, this.hatAttach, this.hatX, this.hatY, this.hatZ,
+                this.backpack, this.backpackStyle, this.backpackAttach, this.backpackX, this.backpackY, this.backpackZ,
+                this.pet, this.petStyle, this.petAttach, this.petX, this.petY, this.petZ,
+                this.halo, this.haloStyle, this.haloAttach, this.haloX, this.haloY, this.haloZ,
+                this.wings, this.wingStyle, this.wingAttach, this.wingX, this.wingY, this.wingZ,
+                this.who, this.syncTheme, this.customColor, this.scale);
     }
 
     @EventTarget
-    public void onDraw(DrawEvent event) {
-        if (!event.c() || mc.world == null || mc.player == null) {
+    public void onFeature(aethereal.event.PlayerCosmeticFeatureEvent event) {
+        if (!n() || event.getPlayer() == null || event.getModel() == null) {
+            return;
+        }
+        PlayerEntity player = event.getPlayer();
+        if (!visible(player)) {
             return;
         }
         int base = this.syncTheme.c().booleanValue()
@@ -64,39 +95,92 @@ public class PlayerCosmetics extends Module {
                 : this.customColor.c().intValue();
         float s = this.scale.c().floatValue();
         float time = (System.currentTimeMillis() % 100000L) / 1000.0f;
-        boolean any = false;
-        for (PlayerEntity player : mc.world.getPlayers()) {
-            if (visible(player)) {
-                any = true;
-                break;
-            }
-        }
-        if (!any) {
-            return;
-        }
+        int[] rgb = ColorUtil.b(base);
+        MatrixStack matrices = event.getMatrices();
 
-        MatrixStack matrices = event.h();
-        Camera camera = mc.gameRenderer.getCamera();
-        Vec3d cam = camera.getPos();
+        if (this.hat.c().booleanValue()) {
+            renderAttached(matrices, event.getModel(), this.hatAttach.c(),
+                    this.hatX.c().floatValue(), this.hatY.c().floatValue(), this.hatZ.c().floatValue(), s,
+                    (buffer, matrix, glow) -> writeHat(buffer, matrix, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
+        }
+        if (this.halo.c().booleanValue()) {
+            renderAttached(matrices, event.getModel(), this.haloAttach.c(),
+                    this.haloX.c().floatValue(), this.haloY.c().floatValue(), this.haloZ.c().floatValue(), s,
+                    (buffer, matrix, glow) -> writeHalo(buffer, matrix, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
+        }
+        if (this.backpack.c().booleanValue()) {
+            renderAttached(matrices, event.getModel(), this.backpackAttach.c(),
+                    this.backpackX.c().floatValue(), this.backpackY.c().floatValue(), this.backpackZ.c().floatValue(), s,
+                    (buffer, matrix, glow) -> writeBackpack(buffer, matrix, 0.45f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
+        }
+        if (this.wings.c().booleanValue()) {
+            renderAttached(matrices, event.getModel(), this.wingAttach.c(),
+                    this.wingX.c().floatValue(), this.wingY.c().floatValue(), this.wingZ.c().floatValue(), s,
+                    (buffer, matrix, glow) -> {
+                        writeWing(buffer, matrix, 1.0f, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow);
+                        writeWing(buffer, matrix, -1.0f, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow);
+                    });
+        }
+        if (this.pet.c().booleanValue()) {
+            matrices.push();
+            applyAttach(matrices, event.getModel(), this.petAttach.c(),
+                    this.petX.c().floatValue(), this.petY.c().floatValue(), this.petZ.c().floatValue());
+            matrices.scale(s * 0.85f, s * 0.85f, s * 0.85f);
+            CosmeticAnimalPets.renderAttached(matrices, player, this.petStyle.c(), time, event.getTickDelta(), event.getLight());
+            matrices.pop();
+        }
+    }
+
+    @FunctionalInterface
+    private interface MeshWriter {
+        void write(BufferBuilder buffer, Matrix4f matrix, boolean glow);
+    }
+
+    private void renderAttached(MatrixStack matrices, net.minecraft.client.render.entity.model.PlayerEntityModel model,
+                                String attach, float ox, float oy, float oz, float scale, MeshWriter writer) {
+        matrices.push();
+        applyAttach(matrices, model, attach, ox, oy, oz);
+        matrices.scale(scale, scale, scale);
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
 
         begin(true);
         BufferBuilder glow = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        for (PlayerEntity player : mc.world.getPlayers()) {
-            if (visible(player)) {
-                renderOn(glow, matrices, player, cam, base, s, time, event.g(), true);
-            }
-        }
+        writer.write(glow, matrix, true);
         BufferRenderer.drawWithGlobalProgram(glow.end());
 
         begin(false);
         BufferBuilder mesh = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        for (PlayerEntity player : mc.world.getPlayers()) {
-            if (visible(player)) {
-                renderOn(mesh, matrices, player, cam, base, s, time, event.g(), false);
-            }
-        }
+        writer.write(mesh, matrix, false);
         BufferRenderer.drawWithGlobalProgram(mesh.end());
         endBatch();
+        matrices.pop();
+    }
+
+    private void applyAttach(MatrixStack matrices, net.minecraft.client.render.entity.model.PlayerEntityModel model,
+                             String attach, float ox, float oy, float oz) {
+        net.minecraft.client.model.ModelPart part = model.body;
+        if ("Голова".equals(attach)) {
+            part = model.head;
+        } else if ("Левое плечо".equals(attach) || "Левая рука".equals(attach)) {
+            part = model.leftArm;
+        } else if ("Правое плечо".equals(attach) || "Правая рука".equals(attach)) {
+            part = model.rightArm;
+        }
+        part.rotate(matrices);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+        if ("Голова".equals(attach)) {
+            // sit on top of the head bone so pitch/yaw move the hat with the head
+            matrices.translate(0.0f, -0.25f, 0.0f);
+        } else if ("Левое плечо".equals(attach)) {
+            matrices.translate(0.0f, 0.05f, 0.0f);
+        } else if ("Правое плечо".equals(attach)) {
+            matrices.translate(0.0f, 0.05f, 0.0f);
+        } else if ("Спина".equals(attach)) {
+            matrices.translate(0.0f, 0.05f, 0.14f);
+        } else if ("Левая рука".equals(attach) || "Правая рука".equals(attach)) {
+            matrices.translate(0.0f, 0.28f, 0.0f);
+        }
+        matrices.translate(ox, oy, oz);
     }
 
     private boolean visible(PlayerEntity player) {
@@ -132,43 +216,14 @@ public class PlayerCosmetics extends Module {
         return mc.getNetworkHandler().getPlayerListEntry(player.getUuid()) == null;
     }
 
-    private void renderOn(BufferBuilder buffer, MatrixStack matrices, PlayerEntity player, Vec3d cam, int base, float scale, float time, float tickDelta, boolean glowPass) {
-        Vec3d pos = MathUtil.a(player, tickDelta);
-        float yaw = player.getYaw(tickDelta);
-        float height = player.getHeight();
-        int[] rgb = ColorUtil.b(base);
-        int r = rgb[0];
-        int g = rgb[1];
-        int b = rgb[2];
-
-        matrices.push();
-        matrices.translate(pos.x - cam.x, pos.y - cam.y, pos.z - cam.z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-yaw));
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
-
-        if (this.hat.c().booleanValue()) {
-            writeHat(buffer, matrix, height, scale, time, r, g, b, glowPass);
-        }
-        if (this.backpack.c().booleanValue()) {
-            writeBackpack(buffer, matrix, height, scale, time, r, g, b, glowPass);
-        }
-        if (this.pet.c().booleanValue()) {
-            writePet(buffer, matrix, height, scale, time, r, g, b, glowPass);
-        }
-        if (this.halo.c().booleanValue()) {
-            writeHalo(buffer, matrix, height, scale, time, r, g, b, glowPass);
-        }
-        if (this.wings.c().booleanValue()) {
-            writeWing(buffer, matrix, 1.0f, height, scale, time, r, g, b, glowPass);
-            writeWing(buffer, matrix, -1.0f, height, scale, time, r, g, b, glowPass);
-        }
-        matrices.pop();
-    }
-
     private void writeHat(BufferBuilder buffer, Matrix4f matrix, float height, float scale, float time, int r, int g, int b, boolean glow) {
         float y = height - 0.08f * scale;
         String style = this.hatStyle.c();
-        if ("Волшебник".equals(style)) {
+        if ("Сундук".equals(style)) {
+            writeChestHat(buffer, matrix, y, scale, time, glow);
+        } else if ("Шалкер".equals(style)) {
+            writeShulkerHat(buffer, matrix, y, scale, time, r, g, b, glow);
+        } else if ("Волшебник".equals(style)) {
             writeWizardHat(buffer, matrix, y, scale, r, g, b, glow);
         } else if ("Рога".equals(style)) {
             writeHorns(buffer, matrix, y, scale, time, r, g, b, glow);
@@ -181,6 +236,87 @@ public class PlayerCosmetics extends Module {
         } else {
             writeCrown(buffer, matrix, y, scale, time, r, g, b, glow);
         }
+    }
+
+    /** UltimaCraft-inspired chest on head (OptiFine CEM proportions + lid animation). */
+    private void writeChestHat(BufferBuilder buffer, Matrix4f matrix, float y, float scale, float time, boolean glow) {
+        float s = 0.55f * scale;
+        float baseY = y + 0.02f * scale;
+        int[] wood = new int[]{140, 92, 42};
+        int[] dark = new int[]{90, 58, 26};
+        int[] metal = new int[]{210, 190, 120};
+        if (glow) {
+            writeBoxLit(buffer, matrix, 0.0f, baseY + 0.18f * s, 0.0f, 0.70f * s, 0.55f * s, 0.70f * s, wood, 35);
+            return;
+        }
+        // base
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.14f * s, 0.0f, 0.70f * s, 0.28f * s, 0.70f * s, wood, 235);
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.14f * s, 0.0f, 0.62f * s, 0.22f * s, 0.62f * s, dark, 200);
+        // animated lid (open/close like UltimaCraft chest.jem)
+        float open = 0.5f + 0.5f * (float) Math.sin(time * 1.35d);
+        float lidAngle = open * 62.0f;
+        float rad = (float) Math.toRadians(lidAngle);
+        float hingeZ = -0.30f * s;
+        float lidCy = baseY + 0.30f * s;
+        float lidH = 0.22f * s;
+        // rotate lid around back hinge
+        float lx = 0.0f;
+        float ly = lidCy + (float) Math.sin(rad) * lidH * 0.85f;
+        float lz = hingeZ + (float) Math.cos(rad) * 0.22f * s;
+        writeBoxLit(buffer, matrix, lx, ly, lz, 0.70f * s, lidH, 0.70f * s, wood, 240);
+        writeBoxLit(buffer, matrix, lx, ly + 0.02f * s, lz + 0.34f * s * (float) Math.cos(rad), 0.10f * s, 0.12f * s, 0.06f * s, metal, 245);
+        // latch
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.22f * s, 0.36f * s, 0.10f * s, 0.10f * s, 0.05f * s, metal, 245);
+    }
+
+    /** UltimaCraft-inspired shulker on head with bobbing lid animation. */
+    private void writeShulkerHat(BufferBuilder buffer, Matrix4f matrix, float y, float scale, float time, int r, int g, int b, boolean glow) {
+        float s = 0.52f * scale;
+        float baseY = y + 0.02f * scale;
+        int[] shell = new int[]{clamp(150 + r / 8), clamp(90 + g / 10), clamp(180 + b / 12)};
+        int[] dark = new int[]{clamp(shell[0] / 2), clamp(shell[1] / 2), clamp(shell[2] / 2)};
+        int[] core = new int[]{255, 220, 255};
+        float lidLift = (0.5f + 0.5f * (float) Math.sin(time * 2.1d)) * 0.28f * s;
+        if (glow) {
+            writeBoxLit(buffer, matrix, 0.0f, baseY + 0.25f * s + lidLift * 0.5f, 0.0f, 0.72f * s, 0.70f * s, 0.72f * s, shell, 32);
+            return;
+        }
+        // base
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.16f * s, 0.0f, 0.72f * s, 0.32f * s, 0.72f * s, shell, 235);
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.18f * s, 0.0f, 0.58f * s, 0.20f * s, 0.58f * s, dark, 210);
+        // lid
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.42f * s + lidLift, 0.0f, 0.72f * s, 0.36f * s, 0.72f * s, shell, 240);
+        writeBoxLit(buffer, matrix, 0.0f, baseY + 0.38f * s + lidLift, 0.0f, 0.58f * s, 0.10f * s, 0.58f * s, dark, 215);
+        // peeking core when open
+        float open = lidLift / (0.28f * s + 1.0e-4f);
+        if (open > 0.25f) {
+            writeBoxLit(buffer, matrix, 0.0f, baseY + 0.30f * s + lidLift * 0.35f, 0.0f, 0.28f * s, 0.18f * s, 0.28f * s, core, Math.round(120 + 100 * open));
+        }
+    }
+
+    private void writeBoxLit(BufferBuilder buffer, Matrix4f matrix, float cx, float cy, float cz, float hx, float hy, float hz, int[] rgb, int a) {
+        float x0 = cx - hx * 0.5f;
+        float x1 = cx + hx * 0.5f;
+        float y0 = cy - hy * 0.5f;
+        float y1 = cy + hy * 0.5f;
+        float z0 = cz - hz * 0.5f;
+        float z1 = cz + hz * 0.5f;
+        int[] f = lit(rgb, 1.00f);
+        int[] b = lit(rgb, 0.55f);
+        int[] u = lit(rgb, 1.18f);
+        int[] d = lit(rgb, 0.38f);
+        int[] l = lit(rgb, 0.72f);
+        int[] r = lit(rgb, 0.88f);
+        quad(buffer, matrix, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, f[0], f[1], f[2], a);
+        quad(buffer, matrix, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, b[0], b[1], b[2], a);
+        quad(buffer, matrix, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0, u[0], u[1], u[2], a);
+        quad(buffer, matrix, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, d[0], d[1], d[2], a);
+        quad(buffer, matrix, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, l[0], l[1], l[2], a);
+        quad(buffer, matrix, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, r[0], r[1], r[2], a);
+    }
+
+    private static int[] lit(int[] rgb, float mul) {
+        return new int[]{clamp((int) (rgb[0] * mul)), clamp((int) (rgb[1] * mul)), clamp((int) (rgb[2] * mul))};
     }
 
     private void writeCrown(BufferBuilder buffer, Matrix4f matrix, float y, float scale, float time, int r, int g, int b, boolean glow) {
@@ -943,7 +1079,7 @@ public class PlayerCosmetics extends Module {
         }
         RenderSystem.disableCull();
         RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(false);
+        RenderSystem.depthMask(!additive);
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
     }
 
