@@ -17,6 +17,11 @@ public class ModeElement extends Element<ModeSetting> {
     private float hoverX;
     private float hoverY;
     private float spin;
+    private float previewAlpha;
+    private String previewSetting;
+    private String previewMode;
+    private float previewX;
+    private float previewY;
 
     public ModeElement(ModeSetting setting) {
         super(setting);
@@ -104,12 +109,33 @@ public class ModeElement extends Element<ModeSetting> {
         }
         this.a.w = (y + 11.0f) - this.a.y;
 
+        // Defer 3D preview to overlay pass so panel/card scissor does not clip it.
         if (this.hoveredMode != null && CosmeticPreview.isCosmeticStyle(this.b.i()) && extend > 0.4f) {
             this.spin += delta * 48.0f;
             if (this.spin > 3600.0f) {
                 this.spin -= 3600.0f;
             }
-            CosmeticPreview.draw(draw, matrices, this.b.i(), this.hoveredMode, this.hoverX, this.hoverY, 54.0f, this.spin, theme.a(ThemeInfo.PRIMARY).toIntColor(), extend);
+            this.previewSetting = this.b.i();
+            this.previewMode = this.hoveredMode;
+            this.previewX = this.hoverX;
+            this.previewY = this.hoverY;
+            this.previewAlpha = extend;
+        } else {
+            this.previewMode = null;
+            this.previewAlpha = 0.0f;
         }
+    }
+
+    @Override
+    public void renderOverlay(DrawContext context, double mouseX, double mouseY, float delta) {
+        if (this.previewMode == null || this.previewAlpha <= 0.01f) {
+            return;
+        }
+        MatrixStack matrices = context.getMatrices();
+        Draw2DProcessor draw = Skeleton.getInstance().getModuleProcessor().i();
+        ThemeProcessor theme = Skeleton.getInstance().getModuleProcessor().o();
+        CosmeticPreview.draw(draw, matrices, this.previewSetting, this.previewMode,
+                this.previewX, this.previewY, 54.0f, this.spin,
+                theme.a(ThemeInfo.PRIMARY).toIntColor(), this.previewAlpha);
     }
 }

@@ -1,8 +1,8 @@
 package aethereal.ui.element;
 
+import aethereal.core.Interface;
 import aethereal.render.ColorUtil;
 import aethereal.render.Draw2DProcessor;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.BufferBuilder;
@@ -41,6 +41,20 @@ public final class CosmeticPreview {
         float panel = size + 18.0f;
         float px = x - panel * 0.5f;
         float py = y - panel - 8.0f;
+        float guiW = Interface.mc.getWindow().getScaledWidth();
+        float guiH = Interface.mc.getWindow().getScaledHeight();
+        if (py < 4.0f) {
+            py = y + 14.0f;
+        }
+        if (py + panel > guiH - 4.0f) {
+            py = Math.max(4.0f, guiH - panel - 4.0f);
+        }
+        if (px < 4.0f) {
+            px = 4.0f;
+        }
+        if (px + panel > guiW - 4.0f) {
+            px = Math.max(4.0f, guiW - panel - 4.0f);
+        }
         int bg = ColorUtil.convertToARGB(10, 12, 18, (int) (220 * alpha));
         int outline = ColorUtil.applyAlphaToColor(accent, 0.55f * alpha);
         draw.a(matrices, px, py, panel, panel, 10.0f, bg);
