@@ -124,7 +124,7 @@
         <p class="lead reveal delay-2">Пишу ядро серверов: плагины и живые панели. Игрок видит мир — я собираю швы между Java, вебом и админкой.</p>
         <div class="hero-actions reveal delay-3">
           <a class="btn primary" href="#work">Смотреть работы</a>
-          <a class="btn ghost" href="#listen">Слушать атмосферу</a>
+          <a class="btn ghost" href="#listen">Любимый трек</a>
         </div>
         <ul class="stats reveal delay-4">
           <li><strong>12+</strong><span>модулей</span></li>
@@ -351,33 +351,29 @@ duels · connectapi · mcru
 
     <section class="section listen" id="listen">
       <header class="section-head reveal">
-        <p class="kicker">Атмосфера</p>
-        <h2>Ember Veil</h2>
-        <p class="section-lead">Оригинальный эмбиент, собранный в браузере. Ничьих треков — только гул пустоты под этот сайт.</p>
+        <p class="kicker">Любимый трек</p>
+        <h2>что мне нужно чувствовать</h2>
+        <p class="section-lead">день ото дня · альбом «мы обязательно прорвёмся», 2024. Официальный плеер Яндекс Музыки — без своих копий трека.</p>
       </header>
-      <div class="altar reveal" data-player>
-        <div class="disc" id="disc" aria-hidden="true">
-          <svg viewBox="0 0 100 100"><use href="#mark"/></svg>
+      <div class="fav reveal">
+        <div class="fav-cover">
+          <img src="https://avatars.yandex.net/get-music-content/14183125/fa111229.a.34458899-1/400x400" alt="Обложка альбома мы обязательно прорвёмся" width="400" height="400">
         </div>
-        <div class="altar-body">
-          <p class="player-kicker">bogdemon · original</p>
-          <h3>Ember Veil</h3>
-          <p class="player-sub">32 секунды петли · низкий дрон и тлеющие искры</p>
-          <div class="vis" id="vis" aria-hidden="true"></div>
-          <div class="player-row">
-            <button class="play-btn" type="button" data-play aria-pressed="false" aria-label="Играть Ember Veil">
-              <svg class="i-play" viewBox="0 0 24 24"><use href="#icon-play"/></svg>
-              <svg class="i-pause" viewBox="0 0 24 24"><use href="#icon-pause"/></svg>
-            </button>
-            <div class="seek-wrap">
-              <input class="seek" data-seek type="range" min="0" max="32" step="0.05" value="0" aria-label="Позиция">
-              <div class="times"><span data-now>0:00</span><span data-dur>0:32</span></div>
-            </div>
-            <label class="vol-wrap">
-              <span class="sr-only">Громкость</span>
-              <input class="vol" data-vol type="range" min="0" max="100" value="55" aria-label="Громкость">
-            </label>
+        <div class="fav-body">
+          <p class="player-kicker">Яндекс Музыка · 2024</p>
+          <h3>что мне нужно чувствовать</h3>
+          <p class="player-sub">день ото дня · мы обязательно прорвёмся</p>
+          <div class="fav-embed">
+            <iframe
+              title="что мне нужно чувствовать — день ото дня"
+              src="https://music.yandex.ru/iframe/#track/134047675/34458899"
+              width="100%"
+              height="180"
+              frameborder="0"
+              allow="clipboard-write; autoplay *; fullscreen *; encrypted-media *"
+              loading="lazy"></iframe>
           </div>
+          <a class="btn primary fav-open" href="https://music.yandex.ru/album/34458899/track/134047675" target="_blank" rel="noopener noreferrer">Открыть в Яндекс Музыке</a>
         </div>
       </div>
     </section>
@@ -401,21 +397,15 @@ duels · connectapi · mcru
     <span class="foot-mark">не шаблон. ядро.</span>
   </footer>
 
-  <aside class="dock" id="dock" role="region" aria-label="Медиаплеер">
-    <button class="play-btn dock-play" type="button" data-play aria-pressed="false" aria-label="Играть Ember Veil">
-      <svg class="i-play" viewBox="0 0 24 24"><use href="#icon-play"/></svg>
-      <svg class="i-pause" viewBox="0 0 24 24"><use href="#icon-pause"/></svg>
-    </button>
+  <aside class="dock" id="dock" role="region" aria-label="Любимый трек">
+    <a class="dock-cover" href="#listen" aria-hidden="true">
+      <img src="https://avatars.yandex.net/get-music-content/14183125/fa111229.a.34458899-1/100x100" alt="">
+    </a>
     <div class="dock-meta">
-      <strong>Ember Veil</strong>
-      <span>bogdemon · ambient</span>
+      <strong>что мне нужно чувствовать</strong>
+      <span>день ото дня</span>
     </div>
-    <input class="seek dock-seek" data-seek type="range" min="0" max="32" step="0.05" value="0" aria-label="Позиция">
-    <span class="dock-time" data-now>0:00</span>
-    <label class="vol-wrap dock-vol">
-      <span class="sr-only">Громкость</span>
-      <input class="vol" data-vol type="range" min="0" max="100" value="55" aria-label="Громкость">
-    </label>
+    <a class="btn primary dock-play" href="https://music.yandex.ru/album/34458899/track/134047675" target="_blank" rel="noopener noreferrer">Слушать</a>
   </aside>
 
   <dialog class="modal" id="modal">

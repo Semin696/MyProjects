@@ -2,7 +2,6 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const DURATION = 32;
 
   const year = $("#year");
   if (year) year.textContent = String(new Date().getFullYear());
@@ -136,170 +135,6 @@
     if (e.key === "Escape") closeMenu();
   });
 
-  const vis = $("#vis");
-  if (vis) {
-    vis.innerHTML = Array.from({ length: 28 }, () => "<i></i>").join("");
-  }
-  const visBars = vis ? $$("#vis i") : [];
-
-  const fmt = (s) => {
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${String(sec).padStart(2, "0")}`;
-  };
-
-  const player = {
-    ctx: null,
-    gain: null,
-    analyser: null,
-    source: null,
-    buffer: null,
-    playing: false,
-    offset: 0,
-    startedAt: 0,
-    duration: DURATION,
-    seeking: false,
-
-    buildBuffer(ctx) {
-      const sr = ctx.sampleRate;
-      const len = Math.floor(sr * DURATION);
-      const buffer = ctx.createBuffer(2, len, sr);
-      for (let ch = 0; ch < 2; ch += 1) {
-        const data = buffer.getChannelData(ch);
-        let brown = 0;
-        const pan = ch === 0 ? -0.15 : 0.15;
-        for (let i = 0; i < len; i += 1) {
-          const t = i / sr;
-          const fade = Math.min(t / 1.4, (DURATION - t) / 1.4, 1);
-          const pulse = 0.62 + 0.38 * Math.sin((Math.PI * 2 * t) / 11);
-          const drone =
-            Math.sin(Math.PI * 2 * (54.8 + pan) * t) * 0.2 +
-            Math.sin(Math.PI * 2 * 82.4 * t + ch) * 0.1 +
-            Math.sin(Math.PI * 2 * 110 * t) * 0.045 +
-            Math.sin(Math.PI * 2 * 36.7 * t) * 0.12;
-          brown = (brown + (Math.random() * 2 - 1) * 0.018) * 0.995;
-          const crackle = Math.random() < 0.0009 ? (Math.random() - 0.5) * 0.09 : 0;
-          data[i] = (drone * pulse + brown * 0.32 + crackle) * fade * 0.72;
-        }
-      }
-      return buffer;
-    },
-
-    async ensure() {
-      if (this.ctx) return;
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new Ctx();
-      this.gain = this.ctx.createGain();
-      this.gain.gain.value = 0.55;
-      this.analyser = this.ctx.createAnalyser();
-      this.analyser.fftSize = 64;
-      this.gain.connect(this.analyser);
-      this.analyser.connect(this.ctx.destination);
-      this.buffer = this.buildBuffer(this.ctx);
-    },
-
-    current() {
-      if (!this.playing || !this.ctx) return this.offset;
-      return (this.offset + (this.ctx.currentTime - this.startedAt)) % this.duration;
-    },
-
-    stopSource() {
-      if (this.source) {
-        try {
-          this.source.stop();
-        } catch {
-          /* already stopped */
-        }
-        this.source.disconnect();
-        this.source = null;
-      }
-    },
-
-    startSource(at) {
-      this.stopSource();
-      const src = this.ctx.createBufferSource();
-      src.buffer = this.buffer;
-      src.loop = true;
-      src.connect(this.gain);
-      const offset = ((at % this.duration) + this.duration) % this.duration;
-      src.start(0, offset);
-      this.source = src;
-      this.offset = offset;
-      this.startedAt = this.ctx.currentTime;
-    },
-
-    async toggle() {
-      await this.ensure();
-      await this.ctx.resume();
-      if (this.playing) {
-        this.offset = this.current();
-        this.stopSource();
-        this.playing = false;
-      } else {
-        this.startSource(this.offset);
-        this.playing = true;
-      }
-      document.body.classList.toggle("is-playing", this.playing);
-      $$("[data-play]").forEach((btn) => {
-        btn.setAttribute("aria-pressed", String(this.playing));
-        btn.setAttribute("aria-label", this.playing ? "Пауза Ember Veil" : "Играть Ember Veil");
-      });
-    },
-
-    async seek(at) {
-      this.offset = Math.max(0, Math.min(this.duration, at));
-      if (this.playing) {
-        await this.ensure();
-        this.startSource(this.offset);
-      }
-      this.paint(this.offset);
-    },
-
-    setVolume(v) {
-      const val = Number(v) / 100;
-      if (this.gain) this.gain.gain.value = val;
-      $$("[data-vol]").forEach((el) => {
-        el.value = String(v);
-        el.style.setProperty("--pos", `${v}%`);
-      });
-    },
-
-    paint(t) {
-      const pos = `${(t / this.duration) * 100}%`;
-      $$("[data-seek]").forEach((el) => {
-        if (!this.seeking) el.value = String(t);
-        el.style.setProperty("--pos", pos);
-      });
-      $$("[data-now]").forEach((el) => {
-        el.textContent = fmt(t);
-      });
-    },
-  };
-
-  $$("[data-play]").forEach((btn) => {
-    btn.addEventListener("click", () => player.toggle());
-  });
-
-  $$("[data-seek]").forEach((el) => {
-    el.addEventListener("pointerdown", () => {
-      player.seeking = true;
-    });
-    el.addEventListener("input", () => {
-      el.style.setProperty("--pos", `${(Number(el.value) / DURATION) * 100}%`);
-    });
-    el.addEventListener("change", () => {
-      player.seeking = false;
-      player.seek(Number(el.value));
-    });
-  });
-
-  $$("[data-vol]").forEach((el) => {
-    el.addEventListener("input", () => player.setVolume(el.value));
-  });
-  player.setVolume(55);
-
-  const freq = new Uint8Array(32);
-
   const canvas = $("#embers");
   const ctx = canvas.getContext("2d", { alpha: true });
   let sparks = [];
@@ -390,18 +225,6 @@
       ctx.fill();
     });
 
-    const t = player.seeking ? Number($("[data-seek]").value) : player.current();
-    player.paint(t);
-
-    if (player.analyser && visBars.length) {
-      player.analyser.getByteFrequencyData(freq);
-      visBars.forEach((bar, i) => {
-        const n = freq[i] || 0;
-        const hgt = player.playing ? Math.max(12, (n / 255) * 100) : 16;
-        bar.style.height = `${hgt}%`;
-      });
-    }
-
     requestAnimationFrame(tick);
   };
 
@@ -415,11 +238,5 @@
       rings = [0, 1, 2].map(spawnRing);
     });
     tick();
-  } else {
-    const loop = () => {
-      player.paint(player.seeking ? Number($("[data-seek]").value) : player.current());
-      requestAnimationFrame(loop);
-    };
-    loop();
   }
 })();
