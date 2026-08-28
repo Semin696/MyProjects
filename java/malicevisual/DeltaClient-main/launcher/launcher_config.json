@@ -1,0 +1,8 @@
+{
+  "selectedJavaPath": "C:\\Program Files\\Java\\jdk-26.0.1",
+  "ramGb": 12,
+  "username": "DeltaUser",
+  "customJvmArgs": "-XX:+UseG1GC -XX:+ParallelRefProcEnabled",
+  "autoScrollLogs": true,
+  "lastGradleTask": "runClient"
+}

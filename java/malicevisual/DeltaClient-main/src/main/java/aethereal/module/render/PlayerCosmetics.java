@@ -6,6 +6,7 @@ import aethereal.core.EventTarget;
 import aethereal.core.Module;
 import aethereal.core.ModuleRegister;
 import aethereal.core.Skeleton;
+import aethereal.event.DrawEvent;
 import aethereal.render.ColorUtil;
 import aethereal.setting.BooleanSetting;
 import aethereal.setting.ColorSetting;
@@ -18,6 +19,7 @@ import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -82,103 +84,123 @@ public class PlayerCosmetics extends Module {
     }
 
     @EventTarget
-    public void onFeature(aethereal.event.PlayerCosmeticFeatureEvent event) {
-        if (!n() || event.getPlayer() == null || event.getModel() == null) {
+    public void onDraw(DrawEvent event) {
+        if (!event.c() || !n() || mc.world == null || mc.player == null) {
             return;
         }
-        PlayerEntity player = event.getPlayer();
-        if (!visible(player)) {
-            return;
-        }
-        int base = this.syncTheme.c().booleanValue()
-                ? Skeleton.getInstance().getModuleProcessor().o().a(ThemeInfo.PRIMARY).toIntColor()
-                : this.customColor.c().intValue();
+        int base = themeColor();
         float s = this.scale.c().floatValue();
         float time = (System.currentTimeMillis() % 100000L) / 1000.0f;
-        int[] rgb = ColorUtil.b(base);
-        MatrixStack matrices = event.getMatrices();
-
-        if (this.hat.c().booleanValue()) {
-            renderAttached(matrices, event.getModel(), this.hatAttach.c(),
-                    this.hatX.c().floatValue(), this.hatY.c().floatValue(), this.hatZ.c().floatValue(), s,
-                    (buffer, matrix, glow) -> writeHat(buffer, matrix, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
-        }
-        if (this.halo.c().booleanValue()) {
-            renderAttached(matrices, event.getModel(), this.haloAttach.c(),
-                    this.haloX.c().floatValue(), this.haloY.c().floatValue(), this.haloZ.c().floatValue(), s,
-                    (buffer, matrix, glow) -> writeHalo(buffer, matrix, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
-        }
-        if (this.backpack.c().booleanValue()) {
-            renderAttached(matrices, event.getModel(), this.backpackAttach.c(),
-                    this.backpackX.c().floatValue(), this.backpackY.c().floatValue(), this.backpackZ.c().floatValue(), s,
-                    (buffer, matrix, glow) -> writeBackpack(buffer, matrix, 0.45f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow));
-        }
-        if (this.wings.c().booleanValue()) {
-            renderAttached(matrices, event.getModel(), this.wingAttach.c(),
-                    this.wingX.c().floatValue(), this.wingY.c().floatValue(), this.wingZ.c().floatValue(), s,
-                    (buffer, matrix, glow) -> {
-                        writeWing(buffer, matrix, 1.0f, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow);
-                        writeWing(buffer, matrix, -1.0f, 0.55f, 1.0f, time, rgb[0], rgb[1], rgb[2], glow);
-                    });
-        }
-        if (this.pet.c().booleanValue()) {
-            matrices.push();
-            applyAttach(matrices, event.getModel(), this.petAttach.c(),
-                    this.petX.c().floatValue(), this.petY.c().floatValue(), this.petZ.c().floatValue());
-            matrices.scale(s * 0.85f, s * 0.85f, s * 0.85f);
-            CosmeticAnimalPets.renderAttached(matrices, player, this.petStyle.c(), time, event.getTickDelta(), event.getLight());
-            matrices.pop();
-        }
-    }
-
-    @FunctionalInterface
-    private interface MeshWriter {
-        void write(BufferBuilder buffer, Matrix4f matrix, boolean glow);
-    }
-
-    private void renderAttached(MatrixStack matrices, net.minecraft.client.render.entity.model.PlayerEntityModel model,
-                                String attach, float ox, float oy, float oz, float scale, MeshWriter writer) {
-        matrices.push();
-        applyAttach(matrices, model, attach, ox, oy, oz);
-        matrices.scale(scale, scale, scale);
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        MatrixStack matrices = event.h();
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cam = camera.getPos();
 
         begin(true);
         BufferBuilder glow = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        writer.write(glow, matrix, true);
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (visible(player)) {
+                renderWorld(glow, matrices, player, cam, base, s, time, event.g(), true);
+            }
+        }
         BufferRenderer.drawWithGlobalProgram(glow.end());
 
         begin(false);
         BufferBuilder mesh = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        writer.write(mesh, matrix, false);
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (!visible(player)) {
+                continue;
+            }
+            renderWorld(mesh, matrices, player, cam, base, s, time, event.g(), false);
+            if (this.pet.c().booleanValue()) {
+                // pet uses its own entity/mesh path with shoulder attach
+                matrices.push();
+                Vec3d pos = MathUtil.a(player, event.g());
+                matrices.translate(pos.x - cam.x, pos.y - cam.y, pos.z - cam.z);
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-player.getBodyYaw()));
+                applyWorldAttach(matrices, player, this.petAttach.c(), event.g(), player.getHeight(),
+                        this.petX.c().floatValue(), this.petY.c().floatValue(), this.petZ.c().floatValue());
+                matrices.scale(s * 0.85f, s * 0.85f, s * 0.85f);
+                CosmeticAnimalPets.renderAttached(matrices, player, this.petStyle.c(), time, event.g(), 0xF000F0);
+                matrices.pop();
+            }
+        }
         BufferRenderer.drawWithGlobalProgram(mesh.end());
         endBatch();
+    }
+
+    private int themeColor() {
+        return this.syncTheme.c().booleanValue()
+                ? Skeleton.getInstance().getModuleProcessor().o().a(ThemeInfo.PRIMARY).toIntColor()
+                : this.customColor.c().intValue();
+    }
+
+    private void renderWorld(BufferBuilder buffer, MatrixStack matrices, PlayerEntity player, Vec3d cam,
+                             int base, float scale, float time, float tickDelta, boolean glowPass) {
+        Vec3d pos = MathUtil.a(player, tickDelta);
+        float bodyYaw = player.getBodyYaw();
+        float height = player.getHeight();
+        int[] rgb = ColorUtil.b(base);
+        int r = rgb[0], g = rgb[1], b = rgb[2];
+
+        matrices.push();
+        matrices.translate(pos.x - cam.x, pos.y - cam.y, pos.z - cam.z);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-bodyYaw));
+
+        if (this.hat.c().booleanValue()) {
+            matrices.push();
+            applyWorldAttach(matrices, player, this.hatAttach.c(), tickDelta, height,
+                    this.hatX.c().floatValue(), this.hatY.c().floatValue(), this.hatZ.c().floatValue());
+            writeHat(buffer, matrices.peek().getPositionMatrix(), 0.55f, scale, time, r, g, b, glowPass);
+            matrices.pop();
+        }
+        if (this.halo.c().booleanValue()) {
+            matrices.push();
+            applyWorldAttach(matrices, player, this.haloAttach.c(), tickDelta, height,
+                    this.haloX.c().floatValue(), this.haloY.c().floatValue(), this.haloZ.c().floatValue());
+            writeHalo(buffer, matrices.peek().getPositionMatrix(), 0.55f, scale, time, r, g, b, glowPass);
+            matrices.pop();
+        }
+        if (this.backpack.c().booleanValue()) {
+            matrices.push();
+            applyWorldAttach(matrices, player, this.backpackAttach.c(), tickDelta, height,
+                    this.backpackX.c().floatValue(), this.backpackY.c().floatValue(), this.backpackZ.c().floatValue());
+            writeBackpack(buffer, matrices.peek().getPositionMatrix(), 0.45f, scale, time, r, g, b, glowPass);
+            matrices.pop();
+        }
+        if (this.wings.c().booleanValue()) {
+            matrices.push();
+            applyWorldAttach(matrices, player, this.wingAttach.c(), tickDelta, height,
+                    this.wingX.c().floatValue(), this.wingY.c().floatValue(), this.wingZ.c().floatValue());
+            Matrix4f m = matrices.peek().getPositionMatrix();
+            writeWing(buffer, m, 1.0f, 0.55f, scale, time, r, g, b, glowPass);
+            writeWing(buffer, m, -1.0f, 0.55f, scale, time, r, g, b, glowPass);
+            matrices.pop();
+        }
         matrices.pop();
     }
 
-    private void applyAttach(MatrixStack matrices, net.minecraft.client.render.entity.model.PlayerEntityModel model,
-                             String attach, float ox, float oy, float oz) {
-        net.minecraft.client.model.ModelPart part = model.body;
+    private void applyWorldAttach(MatrixStack matrices, PlayerEntity player, String attach, float tickDelta,
+                                  float height, float ox, float oy, float oz) {
+        float pitch = player.getPitch(tickDelta);
+        float headYaw = player.getHeadYaw();
+        float bodyYaw = player.getBodyYaw();
         if ("Голова".equals(attach)) {
-            part = model.head;
-        } else if ("Левое плечо".equals(attach) || "Левая рука".equals(attach)) {
-            part = model.leftArm;
-        } else if ("Правое плечо".equals(attach) || "Правая рука".equals(attach)) {
-            part = model.rightArm;
-        }
-        part.rotate(matrices);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
-        if ("Голова".equals(attach)) {
-            // sit on top of the head bone so pitch/yaw move the hat with the head
-            matrices.translate(0.0f, -0.25f, 0.0f);
-        } else if ("Левое плечо".equals(attach)) {
-            matrices.translate(0.0f, 0.05f, 0.0f);
-        } else if ("Правое плечо".equals(attach)) {
-            matrices.translate(0.0f, 0.05f, 0.0f);
-        } else if ("Спина".equals(attach)) {
-            matrices.translate(0.0f, 0.05f, 0.14f);
-        } else if ("Левая рука".equals(attach) || "Правая рука".equals(attach)) {
+            matrices.translate(0.0f, height * 0.75f, 0.0f);
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-(headYaw - bodyYaw)));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-pitch));
             matrices.translate(0.0f, 0.28f, 0.0f);
+        } else if ("Левое плечо".equals(attach)) {
+            matrices.translate(0.32f, height * 0.72f, 0.0f);
+        } else if ("Правое плечо".equals(attach)) {
+            matrices.translate(-0.32f, height * 0.72f, 0.0f);
+        } else if ("Спина".equals(attach)) {
+            matrices.translate(0.0f, height * 0.55f, 0.14f);
+        } else if ("Левая рука".equals(attach)) {
+            matrices.translate(0.38f, height * 0.55f, 0.0f);
+        } else if ("Правая рука".equals(attach)) {
+            matrices.translate(-0.38f, height * 0.55f, 0.0f);
+        } else {
+            matrices.translate(0.0f, height * 0.5f, 0.0f);
         }
         matrices.translate(ox, oy, oz);
     }

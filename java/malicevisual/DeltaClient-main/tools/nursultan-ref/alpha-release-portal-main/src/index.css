@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 217 28% 13%;
+    --foreground: 210 40% 98%;
+    
+    --card: 217 28% 15%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 217 28% 15%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 217 28% 17%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217 28% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --accent: 217 28% 17%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217 28% 17%;
+    --input: 217 28% 17%;
+    --ring: 224 76% 48%;
+    
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer;
+}
+
+.nav-link {
+  @apply flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 hover:bg-accent;
+}
+
+.nav-link.active {
+  @apply bg-accent text-primary;
+}
+
+.glass-panel {
+  @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg;
+}
+
+.slide-enter {
+  @apply transform translate-x-full;
+}
+
+.slide-enter-active {
+  @apply transform translate-x-0 transition-transform duration-300 ease-out;
+}
+
+.slide-exit {
+  @apply transform translate-x-0;
+}
+
+.slide-exit-active {
+  @apply transform -translate-x-full transition-transform duration-300 ease-out;
+}

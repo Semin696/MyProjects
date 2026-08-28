@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <g transform="rotate(9 100 100)">
+    <g opacity="0.3">
+      <polygon points="140,70 140,100 140,170 140,140" fill="#4a4a4a"/>
+      <polygon points="120,40 140,70 140,100 120,70" fill="#d9d9d9" transform="translate(25 0)"/>
+    </g>
+    <polygon points="40,70 100,100 100,170 40,140" fill="#8f8f8f"/>
+    <polygon points="160,70 100,100 100,170 160,140" fill="#3f3f3f"/>
+    <polygon points="100,40 160,70 100,100 40,70" fill="#d9d9d9"/>
+    <rect x="88" y="52" width="12" height="12" fill="#f2f2f2" transform="skewY(26) skewX(-41)"/>
+    <rect x="112" y="60" width="9" height="9" fill="#bfbfbf" transform="skewY(26) skewX(-41)"/>
+  </g>
+</svg>

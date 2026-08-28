@@ -15,3 +15,5 @@ target/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 
+java/malicevisual/фв.rar
+java/malicevisual/DeltaClient-main/launcher/windows/flutter/ephemeral/

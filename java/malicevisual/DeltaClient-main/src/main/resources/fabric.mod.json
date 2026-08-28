@@ -1,0 +1,34 @@
+{
+  "accessWidener": "skeleton.accesswidener",
+  "schemaVersion": 1,
+  "id": "skeleton",
+  "version": "1.0.0",
+  "name": "Malice Visuals",
+  "description": "Malice Visuals Client",
+  "authors": [
+    "Malice Visuals"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/"
+  },
+  "license": "Minecraft EULA",
+  "icon": "assets/skeleton/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "platform.Initializer"
+    ]
+  },
+  "mixins": [
+    "skeleton.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": "\u003e\u003d0.16.5",
+    "minecraft": "~1.21.4",
+    "java": "\u003e\u003d21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

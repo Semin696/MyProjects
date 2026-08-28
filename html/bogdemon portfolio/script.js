@@ -239,4 +239,145 @@
     });
     tick();
   }
+
+  const audio = $("#siteAudio");
+  const playBtn = $("#playBtn");
+  const coverBtn = $("#coverBtn");
+  const dockPlay = $("#dockPlay");
+  const dockCover = $("#dockCover");
+  const seek = $("#seek");
+  const vol = $("#vol");
+  const timeCur = $("#timeCur");
+  const timeDur = $("#timeDur");
+  const statusEl = $("#playerStatus");
+  const deezerFrame = $("#deezerFrame");
+  const TRACK_DUR = 127;
+  const DEEZER = "https://api.deezer.com/track/3152690101";
+  const DEEZER_EMBED = "https://widget.deezer.com/widget/dark/track/3152690101";
+  let srcReady = false;
+  let seeking = false;
+
+  // api.deezer.com не отдаёт CORS-заголовки, поэтому fetch() из браузера падает — грузим через JSONP.
+  const jsonp = (url) => new Promise((resolve, reject) => {
+    const cb = `dz_cb_${Date.now().toString(36)}`;
+    const s = document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("jsonp timeout"));
+    }, 8000);
+    const cleanup = () => {
+      clearTimeout(timer);
+      delete window[cb];
+      s.remove();
+    };
+    window[cb] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+    s.onerror = () => {
+      cleanup();
+      reject(new Error("jsonp failed"));
+    };
+    s.src = `${url}?output=jsonp&callback=${cb}`;
+    document.head.appendChild(s);
+  });
+
+  const fmt = (sec) => {
+    if (!Number.isFinite(sec) || sec < 0) return "0:00";
+    const s = Math.floor(sec);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  };
+
+  const setPlaying = (on) => {
+    document.body.classList.toggle("is-playing", on);
+    const label = on ? "Пауза" : "Играть";
+    [playBtn, coverBtn, dockCover].forEach((btn) => btn && btn.setAttribute("aria-label", label));
+    if (dockPlay) dockPlay.textContent = on ? "Пауза" : "Слушать";
+  };
+
+  const setStatus = (text) => {
+    if (statusEl) statusEl.textContent = text;
+  };
+
+  const showEmbed = (which) => {
+    $$(".embed-tabs .chip").forEach((c) => {
+      const on = c.dataset.embed === which;
+      c.classList.toggle("is-on", on);
+      c.setAttribute("aria-selected", String(on));
+    });
+    const deezerBox = $("#embedDeezer");
+    const yandexBox = $("#embedYandex");
+    if (deezerBox) deezerBox.hidden = which !== "deezer";
+    if (yandexBox) yandexBox.hidden = which !== "yandex";
+  };
+
+  const playEmbed = (which = "yandex") => {
+    if (which === "deezer" && deezerFrame) {
+      deezerFrame.src = `${DEEZER_EMBED}?autoplay=true&tracklist=false`;
+    }
+    showEmbed(which);
+  };
+
+  const ensureSrc = async () => {
+    if (srcReady && audio.src) return true;
+    setStatus("Подключаю трек…");
+    const data = await jsonp(DEEZER);
+    if (!data || data.error || !data.preview) throw new Error("no preview");
+    audio.src = data.preview;
+    srcReady = true;
+    return true;
+  };
+
+  const toggle = async () => {
+    try {
+      if (!audio.paused && audio.src) {
+        audio.pause();
+        return;
+      }
+      await ensureSrc();
+      audio.volume = vol ? Number(vol.value) : 0.85;
+      await audio.play();
+      setStatus("Играет на сайте.");
+    } catch (err) {
+      playEmbed("yandex");
+      document.getElementById("listen").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+      setStatus("Прямой плеер недоступен — трек открыт в Яндекс Музыке ниже.");
+    }
+  };
+
+  audio.addEventListener("play", () => setPlaying(true));
+  audio.addEventListener("pause", () => setPlaying(false));
+  audio.addEventListener("ended", () => {
+    setPlaying(false);
+    playEmbed("yandex");
+    setStatus("Превью закончилось — полный трек в Яндекс Музыке ниже.");
+  });
+  audio.addEventListener("loadedmetadata", () => {
+    timeDur.textContent = fmt(audio.duration || TRACK_DUR);
+  });
+  audio.addEventListener("timeupdate", () => {
+    if (seeking) return;
+    const dur = audio.duration || TRACK_DUR;
+    timeCur.textContent = fmt(audio.currentTime);
+    seek.value = String(Math.round((audio.currentTime / dur) * 1000));
+  });
+
+  seek.addEventListener("pointerdown", () => { seeking = true; });
+  seek.addEventListener("pointerup", () => { seeking = false; });
+  seek.addEventListener("input", () => {
+    const dur = audio.duration || TRACK_DUR;
+    audio.currentTime = (Number(seek.value) / 1000) * dur;
+    timeCur.textContent = fmt(audio.currentTime);
+  });
+  vol.addEventListener("input", () => {
+    audio.volume = Number(vol.value);
+  });
+
+  [playBtn, coverBtn, dockPlay, dockCover].forEach((btn) => {
+    if (btn) btn.addEventListener("click", toggle);
+  });
+
+  $$(".embed-tabs .chip").forEach((chip) => {
+    chip.addEventListener("click", () => showEmbed(chip.dataset.embed));
+  });
 })();

@@ -58,6 +58,12 @@ async function ensureSchema() {
       await db.execute(
         "ALTER TABLE mlv_codes ADD COLUMN type ENUM('sub','tester','owner') NULL"
       ).catch(() => {});
+      await db.execute(
+        'ALTER TABLE mlv_users ADD COLUMN email VARCHAR(255) NULL'
+      ).catch(() => {});
+      await db.execute(
+        'ALTER TABLE mlv_users ADD COLUMN pass_enc TEXT NULL'
+      ).catch(() => {});
     })().catch(e => {
       global.__mlvSchema = null;
       throw e;
@@ -94,6 +100,27 @@ function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
+const PASS_SECRET = process.env.PASS_SECRET || 'mlv-fallback-secret-key';
+
+function encryptText(text) {
+  const key = crypto.createHash('sha256').update(PASS_SECRET).digest();
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  const enc = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]);
+  return iv.toString('hex') + ':' + enc.toString('hex');
+}
+
+function decryptText(data) {
+  try {
+    const [ivHex, encHex] = String(data).split(':');
+    const key = crypto.createHash('sha256').update(PASS_SECRET).digest();
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(ivHex, 'hex'));
+    return Buffer.concat([decipher.update(Buffer.from(encHex, 'hex')), decipher.final()]).toString('utf8');
+  } catch {
+    return null;
+  }
+}
+
 function makeSalt() {
   return crypto.randomBytes(16).toString('hex');
 }
@@ -123,12 +150,11 @@ async function auth(req) {
   if (!token) return null;
   await ensureSchema();
   const [rows] = await getPool().execute(
-    `SELECT u.id, u.username, u.role, u.subscribed, u.created_at
+    `SELECT u.id, u.username, u.role, u.subscribed, u.created_at, u.email
      FROM mlv_sessions s JOIN mlv_users u ON u.id = s.user_id
      WHERE s.token = ? AND s.created_at > NOW() - INTERVAL 30 DAY`,
     [token]
-  );
-  return rows[0] || null;
+  );  return rows[0] || null;
 }
 
 module.exports = {
@@ -142,4 +168,6 @@ module.exports = {
   makeToken,
   makeCode,
   auth,
+  encryptText,
+  decryptText,
 };

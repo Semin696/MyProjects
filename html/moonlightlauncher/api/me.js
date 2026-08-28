@@ -7,10 +7,12 @@ module.exports = async (req, res) => {
     return json(res, 200, {
       ok: true,
       user: {
+        id: user.id,
         username: user.username,
         role: user.role,
         subscribed: !!user.subscribed,
         createdAt: user.created_at,
+        email: user.email || null,
       },
     });
   } catch (e) {

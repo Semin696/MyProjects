@@ -1,0 +1,16 @@
+pluginManagement {
+	repositories {
+		maven {
+			name = 'LocalLoom'
+			url = uri("${rootDir}/.loom-repo")
+		}
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'MaliceVisuals'

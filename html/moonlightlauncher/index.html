@@ -17,13 +17,14 @@
   <div class="moon-glow" aria-hidden="true"></div>
 
   <header class="header">
-    <a class="brand" href="#">
+    <a class="brand" href="index.html">
       <img src="logo.png" alt="" class="brand-logo">
       <span>MoonLight <span class="accent">Visual</span></span>
     </a>
     <nav class="nav">
-      <a href="#" id="navDownloadLink">Скачать</a>
-      <a href="#features">Возможности</a>
+      <a href="#">Главная</a>
+      <a href="#features">Функции</a>
+      <a href="#pricing">Тарифы</a>
     </nav>
     <div class="auth-area" id="authArea"></div>
   </header>
@@ -41,28 +42,83 @@
     </section>
 
     <section class="section" id="features">
-      <h2>Возможности</h2>
-      <div class="features-grid">
-        <div class="feature">
-          <div class="feature-icon">⚡</div>
-          <h3>Быстрый запуск</h3>
-          <p>Быстрый старт.</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">
-            <svg class="feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 4v11"/>
-              <path d="M6.5 10.5L12 16l5.5-5.5"/>
-              <path d="M5 20h14"/>
-            </svg>
+      <h2 class="sec-title">Преимущества нашего лаунчера</h2>
+      <p class="sec-sub">Наш лаунчер открывает доступ к мощному набору функций, которые выводят комфорт и стиль игры на новый уровень. Улучшайте производительность, доминируйте в PvP-сражениях и раскрывайте весь потенциал игры без компромиссов.</p>
+      <div class="feature-cards">
+        <div class="feature-card feature-card-1">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">Дизайн</h3>
+            <p class="feature-card-text">Наслаждайтесь игрой с элегантным минималистичным интерфейсом.</p>
           </div>
-          <h3>Автообновления</h3>
-          <p>Лаунчер сам проверяет и устанавливает свежие версии.</p>
         </div>
-        <div class="feature">
-          <div class="feature-icon">🌙</div>
-          <h3>Тёмная тема</h3>
-          <p>Приятный ночной интерфейс, не режущий глаза.</p>
+        <div class="feature-card feature-card-2">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">Производительность</h3>
+            <p class="feature-card-text">Оптимизированный код позволяет достичь высокого FPS даже на слабых компьютерах.</p>
+          </div>
+        </div>
+        <div class="feature-card feature-card-3">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">PvP преимущества</h3>
+            <p class="feature-card-text">Получайте преимущество в боях с помощью специальных настроек и функций для PvP.</p>
+          </div>
+        </div>
+        <div class="feature-card feature-card-4">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">Гибкие настройки</h3>
+            <p class="feature-card-text">Настройте лаунчер под себя с помощью множества параметров и опций с удобным интерфейсом.</p>
+          </div>
+        </div>
+        <div class="feature-card feature-card-5">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">Анти-чит</h3>
+            <p class="feature-card-text">Наш лаунчер полностью совместим с популярными анти-чит системами на серверах.</p>
+          </div>
+        </div>
+        <div class="feature-card feature-card-6">
+          <div class="feature-card-content">
+            <h3 class="feature-card-title">Регулярные обновления</h3>
+            <p class="feature-card-text">Мы постоянно улучшаем и обновляем наш лаунчер, добавляя новые функции.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="pricing-section">
+      <div class="pricing-header">
+        <h2 class="pricing-title">Ваш идеальный тариф здесь</h2>
+        <p class="pricing-description">Несколько вариантов подписки, чтобы вы платили только за то, <br>что действительно нужно.</p>
+      </div>
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <div class="pricing-card-content">
+            <div class="pricing-card-logo"><img src="logo.png" alt="MoonLight"></div>
+            <div class="pricing-card-info">
+              <h3 class="pricing-card-title">30 дней</h3>
+              <p class="pricing-card-text">Приобретая этот товар, вы получаете <br>30-дневный доступ к полному <br>функционалу MoonLight.</p>
+            </div>
+            <button class="pricing-card-btn">Приобрести</button>
+          </div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-card-content">
+            <div class="pricing-card-logo"><img src="logo.png" alt="MoonLight"></div>
+            <div class="pricing-card-info">
+              <h3 class="pricing-card-title">90 дней<img src="cards/popular.svg" alt="Популярный" class="popular-badge"></h3>
+              <p class="pricing-card-text">Вместе с этим товаром вы открываете <br>себе сезон полного доступа к <br>MoonLight.</p>
+            </div>
+            <button class="pricing-card-btn">Приобрести</button>
+          </div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-card-content">
+            <div class="pricing-card-logo"><img src="logo.png" alt="MoonLight"></div>
+            <div class="pricing-card-info">
+              <h3 class="pricing-card-title">Навсегда</h3>
+              <p class="pricing-card-text">Максимум возможностей <br>MoonLight — навсегда, без продлений <br>и доплат.</p>
+            </div>
+            <button class="pricing-card-btn">Приобрести</button>
+          </div>
         </div>
       </div>
     </section>
@@ -93,101 +149,14 @@
       <form id="registerForm" class="modal-form hidden">
         <label class="field-label" for="regUser">Никнейм</label>
         <input type="text" id="regUser" class="input" autocomplete="off" spellcheck="false">
+        <label class="field-label" for="regEmail">Email</label>
+        <input type="email" id="regEmail" class="input" autocomplete="off" spellcheck="false">
         <label class="field-label" for="regPass">Пароль</label>
         <input type="password" id="regPass" class="input" autocomplete="new-password">
         <button type="submit" class="btn primary wide">Создать аккаунт</button>
       </form>
 
       <div class="status" id="authStatus"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay hidden" id="ownerOverlay">
-    <div class="modal wide-modal">
-      <button class="modal-close" data-close="ownerOverlay">×</button>
-      <h2 class="modal-title">Панель владельца</h2>
-      <p class="hint">Генерируйте коды для тестеров. Один код активирует одну подписку.</p>
-      <label class="field-label" for="codeType">Тип кода</label>
-      <select id="codeType" class="input">
-        <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
-        <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
-        <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
-      </select>
-      <button class="btn primary wide" id="genCodeBtn">Сгенерировать код</button>
-      <div class="codes-list" id="codesList"></div>
-      <div class="status" id="ownerStatus"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay hidden" id="profileOverlay">
-    <div class="modal">
-      <button class="modal-close" data-close="profileOverlay">×</button>
-      <div class="profile-head">
-        <div class="avatar" id="profileAvatar">?</div>
-        <div>
-          <div class="profile-name" id="profileName"></div>
-          <div class="profile-role" id="profileRole"></div>
-        </div>
-      </div>
-      <div class="tabs">
-        <button class="tab active" data-profile-tab="info">Профиль</button>
-        <button class="tab" data-profile-tab="launcher">Лаунчер</button>
-        <button class="tab" data-profile-tab="sub">Подписка</button>
-      </div>
-
-      <div id="profileTabInfo" class="modal-form">
-        <div class="profile-rows">
-          <div class="profile-row">
-            <span>Статус</span>
-            <span id="profileSub"></span>
-          </div>
-          <div class="profile-row">
-            <span>Дата регистрации</span>
-            <span id="profileDate"></span>
-          </div>
-        </div>
-        <button class="btn primary wide hidden" id="profileOwnerBtn">Панель владельца</button>
-        <button class="btn danger wide" id="profileLogoutBtn">Выйти из аккаунта</button>
-      </div>
-
-      <div id="profileTabLauncher" class="modal-form hidden">
-        <div class="profile-rows">
-          <div class="profile-row">
-            <span>Активные подписки</span>
-            <span id="launcherSubs"></span>
-          </div>
-        </div>
-        <div id="launcherGate" class="hidden">
-          <p class="hint center">Для скачивания нужна подписка. Подписка не продаётся — активируйте код во вкладке «Подписка».</p>
-          <button class="btn primary wide" id="toSubTabBtn">Перейти к подписке</button>
-        </div>
-        <div id="launcherDownloads" class="hidden">
-          <div class="download-list" id="downloadList"></div>
-          <div class="status hidden" id="errorState">
-            <p>Лаунчер пока не загружен.</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="profileTabSub" class="modal-form hidden">
-        <div class="sub-plans">
-          <div class="sub-plan">
-            <div class="sub-plan-name">1 месяц</div>
-            <div class="sub-plan-price">—</div>
-            <span class="badge nosub">Недоступно</span>
-          </div>
-          <div class="sub-plan">
-            <div class="sub-plan-name">Навсегда</div>
-            <div class="sub-plan-price">—</div>
-            <span class="badge nosub">Недоступно</span>
-          </div>
-        </div>
-        <p class="hint center">Подписка сейчас не продаётся. Есть код от владельца? Активируйте его:</p>
-        <label class="field-label" for="subCodeInput">Код активации</label>
-        <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-TESTER-XXXXXX" spellcheck="false" autocomplete="off">
-        <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
-        <div class="status" id="subStatus"></div>
-      </div>
     </div>
   </div>
 

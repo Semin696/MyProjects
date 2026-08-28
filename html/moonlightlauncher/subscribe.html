@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подписка — MoonLight Visual</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="stars" aria-hidden="true"></div>
+  <div class="moon-glow" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="brand" href="index.html">
+      <img src="logo.png" alt="" class="brand-logo">
+      <span>MoonLight <span class="accent">Visual</span></span>
+    </a>
+    <div class="auth-area" id="authArea"></div>
+  </header>
+
+  <main>
+    <section class="section section-narrow">
+      <h2>Подписка</h2>
+
+      <div class="card download-card">
+        <div id="guestGate" class="hidden">
+          <p class="hint center">Войдите в аккаунт, чтобы управлять подпиской.</p>
+          <a class="btn primary wide" href="index.html">Войти на главной странице</a>
+        </div>
+
+        <div id="subPage" class="hidden">
+          <div class="profile-rows">
+            <div class="profile-row">
+              <span>Активные подписки</span>
+              <span id="subsBadge"></span>
+            </div>
+          </div>
+
+          <p class="hint center">Подписка не продаётся — она выдаётся владельцем по коду.</p>
+
+          <div class="sub-plans single">
+            <div class="sub-plan">
+              <div class="sub-plan-name">Навсегда</div>
+              <div class="sub-plan-price">9 999 ₽</div>
+              <span class="badge nosub">Недоступно</span>
+            </div>
+          </div>
+
+          <label class="field-label" for="subCodeInput">Код активации</label>
+          <input type="text" id="subCodeInput" class="input mono-input" placeholder="MONO-SUB-XXXXXX" spellcheck="false" autocomplete="off">
+          <button class="btn primary wide" id="subActivateBtn">Активировать код</button>
+          <div class="status" id="subStatus"></div>
+
+          <div class="owner-block hidden" id="subOwnerBlock">
+            <p class="hint center">Функция владельца: создание ключей активации.</p>
+            <label class="field-label" for="keyType">Тип ключа</label>
+            <select id="keyType" class="input">
+              <option value="tester">Тестер — MONO-TESTER-XXXXXX</option>
+              <option value="sub">Подписка — MONO-SUB-XXXXXX</option>
+              <option value="owner">Владелец — MONO-OWNER-XXXXXX</option>
+            </select>
+            <button class="btn primary wide" id="tabGenKeyBtn">Создать ключ активации</button>
+            <div class="status" id="tabGenKeyStatus"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 MoonLight Visual</p>
+  </footer>
+
+  <script src="subscribe.js"></script>
+</body>
+</html>

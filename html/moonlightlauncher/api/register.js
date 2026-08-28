@@ -1,4 +1,4 @@
-const { OWNER_CODE, getPool, ensureSchema, json, readBody, sha256, makeSalt, makeToken } = require('./_lib');
+const { OWNER_CODE, getPool, ensureSchema, json, readBody, sha256, makeSalt, makeToken, encryptText } = require('./_lib');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Метод не поддерживается' });
@@ -6,6 +6,7 @@ module.exports = async (req, res) => {
     const body = await readBody(req);
     const username = String(body.username || '').trim();
     const password = String(body.password || '');
+    const email = String(body.email || '').trim().toLowerCase();
     const code = String(body.code || '').trim();
 
     if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
@@ -14,6 +15,9 @@ module.exports = async (req, res) => {
     if (password.length < 4) {
       return json(res, 400, { error: 'Пароль минимум 4 символа' });
     }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return json(res, 400, { error: 'Введите корректный email' });
+    }
 
     await ensureSchema();
     const db = getPool();
@@ -21,6 +25,10 @@ module.exports = async (req, res) => {
     const [existing] = await db.execute('SELECT id FROM mlv_users WHERE username = ?', [username]);
     if (existing.length > 0) {
       return json(res, 409, { error: 'Такой никнейм уже занят' });
+    }
+    const [existingEmail] = await db.execute('SELECT id FROM mlv_users WHERE email = ?', [email]);
+    if (existingEmail.length > 0) {
+      return json(res, 409, { error: 'Этот email уже используется' });
     }
 
     let role = 'user';
@@ -50,8 +58,8 @@ module.exports = async (req, res) => {
     const salt = makeSalt();
     const hash = sha256(salt + password);
     const [result] = await db.execute(
-      'INSERT INTO mlv_users (username, pass_hash, salt, role, subscribed) VALUES (?, ?, ?, ?, ?)',
-      [username, hash, salt, role, subscribed]
+      'INSERT INTO mlv_users (username, pass_hash, salt, role, subscribed, email, pass_enc) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [username, hash, salt, role, subscribed, email, encryptText(password)]
     );
 
     if (codeRow) {
