@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bogdemon — плагины, панели, веб</title>
+  <meta name="description" content="bogdemon: Minecraft-плагины на Paper 1.21, веб-консоли и серверные панели. Дуэли, империи, защита, живой админ-стек. Техпомощник MaliceVisuals.">
+  <meta name="theme-color" content="#070304">
+  <meta property="og:title" content="bogdemon — portfolio">
+  <meta property="og:description" content="Плагины, веб-консоли и живые панели для Minecraft-серверов.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "bogdemon",
+    "jobTitle": "Minecraft plugin & web developer",
+    "knowsAbout": ["Java", "Paper", "JavaScript", "WebSocket", "Discord OAuth"]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#work">К работам</a>
+  <div class="voidscape" aria-hidden="true">
+    <div class="void-veil"></div>
+    <div class="void-nebula n-a"></div>
+    <div class="void-nebula n-b"></div>
+    <div class="void-nebula n-c"></div>
+    <div class="void-portal"></div>
+    <div class="void-runes"></div>
+    <div class="void-smoke"></div>
+    <canvas id="embers"></canvas>
+    <div class="void-vignette"></div>
+  </div>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="pointer-glow" aria-hidden="true"></div>
+  <div class="progress" aria-hidden="true"><span></span></div>
+
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="icon-swords" viewBox="0 0 64 64">
+      <path d="M14 50 L42 14 M42 14 h8 v8 M22 50 h-8 v-8 M50 14 L22 50" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M28 28 l8 8 M20 44 l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-console" viewBox="0 0 64 64">
+      <rect x="8" y="12" width="48" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M16 26 l8 6 -8 6 M28 38 h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-map" viewBox="0 0 64 64">
+      <path d="M12 18 l14-6 12 6 14-6 v38 l-14 6 -12-6 -14 6 z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="30" cy="30" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M30 35 v10" stroke="currentColor" stroke-width="2" fill="none"/>
+    </symbol>
+    <symbol id="icon-shield" viewBox="0 0 64 64">
+      <path d="M32 8 l20 8 v16 c0 14-8 22-20 26 C20 54 12 46 12 32 V16 z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M22 32 l8 8 14-16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-reload" viewBox="0 0 64 64">
+      <path d="M50 32 a18 18 0 1 1-5-12.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M46 12 v10 h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-rocket" viewBox="0 0 64 64">
+      <path d="M40 8 c10 10 10 28 0 40 L32 40 24 48 C14 38 14 20 24 8 L40 8 z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="34" cy="24" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M20 44 l-8 12 M28 52 l-4 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-poll" viewBox="0 0 64 64">
+      <path d="M14 50 V28 M28 50 V16 M42 50 V34 M56 50 V22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-core" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M32 12 v8 M32 44 v8 M12 32 h8 M44 32 h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 64 64">
+      <path d="M40 14 a20 20 0 1 0 10 34 A16 16 0 0 1 40 14 z" fill="none" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="mark" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="50" cy="56" r="30"/>
+        <circle cx="50" cy="56" r="21" stroke-dasharray="4 7"/>
+        <path d="M38 38 C26 26 22 14 26 8 C31 18 38 30 44 38"/>
+        <path d="M62 38 C74 26 78 14 74 8 C69 18 62 30 56 38"/>
+        <path d="M50 22 v52"/>
+        <path d="M34 54 h32"/>
+        <path d="M50 74 l-11 10 M50 74 l11 10"/>
+        <circle cx="50" cy="54" r="5"/>
+      </g>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24">
+      <path d="M8 5.5 v13 l11-6.5 z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24">
+      <path d="M7 5 h4 v14 H7 z M13 5 h4 v14 h-4 z" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="nav" id="nav">
+    <a class="brand" href="#top">
+      <svg class="sigil" viewBox="0 0 100 100" aria-hidden="true">
+        <use href="#mark"/>
+      </svg>
+      <span>bogdemon</span>
+    </a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+      <span class="sr-only">Меню</span>
+    </button>
+    <nav class="menu" id="menu">
+      <a href="#work">Работы</a>
+      <a href="#listen">Слушать</a>
+      <a href="#stack">Стек</a>
+      <a href="#about">Обо мне</a>
+      <a href="#contact" class="nav-cta">Связь</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="kicker reveal">Paper 1.21 · Web · Infra</p>
+        <h1 class="reveal delay-1">
+          <span class="name-bog">bog</span><span class="name-demon">demon</span>
+        </h1>
+        <p class="lead reveal delay-2">Пишу ядро серверов: плагины и живые панели. Игрок видит мир — я собираю швы между Java, вебом и админкой.</p>
+        <div class="hero-actions reveal delay-3">
+          <a class="btn primary" href="#work">Смотреть работы</a>
+          <a class="btn ghost" href="#listen">Слушать атмосферу</a>
+        </div>
+        <ul class="stats reveal delay-4">
+          <li><strong>12+</strong><span>модулей</span></li>
+          <li><strong>1.21</strong><span>Paper API</span></li>
+          <li><strong>live</strong><span>WebSocket</span></li>
+          <li><strong>help</strong><span>техпомощник</span></li>
+        </ul>
+      </div>
+      <div class="hero-mark reveal delay-2" aria-hidden="true">
+        <div class="portal"></div>
+        <svg class="sigil-lg" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f3ebe3"/>
+              <stop offset="45%" stop-color="#e8c39e"/>
+              <stop offset="100%" stop-color="#c1121f"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#metal)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="50" cy="56" r="30"/>
+            <circle cx="50" cy="56" r="21" stroke-dasharray="4 7"/>
+            <path d="M38 38 C26 26 22 14 26 8 C31 18 38 30 44 38"/>
+            <path d="M62 38 C74 26 78 14 74 8 C69 18 62 30 56 38"/>
+            <path d="M50 22 v52"/>
+            <path d="M34 54 h32"/>
+            <path d="M50 74 l-11 10 M50 74 l11 10"/>
+            <circle cx="50" cy="54" r="5"/>
+          </g>
+        </svg>
+        <p class="now"><span class="pulse"></span> сейчас: дуэли, консоли, MCRU</p>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Java</span><span>Paper 1.21</span><span>JavaScript</span><span>WebSocket</span><span>HTML/CSS</span><span>PHP</span><span>Vite</span><span>React</span><span>Discord OAuth</span><span>PlaceholderAPI</span><span>LuckPerms</span><span>CMI</span><span>GitHub Pages</span><span>Vercel</span>
+        <span>Java</span><span>Paper 1.21</span><span>JavaScript</span><span>WebSocket</span><span>HTML/CSS</span><span>PHP</span><span>Vite</span><span>React</span><span>Discord OAuth</span><span>PlaceholderAPI</span><span>LuckPerms</span><span>CMI</span><span>GitHub Pages</span><span>Vercel</span>
+      </div>
+    </div>
+
+    <section class="section" id="work">
+      <header class="section-head reveal">
+        <p class="kicker">Артефакты</p>
+        <h2>Выбранные работы</h2>
+        <p class="section-lead">Не витрина шаблонов — вещи, которые крутятся на живых серверах: PvP, территории, защита, админка в браузере.</p>
+      </header>
+
+      <div class="filters reveal" role="tablist" aria-label="Фильтр работ">
+        <button class="chip is-on" type="button" data-filter="all" aria-selected="true">Все</button>
+        <button class="chip" type="button" data-filter="plugin">Плагины</button>
+        <button class="chip" type="button" data-filter="web">Веб</button>
+        <button class="chip" type="button" data-filter="infra">Инфра</button>
+      </div>
+
+      <div class="work-grid" id="workGrid">
+        <article class="work-card featured" data-kind="plugin" tabindex="0"
+          data-title="Duels"
+          data-meta="Плагин · Paper 1.21"
+          data-stack="Java, CMI kits, PlaceholderAPI, arenas"
+          data-desc="Дуэли 1v1: вызов игрока, выбор кита и карты, изоляция мира, статистика и выдача наборов. Админ-команды, меню выбора, защита арен — чтобы PvP не расползался по SMP.">
+          <div class="work-visual v-blood">
+            <svg><use href="#icon-swords"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>01</span><span>Плагин</span></div>
+            <h3>Duels</h3>
+            <p>Вызов, киты CMI, арены и статистика. Дуэль как отдельный контур, а не хаос на спавне.</p>
+            <ul class="tags"><li>Java</li><li>Paper</li><li>CMI</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card featured" data-kind="web" tabindex="0"
+          data-title="SpaceTrace Console"
+          data-meta="Веб · WebSocket"
+          data-stack="HTML/JS, WebSocket, ConnectApi, GitHub Pages"
+          data-desc="Сайт сервера в космическом стиле плюс панель и живая консоль. Плагин ConnectApi держит мост: вход по нику, статус, команды, форвард логов. Статика на GitHub Pages, сервер отвечает по WebSocket.">
+          <div class="work-visual v-gold">
+            <svg><use href="#icon-console"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>02</span><span>Веб + API</span></div>
+            <h3>SpaceTrace Console</h3>
+            <p>Админка в браузере: консоль, статус, команды. Плагин ConnectApi — мост до ядра.</p>
+            <ul class="tags"><li>WebSocket</li><li>Java</li><li>HTML</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="plugin" tabindex="0"
+          data-title="Impers"
+          data-meta="Плагин · территории"
+          data-stack="Java, Paper, territory stick"
+          data-desc="Империи на карте: палка выделения, создание тега, список и снос. Территория как игровой слой, а не абстрактный регион в конфиге.">
+          <div class="work-visual v-ember">
+            <svg><use href="#icon-map"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>03</span><span>Плагин</span></div>
+            <h3>Impers</h3>
+            <p>Империи и претензии на землю. Выделил — назвал — держишь фронтир.</p>
+            <ul class="tags"><li>Java</li><li>World</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="plugin" tabindex="0"
+          data-title="CheatShield"
+          data-meta="Плагин · защита"
+          data-stack="Java, IP bans, Paper"
+          data-desc="CheatShield Protection: бан по IP, снятие с админ-команды. Короткий контур защиты, который не мешает ядру, но режет повторные заходы.">
+          <div class="work-visual v-ash">
+            <svg><use href="#icon-shield"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>04</span><span>Плагин</span></div>
+            <h3>CheatShield</h3>
+            <p>IP-баны и снятие блокировок. Защита без лишней панели на 40 кнопок.</p>
+            <ul class="tags"><li>Java</li><li>Security</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="infra" tabindex="0"
+          data-title="Plugin Reloader"
+          data-meta="Инфра · plugin reloader"
+          data-stack="Java, plugin lifecycle, hot reload"
+          data-desc="Plugin Reloader: перезагрузка, включение и выключение плагинов без полного рестарта сервера. Load из папки plugins, reloadall, права по операциям — правка ядра на горячую.">
+          <div class="work-visual v-bone">
+            <svg><use href="#icon-reload"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>05</span><span>Инфра</span></div>
+            <h3>Plugin Reloader</h3>
+            <p>Hot-reload плагинов без полного рестарта. Правка на живом сервере, без простоя на две минуты.</p>
+            <ul class="tags"><li>Java</li><li>Reload</li><li>Ops</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="web" tabindex="0"
+          data-title="MaliceVisuals"
+          data-meta="Веб · техпомощник"
+          data-stack="HTML/CSS/JS, PHP API, auth, поддержка"
+          data-desc="Техпомощник на MaliceVisuals: сайт, бэкенд, кабинет, коды и загрузки. Не автор лаунчера — помогаю держать веб и инфраструктуру, чтобы игроки заходили без сюрпризов.">
+          <div class="work-visual v-blood">
+            <svg><use href="#icon-rocket"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>06</span><span>Роль</span></div>
+            <h3>MaliceVisuals</h3>
+            <p>Техпомощник: сайт, бэкенд, поддержка. Лаунчер — не мой продукт, я в контуре помощи.</p>
+            <ul class="tags"><li>Support</li><li>JS</li><li>PHP</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="web" tabindex="0"
+          data-title="Опросник"
+          data-meta="Веб · Discord"
+          data-stack="React, Vite, Discord OAuth, GitHub API"
+          data-desc="Опросы с входом через Discord. Голоса в общем хранилище, админка по ролям, пинг участников когда опрос закрыт. Чёрно-лаймовый интерфейс, заточенный под комьюнити сервера.">
+          <div class="work-visual v-gold">
+            <svg><use href="#icon-poll"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>07</span><span>Веб</span></div>
+            <h3>Опросник</h3>
+            <p>Discord OAuth, живые голоса, админ по ролям. Решения сервера — не в чате на 400 сообщений.</p>
+            <ul class="tags"><li>React</li><li>OAuth</li></ul>
+          </div>
+        </article>
+
+        <article class="work-card" data-kind="plugin" tabindex="0"
+          data-title="MCRU plugin"
+          data-meta="Плагин · MCRLSMP"
+          data-stack="Java, Paper, TPA, teams, homes, seasons, LuckPerms"
+          data-desc="Ядро SMP для MCRU (MCRLSMP): телепорты, кланы, дома, сезоны, подписки, vanish и gamemode. Бытовой слой сервера — то, без чего выживание держится как мир, а не как одиночная сессия.">
+          <div class="work-visual v-ember">
+            <svg><use href="#icon-core"/></svg>
+          </div>
+          <div class="work-body">
+            <div class="work-meta"><span>08</span><span>Плагин</span></div>
+            <h3>MCRU plugin</h3>
+            <p>TPA, кланы, дома, сезоны, подписки — ядро MCRLSMP в одном модуле.</p>
+            <ul class="tags"><li>Java</li><li>MCRU</li><li>SMP</li></ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="stack">
+      <header class="section-head reveal">
+        <p class="kicker">Инструменты</p>
+        <h2>Стек без лишнего</h2>
+        <p class="section-lead">Фреймворк появляется когда без него больнее. До этого — Java на ядре и тонкий веб, который открывается сразу.</p>
+      </header>
+      <div class="bento">
+        <article class="bento-card reveal">
+          <h3>Сервер</h3>
+          <p>Paper 1.21, события, миры, киты, права. Плагин как продукт, а не свалка команд.</p>
+          <ul class="tags"><li>Java</li><li>Paper</li><li>PAPI</li><li>LuckPerms</li><li>CMI</li></ul>
+        </article>
+        <article class="bento-card reveal delay-1">
+          <h3>Веб</h3>
+          <p>Статика, кабинеты, OAuth, панели. Если нужен SPA — Vite/React. Если нет — чистый HTML.</p>
+          <ul class="tags"><li>HTML</li><li>CSS</li><li>JS</li><li>PHP</li><li>React</li></ul>
+        </article>
+        <article class="bento-card reveal delay-2">
+          <h3>Связки</h3>
+          <p>Браузер говорит с сервером. Discord пускает своих. Админ не заходит по SSH ради /say.</p>
+          <ul class="tags"><li>WebSocket</li><li>Discord</li><li>GitHub Pages</li><li>Vercel</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section about" id="about">
+      <header class="section-head reveal">
+        <p class="kicker">Профиль</p>
+        <h2>Обо мне</h2>
+      </header>
+      <div class="about-grid">
+        <div class="about-copy reveal">
+          <p>Я собираю серверные экосистемы: от Paper-плагинов до сайтов и админ-панелей. Дуэли с китами, империи на карте, защита по IP, консоль в браузере — один стек, чтобы куски не жили в разных вселенных. На MaliceVisuals — техпомощник, не автор лаунчера.</p>
+          <p>Ник <strong>bogdemon</strong>. Discord — <strong>demindemon</strong>. Пишу так, чтобы админ мог поменять поведение без шаманства, а игрок не видел, что под миром ещё три слоя Java и веб-мост.</p>
+          <ul class="facts">
+            <li>Плагины под живой SMP, не под демо-мир</li>
+            <li>Веб, который стыкуется с ядром, а не просто «красивый сайт»</li>
+            <li>Операционка: reload, консоль, роли, подписки</li>
+          </ul>
+        </div>
+        <aside class="term reveal delay-1" aria-label="Терминал">
+          <div class="term-bar"><span></span><span></span><span></span><em>bogdemon@nightfall</em></div>
+          <pre><code><span class="cmt"># whoami</span>
+<span class="cmd">bogdemon</span>
+<span class="cmt"># stack</span>
+java · paper · js · websocket
+<span class="cmt"># focus</span>
+minecraft ecosystems
+<span class="cmt"># now</span>
+duels · connectapi · mcru
+<span class="blink">█</span></code></pre>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section listen" id="listen">
+      <header class="section-head reveal">
+        <p class="kicker">Атмосфера</p>
+        <h2>Ember Veil</h2>
+        <p class="section-lead">Оригинальный эмбиент, собранный в браузере. Ничьих треков — только гул пустоты под этот сайт.</p>
+      </header>
+      <div class="altar reveal" data-player>
+        <div class="disc" id="disc" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><use href="#mark"/></svg>
+        </div>
+        <div class="altar-body">
+          <p class="player-kicker">bogdemon · original</p>
+          <h3>Ember Veil</h3>
+          <p class="player-sub">32 секунды петли · низкий дрон и тлеющие искры</p>
+          <div class="vis" id="vis" aria-hidden="true"></div>
+          <div class="player-row">
+            <button class="play-btn" type="button" data-play aria-pressed="false" aria-label="Играть Ember Veil">
+              <svg class="i-play" viewBox="0 0 24 24"><use href="#icon-play"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24"><use href="#icon-pause"/></svg>
+            </button>
+            <div class="seek-wrap">
+              <input class="seek" data-seek type="range" min="0" max="32" step="0.05" value="0" aria-label="Позиция">
+              <div class="times"><span data-now>0:00</span><span data-dur>0:32</span></div>
+            </div>
+            <label class="vol-wrap">
+              <span class="sr-only">Громкость</span>
+              <input class="vol" data-vol type="range" min="0" max="100" value="55" aria-label="Громкость">
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact">
+      <div class="contact-frame reveal">
+        <p class="kicker">Контакт</p>
+        <h2>Соберём сервер<br>без швов</h2>
+        <p>Плагин, панель или веб-контур. Напишите в Discord <strong>demindemon</strong> — короткий бриф важнее длинного ТЗ.</p>
+        <div class="contact-row">
+          <button class="btn primary" type="button" id="copyDiscord" data-nick="demindemon">Скопировать Discord</button>
+          <a class="btn ghost" href="#work">Ещё раз работы</a>
+        </div>
+        <p class="hint" id="copyHint" hidden>Ник скопирован: demindemon</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>© <span id="year">2026</span> bogdemon</span>
+    <span class="foot-mark">не шаблон. ядро.</span>
+  </footer>
+
+  <aside class="dock" id="dock" role="region" aria-label="Медиаплеер">
+    <button class="play-btn dock-play" type="button" data-play aria-pressed="false" aria-label="Играть Ember Veil">
+      <svg class="i-play" viewBox="0 0 24 24"><use href="#icon-play"/></svg>
+      <svg class="i-pause" viewBox="0 0 24 24"><use href="#icon-pause"/></svg>
+    </button>
+    <div class="dock-meta">
+      <strong>Ember Veil</strong>
+      <span>bogdemon · ambient</span>
+    </div>
+    <input class="seek dock-seek" data-seek type="range" min="0" max="32" step="0.05" value="0" aria-label="Позиция">
+    <span class="dock-time" data-now>0:00</span>
+    <label class="vol-wrap dock-vol">
+      <span class="sr-only">Громкость</span>
+      <input class="vol" data-vol type="range" min="0" max="100" value="55" aria-label="Громкость">
+    </label>
+  </aside>
+
+  <dialog class="modal" id="modal">
+    <div class="modal-inner">
+      <button class="modal-close" type="button" id="modalClose" aria-label="Закрыть">×</button>
+      <p class="kicker" id="modalMeta"></p>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDesc"></p>
+      <p class="modal-stack" id="modalStack"></p>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
