@@ -353,15 +353,15 @@
       if (p.y < -120) p.y = h + 80;
       if (p.y > h + 120) p.y = -80;
       const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-      g.addColorStop(0, `rgba(193, 18, 31, ${p.a})`);
-      g.addColorStop(1, "rgba(193, 18, 31, 0)");
+      g.addColorStop(0, `rgba(255, 106, 0, ${p.a})`);
+      g.addColorStop(1, "rgba(255, 106, 0, 0)");
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.strokeStyle = "rgba(232, 195, 158, 0.09)";
+    ctx.strokeStyle = "rgba(255, 140, 42, 0.14)";
     ctx.lineWidth = 1;
     rings.forEach((ring) => {
       ring.rot += ring.v;
@@ -384,8 +384,8 @@
       if (p.y < -10 || p.a <= 0) Object.assign(p, spawnSpark(), { y: h + 4 });
       ctx.beginPath();
       ctx.fillStyle = p.gold
-        ? `rgba(232, 195, 158, ${p.a})`
-        : `rgba(255, 120, 70, ${p.a})`;
+        ? `rgba(255, 168, 56, ${p.a})`
+        : `rgba(255, 106, 0, ${p.a})`;
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fill();
     });

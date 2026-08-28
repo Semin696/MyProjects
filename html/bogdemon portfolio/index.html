@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>bogdemon — плагины, панели, веб</title>
   <meta name="description" content="bogdemon: Minecraft-плагины на Paper 1.21, веб-консоли и серверные панели. Дуэли, империи, защита, живой админ-стек. Техпомощник MaliceVisuals.">
-  <meta name="theme-color" content="#070304">
+  <meta name="theme-color" content="#050505">
   <meta property="og:title" content="bogdemon — portfolio">
   <meta property="og:description" content="Плагины, веб-консоли и живые панели для Minecraft-серверов.">
   <meta property="og:type" content="website">
@@ -81,16 +81,10 @@
       <path d="M40 14 a20 20 0 1 0 10 34 A16 16 0 0 1 40 14 z" fill="none" stroke="currentColor" stroke-width="2"/>
     </symbol>
     <symbol id="mark" viewBox="0 0 100 100">
-      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="50" cy="56" r="30"/>
-        <circle cx="50" cy="56" r="21" stroke-dasharray="4 7"/>
-        <path d="M38 38 C26 26 22 14 26 8 C31 18 38 30 44 38"/>
-        <path d="M62 38 C74 26 78 14 74 8 C69 18 62 30 56 38"/>
-        <path d="M50 22 v52"/>
-        <path d="M34 54 h32"/>
-        <path d="M50 74 l-11 10 M50 74 l11 10"/>
-        <circle cx="50" cy="54" r="5"/>
+      <g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="miter" stroke-linecap="square">
+        <path d="M20 10 L38 26 L50 18 L62 26 L80 10 L86 30 L80 70 L50 96 L20 70 L14 30 Z"/>
       </g>
+      <polygon points="50,36 66,68 50,58 34,68" fill="currentColor"/>
     </symbol>
     <symbol id="icon-play" viewBox="0 0 24 24">
       <path d="M8 5.5 v13 l11-6.5 z" fill="currentColor"/>
@@ -142,23 +136,7 @@
       <div class="hero-mark reveal delay-2" aria-hidden="true">
         <div class="portal"></div>
         <svg class="sigil-lg" viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f3ebe3"/>
-              <stop offset="45%" stop-color="#e8c39e"/>
-              <stop offset="100%" stop-color="#c1121f"/>
-            </linearGradient>
-          </defs>
-          <g fill="none" stroke="url(#metal)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="50" cy="56" r="30"/>
-            <circle cx="50" cy="56" r="21" stroke-dasharray="4 7"/>
-            <path d="M38 38 C26 26 22 14 26 8 C31 18 38 30 44 38"/>
-            <path d="M62 38 C74 26 78 14 74 8 C69 18 62 30 56 38"/>
-            <path d="M50 22 v52"/>
-            <path d="M34 54 h32"/>
-            <path d="M50 74 l-11 10 M50 74 l11 10"/>
-            <circle cx="50" cy="54" r="5"/>
-          </g>
+          <use href="#mark"/>
         </svg>
         <p class="now"><span class="pulse"></span> сейчас: дуэли, консоли, MCRU</p>
       </div>

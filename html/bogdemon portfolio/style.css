@@ -1,13 +1,13 @@
 :root {
-  --void: #070304;
-  --void-2: #12080a;
-  --blood: #c1121f;
-  --blood-dim: rgba(193, 18, 31, .18);
-  --ember: #ff6b35;
-  --gold: #e8c39e;
-  --bone: #f3ebe3;
-  --ash: #8a7d73;
-  --line: rgba(232, 195, 158, .16);
+  --void: #050505;
+  --void-2: #0c0c0c;
+  --blood: #ff6a00;
+  --blood-dim: rgba(255, 106, 0, .18);
+  --ember: #ff8a1a;
+  --gold: #ff9a1f;
+  --bone: #f2f0ed;
+  --ash: #8d8a86;
+  --line: rgba(255, 106, 0, .2);
   --font-display: "Cinzel", Georgia, serif;
   --font: "Outfit", system-ui, sans-serif;
   --radius: 4px;
@@ -112,9 +112,9 @@ button {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(120, 24, 28, .35), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 100% 80%, rgba(80, 20, 14, .28), transparent 50%),
-    radial-gradient(ellipse 45% 35% at 0% 70%, rgba(232, 195, 158, .07), transparent 55%);
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255, 106, 0, .22), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 80%, rgba(255, 80, 0, .16), transparent 50%),
+    radial-gradient(ellipse 45% 35% at 0% 70%, rgba(255, 154, 31, .08), transparent 55%);
 }
 
 .void-nebula {
@@ -130,7 +130,7 @@ button {
 .void-nebula.n-a {
   top: -18%;
   right: -12%;
-  background: radial-gradient(circle, rgba(193, 18, 31, .55), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 106, 0, .55), transparent 68%);
   animation: nebulaA 28s ease-in-out infinite alternate;
 }
 
@@ -148,7 +148,7 @@ button {
   left: 35%;
   width: 40vmax;
   height: 40vmax;
-  background: radial-gradient(circle, rgba(232, 195, 158, .16), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 140, 42, .16), transparent 68%);
   animation: nebulaC 22s ease-in-out infinite alternate;
 }
 
@@ -160,7 +160,7 @@ button {
   top: 42%;
   translate: -50% -50%;
   border-radius: 50%;
-  background: conic-gradient(from 180deg, transparent 0 48%, rgba(193, 18, 31, .28), rgba(232, 195, 158, .16), transparent 78%);
+  background: conic-gradient(from 180deg, transparent 0 48%, rgba(255, 106, 0, .28), rgba(255, 140, 42, .16), transparent 78%);
   filter: blur(36px);
   opacity: .5;
   animation: spin 52s linear infinite;
@@ -170,7 +170,7 @@ button {
   position: absolute;
   inset: -25%;
   opacity: .11;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23e8c39e' stroke-width='1'%3E%3Ccircle cx='60' cy='60' r='38'/%3E%3Ccircle cx='60' cy='60' r='26' stroke-dasharray='3 8'/%3E%3Cpath d='M60 22 v76 M28 60 h64'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ff6a00' stroke-width='1'%3E%3Ccircle cx='60' cy='60' r='38'/%3E%3Ccircle cx='60' cy='60' r='26' stroke-dasharray='3 8'/%3E%3Cpath d='M60 22 v76 M28 60 h64'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 340px 340px;
   animation: runeDrift 90s linear infinite;
 }
@@ -204,7 +204,7 @@ body.is-playing .void-portal {
 
 .pointer-glow {
   z-index: 0;
-  background: radial-gradient(320px 320px at var(--mx, 50%) var(--my, 20%), rgba(193, 18, 31, .16), transparent 55%);
+  background: radial-gradient(320px 320px at var(--mx, 50%) var(--my, 20%), rgba(255, 106, 0, .16), transparent 55%);
 }
 
 .progress {
@@ -257,9 +257,10 @@ body.is-playing .void-portal {
 }
 
 .brand .sigil {
-  width: 28px;
-  height: 28px;
-  color: var(--gold);
+  width: 32px;
+  height: 32px;
+  color: var(--ember);
+  overflow: visible;
 }
 
 .menu {
@@ -342,7 +343,7 @@ body.is-playing .void-portal {
   height: 55vw;
   top: -10%;
   right: -12%;
-  background: radial-gradient(circle, rgba(193, 18, 31, .28), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 106, 0, .28), transparent 68%);
 }
 
 .hero::after {
@@ -350,7 +351,7 @@ body.is-playing .void-portal {
   height: 40vw;
   bottom: 0;
   left: -8%;
-  background: radial-gradient(circle, rgba(232, 195, 158, .08), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 140, 42, .08), transparent 70%);
 }
 
 .kicker {
@@ -413,8 +414,8 @@ h1 {
 }
 
 .btn.primary {
-  background: linear-gradient(120deg, #e8c39e, #ff8a5b 40%, #c1121f);
-  color: #1a0708;
+  background: linear-gradient(120deg, #ffb347 0%, #ff6a00 55%, #e25700 100%);
+  color: #050505;
 }
 
 .btn.ghost {
@@ -465,7 +466,7 @@ h1 {
   width: min(78%, 420px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: conic-gradient(from 140deg, transparent 0 40%, rgba(193, 18, 31, .55), rgba(232, 195, 158, .35), transparent 72%);
+  background: conic-gradient(from 140deg, transparent 0 40%, rgba(255, 106, 0, .55), rgba(255, 140, 42, .35), transparent 72%);
   filter: blur(8px);
   animation: spin 22s linear infinite;
 }
@@ -473,7 +474,9 @@ h1 {
 .sigil-lg {
   position: relative;
   width: min(72%, 340px);
-  filter: drop-shadow(0 0 28px rgba(193, 18, 31, .35));
+  color: var(--ember);
+  overflow: visible;
+  filter: drop-shadow(0 0 28px rgba(255, 106, 0, .45));
   animation: float 7s ease-in-out infinite;
 }
 
@@ -587,7 +590,7 @@ h2 {
 
 .work-card:hover,
 .work-card:focus-visible {
-  border-color: rgba(232, 195, 158, .45);
+  border-color: rgba(255, 140, 42, .45);
   outline: none;
 }
 
@@ -625,11 +628,11 @@ h2 {
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .35));
 }
 
-.v-blood::before { background: radial-gradient(circle at 30% 20%, #5a1018, #1a0709 70%); }
-.v-gold::before { background: radial-gradient(circle at 70% 30%, #4a3728, #120c0a 72%); }
-.v-ember::before { background: radial-gradient(circle at 40% 80%, #5a2a14, #100806 70%); }
-.v-ash::before { background: radial-gradient(circle at 20% 40%, #2c2422, #0c0808 70%); }
-.v-bone::before { background: radial-gradient(circle at 80% 20%, #3a322c, #0e0908 70%); }
+.v-blood::before { background: radial-gradient(circle at 30% 20%, #3d2208, #0a0a0a 70%); }
+.v-gold::before { background: radial-gradient(circle at 70% 30%, #4a2a08, #080808 72%); }
+.v-ember::before { background: radial-gradient(circle at 40% 80%, #5a2e00, #070707 70%); }
+.v-ash::before { background: radial-gradient(circle at 20% 40%, #1a1a1a, #080808 70%); }
+.v-bone::before { background: radial-gradient(circle at 80% 20%, #2a1c0a, #090909 70%); }
 
 .work-body {
   padding: 20px 20px 22px;
@@ -717,7 +720,7 @@ h3 {
 
 .term {
   border: 1px solid var(--line);
-  background: #0c0708;
+  background: #0a0a0a;
   overflow: hidden;
 }
 
@@ -733,12 +736,12 @@ h3 {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #3a2a28;
+  background: #2a2a2a;
 }
 
-.term-bar span:nth-child(1) { background: #c1121f; }
-.term-bar span:nth-child(2) { background: #e8c39e; }
-.term-bar span:nth-child(3) { background: #8a7d73; }
+.term-bar span:nth-child(1) { background: #ff6a00; }
+.term-bar span:nth-child(2) { background: #ff9a1f; }
+.term-bar span:nth-child(3) { background: #3a3a3a; }
 
 .term-bar em {
   margin-left: 8px;
@@ -768,7 +771,7 @@ h3 {
   padding: clamp(32px, 6vw, 72px);
   border: 1px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(193, 18, 31, .12), transparent 45%),
+    linear-gradient(180deg, rgba(255, 106, 0, .12), transparent 45%),
     rgba(255, 255, 255, .02);
 }
 
@@ -831,7 +834,7 @@ h3 {
 .modal {
   width: min(560px, calc(100% - 32px));
   border: 1px solid var(--line);
-  background: #11080a;
+  background: #0a0a0a;
   color: var(--bone);
   padding: 0;
 }
@@ -993,7 +996,7 @@ h3 {
   padding: 28px;
   border: 1px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(193, 18, 31, .1), transparent 50%),
+    linear-gradient(180deg, rgba(255, 106, 0, .1), transparent 50%),
     rgba(255, 255, 255, .02);
 }
 
@@ -1004,12 +1007,12 @@ h3 {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--gold);
+  color: var(--ember);
   background:
-    radial-gradient(circle at 35% 30%, rgba(243, 235, 227, .18), transparent 40%),
-    radial-gradient(circle at 50% 50%, #1a0a0c, #070304 72%);
-  border: 1px solid rgba(232, 195, 158, .35);
-  box-shadow: 0 0 40px rgba(193, 18, 31, .25), inset 0 0 24px rgba(0, 0, 0, .6);
+    radial-gradient(circle at 35% 30%, rgba(255, 140, 42, .2), transparent 40%),
+    radial-gradient(circle at 50% 50%, #1a1208, #050505 72%);
+  border: 1px solid rgba(255, 140, 42, .35);
+  box-shadow: 0 0 40px rgba(255, 106, 0, .25), inset 0 0 24px rgba(0, 0, 0, .6);
 }
 
 .disc svg {
@@ -1104,7 +1107,7 @@ body.is-playing .play-btn .i-pause {
   width: 100%;
   height: 4px;
   border-radius: 99px;
-  background: linear-gradient(90deg, var(--gold) var(--pos, 0%), rgba(232, 195, 158, .18) var(--pos, 0%));
+  background: linear-gradient(90deg, var(--gold) var(--pos, 0%), rgba(255, 140, 42, .18) var(--pos, 0%));
   outline: none;
 }
 
