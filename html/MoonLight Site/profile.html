@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Профиль — MoonLight Visual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- SVG-спрайт иконок -->
+  <svg style="display:none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <circle cx="12" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="8" cy="10.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="8" cy="15.5" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="13" r="1.3" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <path d="M3.27 6.96L12 12.01l8.73-5.05"/>
+      <path d="M12 22.08V12"/>
+    </symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l1.9 5.8L19.7 10l-5.8 1.9L12 17.7l-1.9-5.8L4.3 12l5.8-1.9L12 3z"/>
+      <path d="M19 3v4"/><path d="M17 5h4"/>
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <path d="M3.3 7L12 12l8.7-5"/><path d="M12 22V12"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <path d="M2 7l10 6 10-6"/>
+    </symbol>
+    <symbol id="i-discord" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+      <circle cx="9" cy="12" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="12" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="4"/>
+      <path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"/>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 20h20"/>
+      <path d="M3 20l1.5-9 4.5 4 3-7 3 7 4.5-4L21 20"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    </symbol>
+    <symbol id="i-gem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 3h12l4 6-10 12L2 9l4-6z"/>
+      <path d="M2 9h20"/>
+      <path d="M12 21L8 9l4-6 4 6-4 12z"/>
+    </symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 12v10H4V12"/>
+      <path d="M2 7h20v5H2z"/>
+      <path d="M12 21V7"/>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+    </symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+    </symbol>
+    <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 6v6l4 2"/>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6L9 17l-5-5"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-loader" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9" stroke-dasharray="14 6" opacity="0.9"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+      <path d="M1 1l22 22"/>
+    </symbol>
+  </svg>
+
+  <!-- Анимированный фон -->
+  <canvas id="starfield"></canvas>
+  <div class="bg-gradient"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Навигация -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon"><svg class="icon"><use href="#i-moon"></use></svg></span>
+        <span class="logo-text">MoonLight Visual</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="index.html#home" class="nav-link">Главная</a>
+        <a href="index.html#about" class="nav-link">О нас</a>
+        <a href="index.html#status" class="nav-link">Статус</a>
+        <a href="index.html#contact" class="nav-link">Контакты</a>
+        <div class="nav-user" id="navUser">
+          <a href="profile.html" class="btn-profile btn-profile-active"><svg class="icon"><use href="#i-user"></use></svg> Профиль</a>
+          <span class="user-greeting" id="userGreeting"></span>
+          <button class="btn-logout" onclick="logout()">Выйти</button>
+        </div>
+      </div>
+      <button class="burger" id="burger" onclick="toggleBurger()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Контент профиля -->
+  <section class="profile-section">
+    <div class="profile-container" id="profileContainer">
+      <!-- Заполняется через JS -->
+    </div>
+  </section>
+
+  <!-- Модальное окно: Редактирование имени -->
+  <div class="modal-overlay" id="editNameModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('editNameModal')">×</button>
+      <div class="modal-header">
+        <h2 class="modal-title">Изменить имя</h2>
+        <p class="modal-subtitle">Введите новое имя пользователя</p>
+      </div>
+      <form class="auth-form" id="editNameForm" onsubmit="handleEditName(event)">
+        <div class="form-group">
+          <label for="editNameInput">Новое имя</label>
+          <input type="text" id="editNameInput" placeholder="Как вас зовут?" required minlength="2">
+          <span class="form-error" id="editNameError"></span>
+        </div>
+        <button type="submit" class="btn-submit">Сохранить</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Смена пароля -->
+  <div class="modal-overlay" id="editPasswordModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('editPasswordModal')">×</button>
+      <div class="modal-header">
+        <h2 class="modal-title">Сменить пароль</h2>
+        <p class="modal-subtitle">Введите старый и новый пароль</p>
+      </div>
+      <form class="auth-form" id="editPasswordForm" onsubmit="handleEditPassword(event)">
+        <div class="form-group">
+          <label for="oldPassword">Текущий пароль</label>
+          <div class="password-wrapper">
+            <input type="password" id="oldPassword" placeholder="Ваш текущий пароль" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('oldPassword', this)"><svg class="icon"><use href="#i-eye"></use></svg></button>
+          </div>
+          <span class="form-error" id="oldPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Новый пароль</label>
+          <div class="password-wrapper">
+            <input type="password" id="newPassword" placeholder="Минимум 6 символов" required minlength="6">
+            <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)"><svg class="icon"><use href="#i-eye"></use></svg></button>
+          </div>
+          <span class="form-error" id="newPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <label for="confirmNewPassword">Подтвердите новый пароль</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirmNewPassword" placeholder="Повторите новый пароль" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('confirmNewPassword', this)"><svg class="icon"><use href="#i-eye"></use></svg></button>
+          </div>
+          <span class="form-error" id="confirmNewPasswordError"></span>
+        </div>
+        <button type="submit" class="btn-submit">Сменить пароль</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Удаление аккаунта -->
+  <div class="modal-overlay" id="deleteAccountModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('deleteAccountModal')">×</button>
+      <div class="modal-header">
+        <h2 class="modal-title" style="color: var(--danger);">Удалить аккаунт</h2>
+        <p class="modal-subtitle">Это действие необратимо. Все данные будут потеряны.</p>
+      </div>
+      <form class="auth-form" id="deleteAccountForm" onsubmit="handleDeleteAccount(event)">
+        <div class="form-group">
+          <label for="deletePassword">Введите пароль для подтверждения</label>
+          <div class="password-wrapper">
+            <input type="password" id="deletePassword" placeholder="Ваш пароль" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('deletePassword', this)"><svg class="icon"><use href="#i-eye"></use></svg></button>
+          </div>
+          <span class="form-error" id="deletePasswordError"></span>
+        </div>
+        <button type="submit" class="btn-submit btn-delete">Удалить аккаунт навсегда</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Активация кода подписки -->
+  <div class="modal-overlay" id="redeemCodeModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('redeemCodeModal')">×</button>
+      <div class="modal-header">
+        <h2 class="modal-title">Активация кода</h2>
+        <p class="modal-subtitle">Введите промокод для активации подписки</p>
+      </div>
+      <form class="auth-form" id="redeemCodeForm" onsubmit="handleRedeemCode(event)">
+        <div class="form-group">
+          <label for="codeInput">Промокод</label>
+          <input type="text" id="codeInput" placeholder="Например: MOONLIGHT2026" required style="text-transform: uppercase;">
+          <span class="form-error" id="codeInputError"></span>
+        </div>
+        <button type="submit" class="btn-submit">Активировать</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Уведомление -->
+  <div class="toast" id="toast"></div>
+
+  <script src="starfield.js"></script>
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script src="codes.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

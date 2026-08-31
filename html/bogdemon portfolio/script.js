@@ -250,10 +250,8 @@
   const timeCur = $("#timeCur");
   const timeDur = $("#timeDur");
   const statusEl = $("#playerStatus");
-  const deezerFrame = $("#deezerFrame");
-  const TRACK_DUR = 127;
+  const TRACK_DUR = 30;
   const DEEZER = "https://api.deezer.com/track/3152690101";
-  const DEEZER_EMBED = "https://widget.deezer.com/widget/dark/track/3152690101";
   let srcReady = false;
   let seeking = false;
 
@@ -299,25 +297,6 @@
     if (statusEl) statusEl.textContent = text;
   };
 
-  const showEmbed = (which) => {
-    $$(".embed-tabs .chip").forEach((c) => {
-      const on = c.dataset.embed === which;
-      c.classList.toggle("is-on", on);
-      c.setAttribute("aria-selected", String(on));
-    });
-    const deezerBox = $("#embedDeezer");
-    const yandexBox = $("#embedYandex");
-    if (deezerBox) deezerBox.hidden = which !== "deezer";
-    if (yandexBox) yandexBox.hidden = which !== "yandex";
-  };
-
-  const playEmbed = (which = "yandex") => {
-    if (which === "deezer" && deezerFrame) {
-      deezerFrame.src = `${DEEZER_EMBED}?autoplay=true&tracklist=false`;
-    }
-    showEmbed(which);
-  };
-
   const ensureSrc = async () => {
     if (srcReady && audio.src) return true;
     setStatus("Подключаю трек…");
@@ -339,9 +318,7 @@
       await audio.play();
       setStatus("Играет на сайте.");
     } catch (err) {
-      playEmbed("yandex");
-      document.getElementById("listen").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
-      setStatus("Прямой плеер недоступен — трек открыт в Яндекс Музыке ниже.");
+      setStatus("Трек не загрузился — проверь соединение и нажми Play ещё раз.");
     }
   };
 
@@ -349,8 +326,8 @@
   audio.addEventListener("pause", () => setPlaying(false));
   audio.addEventListener("ended", () => {
     setPlaying(false);
-    playEmbed("yandex");
-    setStatus("Превью закончилось — полный трек в Яндекс Музыке ниже.");
+    audio.currentTime = 0;
+    setStatus("Превью закончилось — Play, чтобы послушать снова.");
   });
   audio.addEventListener("loadedmetadata", () => {
     timeDur.textContent = fmt(audio.duration || TRACK_DUR);
@@ -375,9 +352,5 @@
 
   [playBtn, coverBtn, dockPlay, dockCover].forEach((btn) => {
     if (btn) btn.addEventListener("click", toggle);
-  });
-
-  $$(".embed-tabs .chip").forEach((chip) => {
-    chip.addEventListener("click", () => showEmbed(chip.dataset.embed));
   });
 })();

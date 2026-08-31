@@ -7,6 +7,7 @@ venv/
 .idea/
 *.log
 .DS_Store
+node_modules/
 
 # Java / Gradle
 build/
