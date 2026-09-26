@@ -94,7 +94,65 @@ Serial Monitor (кнопка внизу справа) — **115200 бод**.
 
 ---
 
-## 6. Симуляция без железа
+## 6. Если Arduino IDE зависает на экране загрузки
+
+На некоторых сетях `arduino.cc`, `downloads.arduino.cc` и `editor.arduino.cc`
+отдают **403 Forbidden** (доступ закрыт). Из-за этого:
+
+* не скачивается новая версия IDE (нужен VPN или другая сеть);
+* IDE может зависать на заставке — она ждёт ответы этих серверов;
+* в Boards Manager не ставится ядро ESP8266.
+
+Проверить доступность:
+
+```powershell
+curl.exe -s -o NUL -w "%{http_code}`n" https://downloads.arduino.cc/arduino-ide/
+```
+
+`200` — всё в порядке, `403` — доступ закрыт.
+
+### Обходной путь: arduino-cli без IDE
+
+Всё нужное ставится с GitHub (он доступен) и уже установлено:
+
+| Что | Где |
+|---|---|
+| arduino-cli 1.5.1 | `C:\Users\<user>\Tools\arduino-cli\arduino-cli.exe` |
+| ядро ESP8266 3.1.2 | `C:\Users\<user>\Tools\arduino-cli\packages\esp8266` |
+
+Команды (PowerShell):
+
+```powershell
+$cli = "$env:USERPROFILE\Tools\arduino-cli\arduino-cli.exe"
+
+& $cli compile -b esp8266:esp8266:generic  ".\esp12f_server"      # сервер
+& $cli compile -b esp8266:esp8266:nodemcuv2 ".\esp8266_relay"     # устройство
+```
+
+Если появится ошибка про `ctags`, добавь путь к ctags:
+
+```powershell
+$ct = (Get-Command ctags).Source | Split-Path -Parent
+& $cli compile -b esp8266:esp8266:generic ".\esp12f_server" --build-property "runtime.tools.ctags.path=$ct"
+```
+
+Готовые размеры после сборки: сервер ~280 КБ (26 % флеша), устройство ~259 КБ (24 %).
+
+Прошивка платы (нужен подключённый USB, порт виден в диспетчере устройств):
+
+```powershell
+& $cli upload -p COM3 -b esp8266:esp8266:generic ".\esp12f_server"
+```
+
+Подключение к Serial Monitor (115200):
+
+```powershell
+& $cli monitor -p COM3 -c baudrate=115200
+```
+
+---
+
+## 7. Симуляция без железа
 
 Проекты для <https://wokwi.com> лежат в `wokwi/`: `esp12f_server` и `esp8266mod_device`.
 Как открыть — в `wokwi/README.md`.

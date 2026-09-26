@@ -266,8 +266,12 @@ void setup() {
   bool ok = (*AP_PASS && strlen(AP_PASS) >= 8)
                 ? WiFi.softAP(AP_SSID, AP_PASS)
                 : WiFi.softAP(AP_SSID);
-  Serial.print(F("точка доступа: "));
-  Serial.println(ok ? AP_SSID : F("ошибка запуска"));
+  if (ok) {
+    Serial.print(F("точка доступа: "));
+    Serial.println(AP_SSID);
+  } else {
+    Serial.println(F("ошибка запуска точки доступа"));
+  }
 
   dns.start(53, "*", IPAddress(192, 168, 4, 1));
 
