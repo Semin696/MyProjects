@@ -25,7 +25,7 @@
 |---|---|---|
 | `esp12f_server/esp12f_server.ino` | ESP-12F (ESP8266EX) | точка доступа, веб-панель, реестр устройств, консоль |
 | `esp8266_relay/esp8266_relay.ino` | ESP8266MOD (NodeMCU v2/v3, ESP-12E) | поиск сети, подключение, управление реле, консоль |
-| `wokwi/device/`, `wokwi/server/` | ESP32 в Wokwi | схема и симуляция (Wokwi не поддерживает ESP8266) — см. `wokwi/README.md` |
+| `wokwi/esp12f_server/`, `wokwi/esp8266mod_device/` | ESP32 в Wokwi | схема и симуляция (Wokwi не поддерживает ESP8266) — см. `wokwi/README.md` |
 
 ---
 

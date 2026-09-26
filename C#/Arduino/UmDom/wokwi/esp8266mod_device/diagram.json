@@ -45,7 +45,7 @@
       "top": 20,
       "left": 30,
       "attrs": {
-        "text": "Устройство ESP8266MOD (в Wokwi — ESP32, ESP8266 не поддерживается)"
+        "text": "Плата УСТРОЙСТВА: ESP8266MOD (реле SRD-05VDC-SL-C).\nВ симуляции Wokwi — ESP32, потому что Wokwi не поддерживает ESP8266.\nПин реле: ESP8266MOD D1 (GPIO5) = ESP32 GPIO5"
       }
     },
     {

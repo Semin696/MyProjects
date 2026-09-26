@@ -1,18 +1,22 @@
 # Проекты для Wokwi (https://wokwi.com)
 
-Готовые проекты-симуляции: схема подключения реле и логика сервера.
-Реальные скетчи для железа лежат в `../esp12f_server` и `../esp8266_relay`.
+Два симуляционных проекта — по одному на каждую плату:
 
-## Почему ESP32, а не ESP8266
+| Проект в Wokwi | Реальная плата | Скетч |
+|---|---|---|
+| `esp12f_server/` | **ESP-12F** — сервер | `../esp12f_server/esp12f_server.ino` |
+| `esp8266mod_device/` | **ESP8266MOD** — устройство с реле | `../esp8266_relay/esp8266_relay.ino` |
+
+## Почему в схемах ESP32
 
 Wokwi не поддерживает ESP8266 — в списке плат только AVR (Uno/Nano/Mega/ATtiny85),
-ESP32, STM32, Pi Pico. Поэтому схема нарисована на ESP32 DevKit C V4:
-распиновка и логика те же, отличается только номер пина
-(GPIO5 в симуляции = D1/GPIO5 на ESP8266MOD).
+ESP32, STM32, Pi Pico. Поэтому в симуляции стоит ESP32 DevKit C V4, а подписи на схеме
+указывают настоящую плату. Распиновка совпадает по нужному пину:
+ESP32 `GPIO5` = ESP8266MOD `D1` (GPIO5).
 
 Реле SRD-05VDC-SL-C в Wokwi — это деталь `wokwi-ks2e-m-dc5` (то же семейство 5 В SPDT).
 
-## Проект 1: `device` — устройство-реле
+## Проект 1: `esp8266mod_device` — устройство-реле
 
 Файлы: `diagram.json`, `umdom_relay_sim/umdom_relay_sim.ino`
 
@@ -33,7 +37,7 @@ ESP32, STM32, Pi Pico. Поэтому схема нарисована на ESP32
 В симуляции пин включает обмотку напрямую, поэтому `ACTIVE_LOW = false`.
 В реальной схеме реле включается через транзистор, там `ACTIVE_LOW = true`.
 
-## Проект 2: `server` — сервер
+## Проект 2: `esp12f_server` — сервер
 
 Файлы: `diagram.json`, `umdom_server_sim/umdom_server_sim.ino`
 
@@ -50,14 +54,14 @@ ESP32, STM32, Pi Pico. Поэтому схема нарисована на ESP32
 1. Зайди на <https://wokwi.com> (нужен аккаунт, бесплатный).
 2. Создай проект: **New Project → Blank/ESP32**.
 3. В дереве файлов открой `diagram.json`, вставь содержимое
-   `device/diagram.json` (или `server/diagram.json`).
+   `esp12f_server/diagram.json` (или `esp8266mod_device/diagram.json`).
 4. Открой файл скетча, вставь содержимое соответствующего `.ino`.
 5. Нажми **Play**. Слева внизу — Serial Monitor.
 
 Способ 2 — расширение для VS Code:
 
 1. Установи расширение **Wokwi for VS Code**.
-2. `File → Open Folder` → папку `wokwi/device` (или `wokwi/server`).
+2. `File → Open Folder` → папку `wokwi/esp12f_server` (или `wokwi/esp8266mod_device`).
 3. Нажми **Simulate**.
 
 ## Что можно поменять в схеме
