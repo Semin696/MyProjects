@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "author": "UmDom",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 60,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 60,
+      "left": 380,
+      "attrs": {
+        "color": "green",
+        "label": "сервер работает"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 300,
+      "left": 330,
+      "attrs": {
+        "color": "green",
+        "label": "ВКЛ / ВЫКЛ (сайт)",
+        "key": "1",
+        "bounce": "0"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t1",
+      "top": 20,
+      "left": 30,
+      "attrs": {
+        "text": "ESP-12F — сервер умного дома (в Wokwi — ESP32, ESP8266 не поддерживается)"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t2",
+      "top": 170,
+      "left": 300,
+      "attrs": {
+        "text": "точка доступа WiFi: UmDom\nпанель: http://192.168.4.1/\n\nКнопка и Serial Monitor (on / off / toggle) —\nэто те же запросы, что шлёт сайт:\nGET /api/toggle?id=<chipid>"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t3",
+      "top": 400,
+      "left": 300,
+      "attrs": {
+        "text": "каждые 5 с плата опрашивает сама себя и печатает /api/state —\nпроверка, что веб-сервер и API работают"
+      }
+    }
+  ],
+  "connections": [
+    ["esp:TX", "$serialMonitor:RX", "", []],
+    ["esp:RX", "$serialMonitor:TX", "", []],
+    ["esp:2", "led1:A", "green", []],
+    ["led1:C", "esp:GND.1", "black", []],
+    ["btn1:1.l", "esp:27", "green", []],
+    ["btn1:2.l", "esp:GND.1", "black", []]
+  ],
+  "dependencies": {}
+}

@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "author": "UmDom",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 60,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ks2e-m-dc5",
+      "id": "relay1",
+      "top": 40,
+      "left": 440,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "lamp1",
+      "top": 40,
+      "left": 700,
+      "attrs": {
+        "color": "orange",
+        "label": "лампа 220 В"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 360,
+      "left": 330,
+      "attrs": {
+        "color": "green",
+        "label": "ВКЛ / ВЫКЛ (сайт)",
+        "key": "1",
+        "bounce": "0"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t1",
+      "top": 20,
+      "left": 30,
+      "attrs": {
+        "text": "Устройство ESP8266MOD (в Wokwi — ESP32, ESP8266 не поддерживается)"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t2",
+      "top": 300,
+      "left": 330,
+      "attrs": {
+        "text": "в реальной схеме: GPIO5 (D1) → 1 кОм → база 2N2222, эмиттер на GND.\n1N4148 параллельно обмотке. В Wokwi транзисторов и диодов нет,\nпин включает обмотку напрямую."
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t3",
+      "top": 0,
+      "left": 430,
+      "attrs": {
+        "text": "реле SRD-05VDC-SL-C (5 В, SPDT) — в Wokwi это KS2E-M-DC5"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t4",
+      "top": 170,
+      "left": 560,
+      "attrs": {
+        "text": "контакты реле:\nP1 = COM (общий)\nNO1 = нормально разомкнутый\nNC1 = нормально замкнутый"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "t5",
+      "top": 460,
+      "left": 240,
+      "attrs": {
+        "text": "Serial Monitor: on / off / toggle / status"
+      }
+    }
+  ],
+  "connections": [
+    ["esp:TX", "$serialMonitor:RX", "", []],
+    ["esp:RX", "$serialMonitor:TX", "", []],
+    ["esp:5", "relay1:COIL1", "orange", []],
+    ["relay1:COIL2", "esp:GND.1", "black", []],
+    ["relay1:P1", "esp:GND.3", "black", []],
+    ["relay1:NO1", "lamp1:A", "red", []],
+    ["lamp1:C", "esp:GND.2", "black", []],
+    ["btn1:1.l", "esp:27", "green", []],
+    ["btn1:2.l", "esp:GND.1", "black", []]
+  ],
+  "dependencies": {}
+}
